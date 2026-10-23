@@ -447,7 +447,7 @@ function daySummary(rows, day, age, rhr) {
 //         kv    {k, v}                             - settings, theme, sync log, pending clock-reset readings
 const SEC_KEEP = 48 * 3600;
 class Store {
-  constructor(name = "pulse") { this.name = name; this.days = new Map(); this.dirtyDays = new Set(); this.kv = new Map(); this.version = 0; this.mem = !root.indexedDB; }
+  constructor(name = "pulse") { this.name = name; this.days = new Map(); this.keys = new Set(); this.dirtyDays = new Set(); this.kv = new Map(); this.version = 0; this.mem = !root.indexedDB; }
   async open() {
     if (this.mem) return;
     this.db = await new Promise((res, rej) => {
@@ -456,7 +456,10 @@ class Store {
       r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
     });
     for (const x of await this._all("kv")) this.kv.set(x.k, x.v);
-    for (const x of await this._all("days")) this.days.set(x.day, new Map(Object.entries(x.rows).map(([t, r]) => [+t, r])));
+    // only the day list is read at start; a day's minutes load when something needs them
+    for (const k of await new Promise((res, rej) => { const r = this._tx("days").getAllKeys(); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })) this.keys.add(k);
+    const today = localDay(now());
+    for (let i = 0; i < 4; i++) await this.load(addDays(today, -i));
     try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) { /* best effort */ }
   }
   _tx(store, mode = "readonly") { return this.db.transaction(store, mode).objectStore(store); }
@@ -464,6 +467,17 @@ class Store {
   _put(store, val) { if (this.mem) return Promise.resolve(); return new Promise((res, rej) => { const r = this._tx(store, "readwrite").put(val); r.onsuccess = () => res(); r.onerror = () => rej(r.error); }); }
   _get(store, key) { if (this.mem) return Promise.resolve(undefined); return new Promise((res, rej) => { const r = this._tx(store).get(key); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
   _del(store, range) { if (this.mem) return Promise.resolve(); return new Promise((res, rej) => { const r = this._tx(store, "readwrite").delete(range); r.onsuccess = () => res(); r.onerror = () => rej(r.error); }); }
+  async load(day) {
+    if (this.days.has(day) || !this.keys.has(day) || this.mem) return;
+    const x = await this._get("days", day);
+    if (x && !this.days.has(day)) this.days.set(day, new Map(Object.entries(x.rows).map(([t, r]) => [+t, r])));
+  }
+  async loadSpan(t0, t1) { for (let d = localDay(t0); d <= localDay(t1 - 1); d = addDays(d, 1)) await this.load(d); }
+  // keep memory small: drop loaded days that are not recent and not waiting to be saved
+  evict(keep = 4) {
+    const cut = addDays(localDay(now()), -keep);
+    for (const d of [...this.days.keys()]) if (d < cut && !this.dirtyDays.has(d)) this.days.delete(d);
+  }
   get(k, d = null) { return this.kv.has(k) ? this.kv.get(k) : d; }
   async put(k, v) { this.kv.set(k, v); await this._put("kv", { k, v }); }
   minutes(t0, t1) {
@@ -477,7 +491,7 @@ class Store {
   setMinute(row) {
     const day = localDay(row[0]);
     if (!this.days.has(day)) this.days.set(day, new Map());
-    this.days.get(day).set(row[0], row); this.dirtyDays.add(day);
+    this.days.get(day).set(row[0], row); this.dirtyDays.add(day); this.keys.add(day);
   }
   async saveDays() {
     for (const day of this.dirtyDays) {
@@ -503,29 +517,37 @@ class Store {
   }
   async secsFor(m, mem) { return mem.get(m) || (await this._get("secs", m) || { rows: [] }).rows; }
   async pruneSecs() { if (!this.mem && root.IDBKeyRange) await this._del("secs", IDBKeyRange.upperBound(now() - SEC_KEEP)); }
-  firstDay() { const k = [...this.days.keys()].sort(); return k[0] || null; }
-  dayKeys() { return [...this.days.keys()].sort(); }
+  dayKeys() { return [...this.keys].sort(); }
 }
 
 /* ------------------------------------------------------------------ analysis over the store */
 class Analysis {
-  constructor(store) { this.s = store; this.ver = -1; this.cache = null; this.nightCache = new Map(); this.dayCache = new Map(); }
-  invalidate(days) { for (const d of days) { this.nightCache.delete(d); this.nightCache.delete(addDays(d, 1)); this.dayCache.delete(d); } }
-  all(conf) {
-    if (this.cache && this.ver === this.s.version) return this.cache;
-    const today = localDay(now()), have = this.s.dayKeys();
+  constructor(store) { this.s = store; this.ver = -1; this.cache = null; this.saved = null; }
+  // results for settled days (older than two days) are kept in storage, so their minutes never need loading again
+  settled() { if (!this.saved) this.saved = Object.assign({}, this.s.get("analysis_v1", {})); return this.saved; }
+  invalidate(days) { const c = this.settled(); for (const d of days) { if (c[d] || c[addDays(d, 1)]) this.dirty = true; delete c[d]; delete c[addDays(d, 1)]; } if (days.length) this.ver = -1; }
+  all(conf) {                                        // one computation at a time; callers share it
+    if (this.running) return this.running;
+    this.running = this._all(conf).finally(() => { this.running = null; });
+    return this.running;
+  }
+  async _all(conf) {
+    if (this.cache && this.ver === this.s.version && this.cacheDay === localDay(now())) return this.cache;
+    const today = localDay(now()), have = this.s.dayKeys(), saved = this.settled();
     const todo = [...new Set([...have, ...have.map(d => addDays(d, 1))])].sort();
-    const nights = [], days = [];
+    const nights = [], days = []; let wrote = false;
     for (const day of todo) {
       if (day > today || (conf.since && day < conf.since)) continue;
       const recent = (dayStart(today) - dayStart(day)) / 86400 <= 2;
-      let n;
-      if (!recent && this.nightCache.has(day)) n = this.nightCache.get(day) && { ...this.nightCache.get(day) };
+      let raw, sum_;
+      if (!recent && saved[day]) ({ n: raw, s: sum_ } = saved[day]);
       else {
-        const t0 = dayStart(day) - 6 * 3600, t1 = dayStart(day) + 14 * 3600;
-        const raw = nightFor(this.s.minutes(t0, t1).map(rowObj), day);
-        this.nightCache.set(day, raw); n = raw && { ...raw };
+        const t0 = dayStart(day) - 6 * 3600, t1 = dayStart(day) + 86400;
+        await this.s.loadSpan(t0, t1);
+        raw = nightFor(this.s.minutes(t0, dayStart(day) + 14 * 3600).map(rowObj), day);
+        sum_ = undefined;
       }
+      const n = raw && { ...raw };
       if (n) {
         const prev = nights.filter(x => x.temp).slice(-30);
         n.temp_dev = n.temp && prev.length >= 3 ? round(n.temp - median(prev.map(x => x.temp)), 2) : null;
@@ -535,12 +557,13 @@ class Analysis {
         nights.push(n);
       }
       const rhr = nights.length && nights[nights.length - 1].day === day ? nights[nights.length - 1].rhr : null;
-      let s;
-      if (!recent && this.dayCache.has(day)) s = this.dayCache.get(day);
-      else { s = daySummary(this.s.minutes(dayStart(day), dayStart(day) + 86400).map(rowObj), day, conf.age, rhr); this.dayCache.set(day, s); }
-      if (s) days.push(s);
+      if (sum_ === undefined) sum_ = daySummary(this.s.minutes(dayStart(day), dayStart(day) + 86400).map(rowObj), day, conf.age, rhr);
+      if (sum_) days.push(sum_);
+      if (!recent && !saved[day]) { saved[day] = { n: raw, s: sum_ }; wrote = true; }
     }
-    this.cache = { nights, days }; this.ver = this.s.version;
+    if (wrote || this.dirty) { this.dirty = false; await this.s.put("analysis_v1", saved); }
+    this.s.evict();
+    this.cache = { nights, days }; this.ver = this.s.version; this.cacheDay = today;
     return this.cache;
   }
 }
@@ -766,7 +789,7 @@ class Pulse {
       const todo = [...this.dirtyMinutes].sort((a, b) => a - b); this.dirtyMinutes.clear();
       for (const m of todo) {
         const rows = [...(await this.store.secsFor(m - 60, this.secMem)).filter(s => s[0] === m - 1), ...await this.store.secsFor(m, this.secMem)];
-        const row = minuteRow(m, rows); if (row) this.store.setMinute(row);
+        const row = minuteRow(m, rows); if (row) { await this.store.load(localDay(m)); this.store.setMinute(row); }
       }
       const changed = await this.store.saveDays();
       this.an.invalidate(changed);
@@ -776,8 +799,13 @@ class Pulse {
   }
 
   /* --- backups and the one-time import from the Mac --- */
-  exportBackup() {
-    const days = {}; for (const [d, m] of this.store.days) { const o = {}; for (const [t, r] of m) o[t] = r; days[d] = o; }
+  async exportBackup() {
+    const days = {};
+    for (const d of this.store.dayKeys()) {
+      await this.store.load(d);
+      const o = {}; for (const [t, r] of this.store.days.get(d) || []) o[t] = r; days[d] = o;
+      this.store.evict();
+    }
     const kv = {}; for (const [k, v] of this.store.kv) kv[k] = v;
     return JSON.stringify({ pulse: 1, cols: MIN_COLS, days, kv, exported: now() });
   }
@@ -788,29 +816,51 @@ class Pulse {
     let n = 0;
     for (const day of Object.keys(j.days)) for (const r of Object.values(j.days[day])) {
       const row = map.map(i => i < 0 ? null : r[i]);
+      await this.store.load(localDay(row[0]));
       const have = this.store.days.get(localDay(row[0]));
       if (have && have.has(row[0]) && (have.get(row[0])[15] || 0) >= (row[15] || 0)) continue;     // keep richer local rows
       this.store.setMinute(row); n++;
     }
     for (const k of ["theme", "conf"]) if (j.kv && j.kv[k] && !this.store.get(k)) await this.store.put(k, j.kv[k]);
-    const changed = await this.store.saveDays(); this.an.invalidate(changed);
+    const changed = await this.store.saveDays(); this.an.invalidate(changed); this.store.evict();
     return n;
   }
+
+  /* --- Apple Health, through the Shortcuts app ---
+   * Web pages cannot write to Health, but a Shortcut can. Pulse hands the Shortcut a small JSON
+   * (heart rate as 10-minute averages, resting heart rate and HRV once per night) on the clipboard. */
+  async healthPayload(resend) {
+    const last = resend ? {} : this.store.get("health_last", {}), t = now(), from = Math.max(last.hr || 0, t - 7 * 86400);
+    await this.store.loadSpan(from, t);
+    const rows = this.store.minutes(from, t).filter(r => r[1] && r[0] + 60 <= t - 60);
+    const hr = [], slots = new Map();
+    for (const r of rows) { const k = r[0] - r[0] % 600; if (!slots.has(k)) slots.set(k, []); slots.get(k).push(r[1]); }
+    for (const [k, v] of [...slots].sort((a, b) => a[0] - b[0])) if (k + 600 <= t - 60 && k + 600 > (last.hr || 0)) hr.push({ d: isoLocal(k + 300), v: Math.round(sum(v) / v.length) });
+    const nights = (await this.an.all(this.conf())).nights.filter(n => n.day > (last.night || "") && n.day >= localDay(t - 7 * 86400) && n.day < localDay(t + 86400));
+    const rhr = nights.filter(n => n.rhr).map(n => ({ d: isoLocal(n.end), v: n.rhr }));
+    const hrv = nights.filter(n => n.hrv).map(n => ({ d: isoLocal(n.end), v: n.hrv }));
+    const mark = { hr: slots.size ? Math.max(...[...slots.keys()].filter(k => k + 600 <= t - 60), last.hr || 0) + 600 : last.hr || 0,
+      night: nights.length ? nights[nights.length - 1].day : last.night || "" };
+    // only settled nights count as sent: last night may still change while today's data arrives
+    if (nights.length && nights[nights.length - 1].day === localDay(t) && t - nights[nights.length - 1].end < 3 * 3600) mark.night = last.night || "";
+    return { payload: { pulse: 1, hr, rhr, hrv }, mark, counts: { hr: hr.length, rhr: rhr.length, hrv: hrv.length } };
+  }
+  async healthSent(mark) { await this.store.put("health_last", Object.assign({}, mark, { at: now() })); }
 
   /* --- the page's requests (same answers the Mac server gave) --- */
   async api(path, body) {
     const u = new URL(path, "https://pulse.local"), q = Object.fromEntries(u.searchParams), p = u.pathname, c = this.conf();
-    if (p === "/api/now") return this.apiNow(c);
+    if (p === "/api/now") return this.apiNow(c, await this.an.all(c));
     if (p === "/api/hr") return this.apiHr(q.range || "600");
-    if (p === "/api/nights") return [...this.an.all(c).nights].reverse().slice(0, 60);
+    if (p === "/api/nights") return [...(await this.an.all(c)).nights].reverse().slice(0, 60);
     if (p === "/api/trend") {
       const src = { recovery: ["nights", "recovery"], hrv: ["nights", "hrv"], rhr: ["nights", "rhr"], sleep: ["nights", "asleep"], rest: ["nights", "rest"], temp: ["nights", "temp"], steps: ["days", "steps"], strain: ["days", "strain"] }[q.metric] || ["nights", "recovery"];
       const cut = localDay(now() - (+q.days || 30) * 86400);
-      return this.an.all(c)[src[0]].filter(x => x.day > cut && x[src[1]] != null).map(x => [dayStart(x.day) + 43200, x[src[1]]]);
+      return (await this.an.all(c))[src[0]].filter(x => x.day > cut && x[src[1]] != null).map(x => [dayStart(x.day) + 43200, x[src[1]]]);
     }
     if (p === "/api/settings") {
       if (body && body.sync_every) { if (![5, 15, 30, 60].includes(+body.sync_every)) throw new Error("Pick 5, 15, 30 or 60 minutes."); await this.store.put("conf", Object.assign(c, { sync_every: +body.sync_every })); }
-      return Object.assign({}, this.conf(), { version: VERSION, days: this.store.days.size, records: this.store.get("records", 0), web: true }, this.strapStatus());
+      return Object.assign({}, this.conf(), { version: VERSION, days: this.store.keys.size, records: this.store.get("records", 0), web: true }, this.strapStatus());
     }
     if (p === "/api/sync") { this.st.want_sync = true; return { ok: true }; }
     if (p === "/api/theme") {
@@ -823,8 +873,8 @@ class Pulse {
     const pack = this.st.pack && now() - this.st.pack.at < 900 ? this.st.pack : null;
     return { strap_newest: this.store.get("strap_newest"), clock_off: this.st.clock_off != null ? this.st.clock_off : this.store.get("clock_off"), not_saving: false, pack, charging: this.st.charging };
   }
-  apiNow(c) {
-    const st = this.st, a = this.an.all(c), today = localDay(now());
+  apiNow(c, a) {
+    const st = this.st, today = localDay(now());
     const night = [...a.nights].reverse().find(n => n.day === today), last = night || a.nights[a.nights.length - 1] || null;
     const day = a.days.find(d => d.day === today) || null;
     const prev = a.nights.filter(n => last && n.day < last.day).slice(-30);
@@ -836,10 +886,11 @@ class Pulse {
       battery: st.battery, target: c.target, sync: st.sync, sync_pct: st.sync_pct, sync_seen: st.sync_seen, sync_ok: st.sync_ok, sync_note: st.sync_note,
       last_sync: this.store.get("last_sync"), night: nightOut, night_today: !!night, base: { rhr: base("rhr"), hrv: base("hrv") }, day, now: now() }, this.strapStatus());
   }
-  apiHr(rng) {
+  async apiHr(rng) {
     const t = now();
     if (rng === "day") {
       const t0 = dayStart(localDay(t));
+      await this.store.load(localDay(t));
       const pts = this.store.minutes(t0, t + 60).filter(r => r[1]).map(r => [r[0], round(r[1], 1)]);
       return { from: t0, to: t, gap: 600, points: decimate(pts, 288) };
     }
@@ -849,8 +900,13 @@ class Pulse {
     return { from: t0, to: t, gap: 30, points: pts };
   }
 }
-const VERSION = "web-2026.10.22-1";
+const VERSION = "web-2026.10.22-2";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+function isoLocal(t) {
+  const d = new Date(t * 1000), p = n => String(n).padStart(2, "0"), off = -d.getTimezoneOffset();
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) +
+    (off >= 0 ? "+" : "-") + p(Math.floor(Math.abs(off) / 60)) + ":" + p(Math.abs(off) % 60);
+}
 
 /* ------------------------------------------------------------------ Bluetooth wrapper */
 class BleLink {
