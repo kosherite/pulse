@@ -443,9 +443,9 @@ function daySummary(rows, day, age, rhr) {
 
 /* ------------------------------------------------------------------ storage (IndexedDB) */
 // stores: days  {day, rows: {t: minuteRowArray}}  - every minute, kept forever
-//         secs  {m, rows: [secTuple]}              - per-second detail for 48 h (to build minute rows)
+//         secs  {m, rows: [secTuple]}              - per-second detail for 3 h (to build minute rows and the short charts)
 //         kv    {k, v}                             - settings, theme, sync log, pending clock-reset readings
-const SEC_KEEP = 48 * 3600;
+const SEC_KEEP = 3 * 3600;     // minute rows are the permanent record; seconds only bridge chunk edges and feed the 1-hour chart
 class Store {
   constructor(name = "pulse") { this.name = name; this.days = new Map(); this.keys = new Set(); this.dirtyDays = new Set(); this.kv = new Map(); this.version = 0; this.mem = !root.indexedDB; }
   async open() {
@@ -505,18 +505,25 @@ class Store {
   // per-second rows for one minute (strap rows replace live rows for the same second)
   async addSecs(tuples, mem) {
     const by = new Map();
-    for (const s of tuples) { const m = s[0] - s[0] % 60; if (!by.has(m)) by.set(m, []); by.get(m).push(s); }
-    for (const [m, list] of by) {
-      const cur = mem.get(m) || (await this._get("secs", m) || { rows: [] }).rows;
-      const byT = new Map(cur.map(s => [s[0], s]));
-      for (const s of list) { const old = byT.get(s[0]); if (!old || s[9] >= old[9]) byT.set(s[0], s); }
-      const rows = [...byT.values()].sort((a, b) => a[0] - b[0]);
-      mem.set(m, rows); await this._put("secs", { m, rows });
-    }
+    for (const x of tuples) { const m = x[0] - x[0] % 60; if (!by.has(m)) by.set(m, []); by.get(m).push(x); }
+    const merge = (m, cur) => {
+      const byT = new Map(cur.map(x => [x[0], x]));
+      for (const x of by.get(m)) { const old = byT.get(x[0]); if (!old || x[9] >= old[9]) byT.set(x[0], x); }
+      const rows = [...byT.values()].sort((a, b) => a[0] - b[0]); mem.set(m, rows); return rows;
+    };
+    if (this.mem) { for (const m of by.keys()) merge(m, mem.get(m) || []); return [...by.keys()]; }
+    await new Promise((res, rej) => {
+      const tx = this.db.transaction("secs", "readwrite"), st = tx.objectStore("secs");
+      tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+      for (const m of by.keys()) {
+        if (mem.has(m)) { st.put({ m, rows: merge(m, mem.get(m)) }); continue; }
+        const g = st.get(m); g.onsuccess = () => st.put({ m, rows: merge(m, (g.result || { rows: [] }).rows) });
+      }
+    });
     return [...by.keys()];
   }
   async secsFor(m, mem) { return mem.get(m) || (await this._get("secs", m) || { rows: [] }).rows; }
-  async pruneSecs() { if (!this.mem && root.IDBKeyRange) await this._del("secs", IDBKeyRange.upperBound(now() - SEC_KEEP)); }
+  async pruneSecs(edge = Infinity) { if (!this.mem && root.IDBKeyRange) await this._del("secs", IDBKeyRange.upperBound(Math.min(now() - SEC_KEEP, edge - 180), true)); }
   dayKeys() { return [...this.keys].sort(); }
 }
 
@@ -818,7 +825,7 @@ class Pulse {
         if (done) {
           this.logStats("done"); this.stats = null;
           await this.flush();
-          Object.assign(this.st, { sync: "synced", sync_pct: null, synced_once: true });
+          Object.assign(this.st, { sync: "synced", sync_pct: null, synced_once: true }); this.histEdge = null;
           if (!this.repairNote) this.st.sync_note = "";
           this.repairNote = null;
           await this.store.put("last_sync", now());
@@ -853,6 +860,7 @@ class Pulse {
       const ms = await this.store.addSecs(good.map(secTuple), this.secMem);
       for (const m of ms) this.dirtyMinutes.add(m);
       const newest = Math.max(...good.map(r => r.t));
+      this.histEdge = Math.max(this.histEdge || 0, newest);
       if (newest > (this.store.get("strap_newest") || 0)) await this.store.put("strap_newest", newest);
       await this.store.put("records", (this.store.get("records") || 0) + good.length);
     }
@@ -868,8 +876,11 @@ class Pulse {
       }
       const changed = await this.store.saveDays();
       this.an.invalidate(changed);
-      for (const m of [...this.secMem.keys()]) if (m < now() - 7200) this.secMem.delete(m);
-      if (todo.length) await this.store.pruneSecs();
+      // rows are saved above before their seconds go; keep the last few minutes behind a running sync's edge,
+      // because the next chunk may finish them
+      const edge = this.histEdge || Infinity;
+      for (const m of [...this.secMem.keys()]) if (m < now() - 7200 && m < edge - 180) this.secMem.delete(m);
+      if (todo.length) await this.store.pruneSecs(edge);
     } finally { this.flushing = false; }
   }
 
@@ -994,7 +1005,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-7";
+const VERSION = "web-2026.10.23-8";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
