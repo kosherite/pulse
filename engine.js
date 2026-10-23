@@ -599,7 +599,7 @@ class Pulse {
       // show every nearby device: the strap advertises under its own name (for example "BAS WHOOP")
       const dev = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: [SVC, "heart_rate", "battery_service"] });
       await this.store.put("conf", Object.assign(c, { target: dev.name || c.target }));
-      this.link = new BleLink(dev, () => this.onDisconnect());
+      this.link = new BleLink(dev, () => this.onDisconnect()); this.link.onNote = m => this.note(m);
       await this.link.open();
     }
     this.st.link = "connected";
@@ -611,7 +611,7 @@ class Pulse {
     const target = this.conf().target, devs = await navigator.bluetooth.getDevices();
     const dev = devs.find(d => target && d.name === target) || devs.find(d => /whoop/i.test(d.name || "")) || null;
     if (!dev) return false;
-    this.link = new BleLink(dev, () => this.onDisconnect());
+    this.link = new BleLink(dev, () => this.onDisconnect()); this.link.onNote = m => this.note(m);
     this.st.link = "connecting";
     for (let i = 0; i < 3; i++) {
       try { await this.link.open(); this.st.link = "connected"; await this.session(); return true; }
@@ -650,11 +650,7 @@ class Pulse {
   // Confirmed writes are what the Mac uses; if iPhone rejects one, send it unconfirmed (what NOOP's iOS app does
   // for ordinary commands) and keep doing so for the rest of this connection.
   async write(data, response = true) {
-    if (response && !this.noResp) {
-      try { return await this.link.write(data, true); }
-      catch (e) { this.noResp = true; this.note("Confirmed write refused (" + errText(e) + "); switching to unconfirmed writes"); }
-    }
-    return this.link.write(data, false);
+    return this.link.write(data, response);
   }
 
   // one line per connection step, kept for Settings → About → Connection log
@@ -991,7 +987,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-4";
+const VERSION = "web-2026.10.23-5";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
@@ -1030,9 +1026,26 @@ class BleLink {
   write(data, response = true, ms) {
     return this.op(async () => {
       const c = await this.char(SVC, CMD);
-      if (response && c.writeValueWithResponse) return c.writeValueWithResponse(data);
-      if (!response && c.writeValueWithoutResponse) return c.writeValueWithoutResponse(data);
-      return c.writeValue(data);
+      if (!this.propsNoted && this.onNote) {
+        this.propsNoted = true; const pr = c.properties || {};
+        this.onNote("Command channel allows: " + (["write", "writeWithoutResponse"].filter(k => pr[k]).join(", ") || "nothing reported"));
+      }
+      // a plain ArrayBuffer of exactly the frame's bytes: some browsers mishandle typed-array views
+      const buf = new Uint8Array(data).buffer;
+      const ways = this.way ? [this.way] : response ? ["with", "without", "plain"] : ["without", "plain", "with"];
+      let err = null;
+      for (const w of ways) {
+        try {
+          if (w === "with" && c.writeValueWithResponse) await c.writeValueWithResponse(buf);
+          else if (w === "without" && c.writeValueWithoutResponse) await c.writeValueWithoutResponse(buf);
+          else if (w === "plain" && c.writeValue) await c.writeValue(buf);
+          else continue;
+          if (err && this.onNote) this.onNote("Writes work as '" + w + "' after: " + errText(err));
+          if (err) this.way = w;
+          return;
+        } catch (e) { err = err || e; }
+      }
+      throw err || new Error("no write method");
     }, ms);
   }
   read(svc, ch) { return this.op(async () => { const v = await (await this.char(svc, ch)).readValue(); return new Uint8Array(v.buffer, v.byteOffset, v.byteLength).slice(); }); }
