@@ -205,8 +205,6 @@ h3 { font-size: var(--t4); font-weight: 600; margin: 8px 0 0; letter-spacing: -0
 @media (max-width: 560px) {
   body { padding: 0 16px max(40px, env(safe-area-inset-bottom)); }
   header { margin: 0 -16px 8px; padding-left: 16px; padding-right: 16px; }
-  #tabs { width: 100%; display: flex; }
-  #tabs a { flex: 1; text-align: center; padding: 8px 4px; }
   :root { --pad: 20px; --gap: 12px; --t5: 26px; }
   .scores .s4 { grid-column: span 12; }
   .scores .card { display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto auto; column-gap: 16px; row-gap: 4px; }
@@ -263,21 +261,116 @@ html[data-fin="frosted"] header { background: var(--page); }
   .vitals .value { font-size: 22px; line-height: 28px; } .vitals .value small { font-size: 12px; margin-left: 2px; }
   .vitals .note { font-size: 11px; }
 }
+
+/* ---- app layout: large titles, liquid orbs, a card list and a floating tab bar ---- */
+body { position: relative; isolation: isolate; padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+.glow { position: absolute; left: 0; right: 0; top: 0; height: 560px; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--deep) 46%, transparent) 0%, color-mix(in srgb, var(--green) 24%, transparent) 42%, transparent 100%); }
+header.top { position: relative; background: transparent; border: 0; max-width: 1040px; margin: 0 auto 4px; padding: max(20px, env(safe-area-inset-top)) 0 0; }
+.titlebar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.ttl { min-width: 0; }
+.ttl h1 { margin: 0; font-size: 34px; line-height: 40px; font-weight: 700; letter-spacing: -0.03em; }
+.date { font-size: var(--t2); color: var(--sub); min-height: 18px; }
+.date:empty { display: none; }
+.icons { display: flex; gap: 8px; align-items: center; padding-top: 2px; flex: none; }
+.ic { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; position: relative; color: var(--faint); text-decoration: none; }
+.ic > svg { width: 22px; height: 22px; fill: currentColor; }
+#dot.on { color: var(--green); } #dot.wait { color: var(--gold); }
+.ring { background: color-mix(in srgb, var(--surface) 70%, transparent); }
+.ring svg { position: absolute; inset: 0; width: 36px; height: 36px; transform: rotate(-90deg); fill: none; }
+.ring .trk { stroke: var(--well); stroke-width: 3; }
+.ring .arc { stroke: var(--green); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 0 100; transition: stroke-dasharray .6s; }
+.ring i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
+.ring b { position: relative; font-size: 11px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+#ring-sync.spin svg { animation: spin 1.4s linear infinite; }
+@keyframes spin { from { transform: rotate(-90deg); } to { transform: rotate(270deg); } }
+.word { text-align: center; font-size: 15px; font-weight: 500; letter-spacing: .6em; padding-left: .6em; color: color-mix(in srgb, var(--ink) 70%, transparent); margin: 22px 0 22px; }
+body:not([data-v="today"]) .word { display: none; }
+body:not([data-v="today"]) header.top { margin-bottom: 20px; }
+
+.orbs { max-width: 1040px; margin: 0 auto 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 22px 10px 16px;
+  border-radius: calc(var(--r) + 4px); background: color-mix(in srgb, var(--surface) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink) 7%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.orbcell { background: none; border: 0; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; min-width: 0; color: var(--ink); }
+.orbcell:hover, .orbcell:focus { background: none; }
+.orb { position: relative; width: min(100px, 25vw); aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--well); display: grid; place-items: center;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent), 0 10px 24px rgba(0,0,0,.14); }
+.orb .liq { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: var(--c, var(--green)); transition: height 1.1s cubic-bezier(.2,.8,.2,1); }
+.orb .liq::before { content: ""; position: absolute; left: 0; right: 0; top: -5px; height: 6px;
+  background: radial-gradient(ellipse 11px 6px at 50% 100%, var(--c, var(--green)) 97%, transparent 100%) 0 0 / 22px 6px repeat-x; animation: wave 2.6s linear infinite; }
+@keyframes wave { to { background-position: 22px 0; } }
+.orb::after { content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 32% 20%, rgba(255,255,255,.24), transparent 36%); }
+.orb b { position: relative; z-index: 1; font-size: clamp(24px, 7.4vw, 34px); font-weight: 700; letter-spacing: -0.03em; color: var(--ink);
+  text-shadow: 0 1px 10px color-mix(in srgb, var(--page) 70%, transparent); }
+.olab { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; margin-top: 4px; }
+.olab::after { content: " ›"; color: var(--sub); letter-spacing: 0; }
+.onote { font-size: 11px; color: var(--sub); text-align: center; line-height: 14px; min-height: 28px; padding: 0 2px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.sechead { max-width: 1040px; margin: 4px auto 10px; padding: 0 4px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--sub); }
+.sechead .secr { letter-spacing: 0; text-transform: none; font-weight: 500; font-size: var(--t2); }
+.sechead button { border: 0; background: none; color: var(--green-ink); font: 600 12px var(--sans); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; padding: 4px 0; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); }
+.hrcard .note { margin-top: -4px; }
+.hrcard .top { align-items: center; margin-top: 8px; }
+.hrcard .seg { align-self: flex-start; margin-top: 4px; }
+
+.tiles { max-width: 1040px; margin: 0 auto 24px; display: grid; gap: 10px; }
+.tile { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 18px; background: var(--surface); border: var(--card-edge);
+  box-shadow: var(--card-shadow); min-height: 62px; cursor: pointer; text-align: left; width: 100%; font: inherit; color: var(--ink); }
+.tile .orb { width: 30px; flex: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent); }
+.tile .orb .liq::before { top: -2px; height: 3px; background-size: 8px 3px; background-image: radial-gradient(ellipse 4px 3px at 50% 100%, var(--c, var(--green)) 97%, transparent 100%); animation: none; }
+.tile .tx { flex: 1; min-width: 0; display: grid; }
+.tile .tx b { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; line-height: 18px; }
+.tile .tx span { font-size: var(--t2); color: var(--sub); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .tv { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+.tile .tv small { font-size: 13px; color: var(--sub); font-weight: 500; margin-left: 3px; }
+.tile .chev { color: var(--faint); font-size: 20px; line-height: 1; margin-left: -4px; }
+.tile .ed { display: none; gap: 6px; flex: none; }
+.editing .tile { cursor: default; }
+.editing .tile .ed { display: flex; }
+.editing .tile .chev, .editing .tile .tv { display: none; }
+.tile.off .orb, .tile.off .tx { opacity: .4; }
+.ed button { height: 32px; min-width: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--page); color: var(--ink); cursor: pointer; font: 600 12px var(--sans); }
+.ed button:disabled { opacity: .3; cursor: default; }
+
+.metricbar { display: flex; margin: 0 auto 16px; max-width: 100%; }
+.metricbar button { flex: 1 1 auto; padding: 8px 6px; }
+.accent { color: var(--green-ink); }
+.big small { font-size: 18px; font-weight: 600; color: var(--sub); margin-left: 6px; letter-spacing: 0; }
+.mma { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--line); }
+.mma span { display: block; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--sub); }
+.mma b { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+
+.tabbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 8; width: min(440px, calc(100% - 32px));
+  display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px; border-radius: 999px;
+  background: color-mix(in srgb, var(--card) 80%, transparent); -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+.tabbar a { display: grid; justify-items: center; gap: 2px; padding: 7px 0 6px; border-radius: 999px; color: var(--sub); text-decoration: none; font-size: 11px; font-weight: 600; line-height: 14px; }
+.tabbar svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tabbar svg .fill { fill: currentColor; stroke: none; }
+.tabbar a[aria-current="page"] { color: var(--green-ink); background: color-mix(in srgb, var(--green) 14%, transparent); }
+.toast { bottom: calc(96px + env(safe-area-inset-bottom)); }
+@media (prefers-reduced-motion: reduce) { .orb .liq::before, #ring-sync.spin svg { animation: none; } .orb .liq { transition: none; } }
+@media (max-width: 560px) { .ttl h1 { font-size: 32px; } .orbs { padding: 18px 6px 14px; } }
 </style>
 <style id="custom"></style>
 <script>(function(){var d=document.documentElement;d.dataset.pal="sage";d.dataset.fin="lift";try{var t=JSON.parse(localStorage.getItem("pulse.theme")||"null");if(t){d.dataset.pal=t.palette;d.dataset.fin=t.finish;document.getElementById("custom").textContent=localStorage.getItem("pulse.css")||"";}}catch(e){}})();</script>
 </head>
 <body>
-<header>
-  <div class="bar">
-    <div class="brand"><span class="logo"><svg aria-hidden="true" viewBox="-16.0 -15.7 132.1 132.1"><defs><linearGradient id="lg-up" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#3D96F4"/><stop offset="1" stop-color="#3189F0"/></linearGradient><linearGradient id="lg-down" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B4F9E"/><stop offset=".5" stop-color="#2A7CE4"/><stop offset="1" stop-color="#3D96F4"/></linearGradient><linearGradient id="lg-up2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#1B4F9E"/><stop offset=".6" stop-color="#2E84EA"/><stop offset="1" stop-color="#3D96F4"/></linearGradient></defs><polygon points="47.61,25.70 57.69,114.38 62.31,73.62 52.39,-13.70" fill="url(#lg-down)"/><polygon points="6.00,64.60 33.20,64.60 26.80,55.40 6.00,55.40" fill="#3D96F4"/><polygon points="33.20,64.60 47.61,25.70 52.39,-13.70 26.80,55.40" fill="url(#lg-up)"/><polygon points="57.69,114.38 75.25,64.60 68.75,55.40 62.31,73.62" fill="url(#lg-up2)"/><polygon points="75.25,64.60 94.00,64.60 94.00,55.40 68.75,55.40" fill="#3D96F4"/></svg></span><b>Pulse</b><span class="status"><span class="dot" id="dot"></span><span id="status">Starting</span><span class="warn" id="warn"></span></span></div>
-    <nav class="seg" id="tabs" aria-label="Sections">
-      <a href="#today" data-v="today">Today</a>
-      <a href="#sleep" data-v="sleep">Sleep</a>
-      <a href="#trends" data-v="trends">Trends</a>
-      <a href="#settings" data-v="settings">Settings</a>
-    </nav>
+<div class="glow" aria-hidden="true"></div>
+<header class="top">
+  <div class="titlebar">
+    <div class="ttl"><h1 id="vtitle">Today</h1><div class="date" id="vdate"></div></div>
+    <div class="icons">
+      <a class="ic" href="#settings" id="dot" aria-label="Strap status"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.3-4.4-9.3-9C1.3 8.2 3.3 4.6 6.8 4.6c2 0 3.5 1.1 4.3 2.5.8-1.4 2.3-2.5 4.3-2.5 3.5 0 5.5 3.6 4.1 6.9-2 4.6-9.3 9-9.3 9z"/></svg></a>
+      <a class="ic ring" href="#settings" id="ring-sync" aria-label="Sync"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="trk" cx="18" cy="18" r="15"/><circle class="arc" cx="18" cy="18" r="15" pathLength="100"/></svg><i></i></a>
+      <a class="ic ring" href="#settings" id="ring-bat" aria-label="Strap battery"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="trk" cx="18" cy="18" r="15"/><circle class="arc" cx="18" cy="18" r="15" pathLength="100"/></svg><b>--</b></a>
+    </div>
   </div>
+  <div class="word">PULSE</div>
 </header>
 
 <main>
@@ -288,32 +381,31 @@ html[data-fin="frosted"] header { background: var(--page); }
       <div class="note" id="connect-n">Tap Connect and choose your WHOOP. Keep Pulse open while it syncs.</div>
       <div class="actions"><button class="btn dark" type="button" id="connect">Connect</button></div></div>
   </div>
-  <div class="grid scores">
-    <div class="card s4" data-go="trends:recovery"><div class="label" data-lbl="recovery">Recovery</div><div class="value" id="rec">--</div><div class="note" id="rec-n"> </div><div class="meter"><span id="rec-m"></span></div></div>
-    <div class="card s4" data-go="sleep"><div class="label" data-lbl="sleep">Sleep</div><div class="value" id="slp">--</div><div class="note" id="slp-n"> </div><div class="meter"><span id="slp-m"></span></div></div>
-    <div class="card s4" data-go="trends:strain"><div class="label" data-lbl="strain">Strain</div><div class="value" id="str">--</div><div class="note" id="str-n">Today so far</div><div class="meter"><span id="str-m"></span></div></div>
+  <div class="orbs" id="scores">
+    <button type="button" class="orbcell" data-go="trends:recovery"><span class="orb"><i class="liq" id="rec-m"></i><b id="rec">--</b></span><span class="olab"><span data-lbl="recovery">Recovery</span></span><span class="onote" id="rec-n"> </span></button>
+    <button type="button" class="orbcell" data-go="sleep"><span class="orb"><i class="liq" id="slp-m"></i><b id="slp">--</b></span><span class="olab"><span data-lbl="sleep">Sleep</span></span><span class="onote" id="slp-n"> </span></button>
+    <button type="button" class="orbcell" data-go="trends:strain"><span class="orb"><i class="liq" id="str-m"></i><b id="str">--</b></span><span class="olab"><span data-lbl="strain">Strain</span></span><span class="onote" id="str-n"> </span></button>
   </div>
   <div class="grid" id="watch" hidden>
     <div class="card s12 alert" data-go="sleep"><div class="label">Health watch</div><div class="value text" id="watch-v"></div><div class="note" id="watch-n"></div></div>
   </div>
+  <div class="sechead"><span>Heart rate</span><span class="secr" id="hr-live">Offline</span></div>
   <div class="grid">
-    <div class="card hero s12">
+    <div class="card hero s12 hrcard">
+      <div class="label">Beats per minute</div>
+      <div class="note"><span id="status">Starting</span><span class="warn" id="warn"></span></div>
       <div class="top">
-        <div class="label">Heart rate</div>
-        <div class="seg" role="group" aria-label="Chart range" id="ranges">
-          <button type="button" data-r="60">1 min</button><button type="button" data-r="600">10 min</button><button type="button" data-r="3600">1 hour</button><button type="button" data-r="day">Today</button>
-        </div>
+        <div class="huge"><span id="bpm">--</span><small>bpm</small></div>
+        <span class="chip gray" id="zone">No signal</span>
       </div>
-      <div class="huge"><span id="bpm">--</span><small>bpm</small></div>
-      <div class="chips"><span class="chip gray" id="zone">No signal</span></div>
+      <div class="seg" role="group" aria-label="Chart range" id="ranges">
+        <button type="button" data-r="60">1 min</button><button type="button" data-r="600">10 min</button><button type="button" data-r="3600">1 hour</button><button type="button" data-r="day">Today</button>
+      </div>
       <div class="chart" id="c-hr"></div>
     </div>
   </div>
-  <div class="grid vitals">
-    <div class="card s4" data-go="trends:rhr"><div class="label"><span class="long">Resting heart rate</span><span class="short">Resting HR</span></div><div class="value" id="v-rhr">--</div><div class="note" id="v-rhr-n"> </div></div>
-    <div class="card s4" data-go="trends:hrv"><div class="label"><span class="long">Heart rate variability</span><span class="short">HRV</span></div><div class="value" id="v-hrv">--</div><div class="note" id="v-hrv-n"> </div></div>
-    <div class="card s4"><div class="label"><span class="long">Skin temperature</span><span class="short">Skin temp</span></div><div class="value" id="v-temp">--</div><div class="note" id="v-temp-n"> </div></div>
-  </div>
+  <div class="sechead"><span>Your cards</span><button type="button" id="cards-edit">Customise</button></div>
+  <div class="tiles" id="tiles"></div>
 </section>
 
 <!-- SLEEP -->
@@ -346,20 +438,20 @@ html[data-fin="frosted"] header { background: var(--page); }
 
 <!-- TRENDS -->
 <section data-view="trends" hidden>
+  <div class="seg metricbar" role="group" aria-label="Metric" id="metrics">
+    <button type="button" data-m="recovery" data-lbl="recovery">Recovery</button><button type="button" data-m="hrv">HRV</button><button type="button" data-m="rhr">Resting HR</button><button type="button" data-m="sleep">Sleep</button><button type="button" data-m="strain" data-lbl="strain">Strain</button>
+  </div>
+  <div class="sechead"><span id="t-label">Recovery</span><span class="secr" id="t-count"></span></div>
   <div class="grid">
     <div class="card hero s12">
-      <div class="top">
-        <div class="seg" role="group" aria-label="Metric" id="metrics">
-          <button type="button" data-m="recovery" data-lbl="recovery">Recovery</button><button type="button" data-m="hrv">HRV</button><button type="button" data-m="rhr">Resting HR</button><button type="button" data-m="sleep">Sleep</button><button type="button" data-m="strain" data-lbl="strain">Strain</button>
-        </div>
-        <div class="seg" role="group" aria-label="Range" id="spans">
-          <button type="button" data-d="14">14 days</button><button type="button" data-d="30">30 days</button><button type="button" data-d="90">90 days</button>
-        </div>
+      <div class="label">Latest</div>
+      <div class="big accent" id="t-latest">--</div>
+      <div class="note" id="t-asof"> </div>
+      <div class="seg" role="group" aria-label="Range" id="spans" style="margin-top:12px">
+        <button type="button" data-d="7">W</button><button type="button" data-d="30">M</button><button type="button" data-d="90">3M</button><button type="button" data-d="180">6M</button><button type="button" data-d="365">1Y</button>
       </div>
-      <div class="label" id="t-label">Average</div>
-      <div class="big" id="t-avg">--</div>
-      <div class="chips" id="t-note"></div>
       <div class="chart" id="c-trend"></div>
+      <div class="mma"><div><span>Min</span><b id="t-min">--</b></div><div><span>Avg</span><b id="t-avg">--</b></div><div><span>Max</span><b id="t-max">--</b></div></div>
     </div>
   </div>
 </section>
@@ -459,6 +551,12 @@ html[data-fin="frosted"] header { background: var(--page); }
   </div>
 </section>
 </main>
+<nav class="tabbar" id="tabs" aria-label="Sections">
+  <a href="#today" data-v="today"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg><span>Today</span></a>
+  <a href="#trends" data-v="trends"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 17l5.5-5.5 4 4 7.5-7.5"/><path d="M15 8h5.5v5.5"/></svg><span>Trends</span></a>
+  <a href="#sleep" data-v="sleep"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/></svg><span>Sleep</span></a>
+  <a href="#settings" data-v="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="fill" cx="5.5" cy="12" r="1.7"/><circle class="fill" cx="12" cy="12" r="1.7"/><circle class="fill" cx="18.5" cy="12" r="1.7"/></svg><span>More</span></a>
+</nav>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -486,7 +584,7 @@ const hourLabel = t => { const d = new Date(t * 1000); return d.getMinutes() ? t
 function niceStep(raw) { const p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
 function makeChart(box) {
   const id = "g" + gid++;
-  box.innerHTML = `<div class="plot"><svg viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--green)" stop-opacity=".16"/><stop offset="1" style="stop-color:var(--green)" stop-opacity="0"/></linearGradient></defs><g class="grid"></g><path class="a" fill="url(#${id})"/><path class="l" fill="none" style="stroke:var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle class="p" r="5" style="fill:var(--green)" stroke-width="2" vector-effect="non-scaling-stroke" style="display:none;stroke:var(--page)"/></svg><div class="empty"></div><div class="tip" hidden></div></div><div class="yax"></div><div class="xax"></div>`;
+  box.innerHTML = `<div class="plot"><svg viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--green)" stop-opacity=".16"/><stop offset="1" style="stop-color:var(--green)" stop-opacity="0"/></linearGradient></defs><g class="grid"></g><path class="a" fill="url(#${id})"/><path class="l" fill="none" style="stroke:var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle class="p" r="5" stroke-width="2" vector-effect="non-scaling-stroke" style="display:none;fill:var(--green);stroke:var(--page)"/></svg><div class="empty"></div><div class="tip" hidden></div></div><div class="yax"></div><div class="xax"></div>`;
   const plot = box.querySelector(".plot"), G = box.querySelector(".grid"), L = box.querySelector(".l"), A = box.querySelector(".a"), P = box.querySelector(".p"),
         E = box.querySelector(".empty"), T = box.querySelector(".tip"), Y = box.querySelector(".yax"), X = box.querySelector(".xax");
   let pts = [], unit = "", fmtV = v => Math.round(v).toLocaleString(), fmtX = tm;
@@ -557,40 +655,110 @@ document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => { ran
 seg("ranges", "r", range);
 async function loadHR() { try { const r = await api("/api/hr?range=" + range); drawHR(r.points, "Waiting for your strap", "bpm", { from: r.from, to: r.to, gap: r.gap }); } catch (e) {} }
 
+function ring(id, pct, color) { const a = $(id).querySelector(".arc"); a.style.strokeDasharray = Math.max(0, Math.min(100, pct || 0)) + " 100"; a.style.stroke = color || "var(--green)"; }
+function orb(id, pct, color) { const l = $(id); l.style.height = Math.max(0, Math.min(100, pct || 0)) + "%"; l.style.visibility = pct > 0.5 ? "" : "hidden"; l.style.setProperty("--c", color || "var(--green)"); }
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 function renderNow(s) {
   const on = s.live;
-  $("dot").className = "dot " + (on ? "on" : "wait");
+  $("dot").className = "ic " + (on ? "on" : s.link === "connected" ? "wait" : "");
   const sync = s.sync === "syncing" ? (s.sync_pct ? "Syncing " + s.sync_pct + "%" : s.sync_seen ? "Syncing · " + num(s.sync_seen) + " received" : "Syncing") : s.sync === "synced" && s.last_sync ? "Synced " + ago(s.last_sync) : s.sync === "pairing" ? "History needs pairing" : s.sync === "stalled" ? "Sync paused, retrying" : "";
-  $("warn").textContent = s.not_saving ? "· Strap isn't saving" : s.battery != null && s.battery < 20 ? "· Strap battery " + s.battery + "%" : "";
-  $("status").textContent = [on ? s.bpm + " bpm" : s.link === "connected" ? "Connected" : s.link === "connecting" ? "Connecting" : "Not connected", sync].filter(Boolean).join(" · ");
+  $("warn").textContent = s.not_saving ? " · Strap isn't saving" : s.battery != null && s.battery < 20 ? " · Strap battery " + s.battery + "%" : "";
+  $("status").textContent = [on ? "Live" : s.link === "connected" ? "Connected" : s.link === "connecting" ? "Connecting" : "Not connected", sync].filter(Boolean).join(" · ");
+  $("hr-live").textContent = on ? "Live" : s.link === "connected" ? "Connected" : "Offline";
+
+  /* header: sync ring and strap battery ring */
+  const rs = $("ring-sync"); rs.classList.toggle("spin", s.sync === "syncing"); rs.title = sync || "Not synced yet";
+  ring("ring-sync", s.sync === "syncing" ? Math.max(12, s.sync_pct || 0) : s.sync === "synced" ? 100 : 0, s.sync === "stalled" || s.sync === "error" ? "var(--gold)" : "var(--green)");
+  $("ring-bat").querySelector("b").textContent = s.battery == null ? "--" : s.battery;
+  ring("ring-bat", s.battery, s.battery != null && s.battery < 20 ? "var(--gold)" : "var(--green)");
 
   $("bpm").textContent = on ? s.bpm : "--";
   const z = $("zone");
   if (on) { z.textContent = ZN[s.zone] + " zone"; z.className = "chip" + (s.zone >= 3 ? " gold" : ""); } else { z.textContent = "No signal"; z.className = "chip gray"; }
 
+  /* the three orbs */
   const n = s.night, d = s.day;
   if (n && n.recovery != null) {
-    $("rec").textContent = n.recovery + "%";
+    $("rec").textContent = n.recovery;
     $("rec-n").textContent = n.recovery >= 67 ? "Ready to push" : n.recovery >= 34 ? "Take it steady" : "Go easy today";
-    meter("rec-m", n.recovery, n.recovery >= 67 ? "var(--green)" : n.recovery >= 34 ? "var(--gold)" : "var(--faint)");
+    orb("rec-m", n.recovery, n.recovery >= 67 ? "var(--green)" : n.recovery >= 34 ? "var(--gold)" : "var(--faint)");
   } else {
     $("rec").textContent = "--";
-    $("rec-n").textContent = n ? "Learning your normal · " + Math.min(n.baseline_n || 0, 4) + " of 4 nights" : "Wear your strap to bed";
-    meter("rec-m", n ? (n.baseline_n || 0) * 25 : 0, "var(--faint)");
+    $("rec-n").textContent = n ? "Learning · " + Math.min(n.baseline_n || 0, 4) + " of 4 nights" : "Wear it to bed";
+    orb("rec-m", n ? (n.baseline_n || 0) * 25 : 0, "var(--faint)");
   }
-  if (n) { $("slp").textContent = hmShort(n.asleep); $("slp-n").textContent = (s.night_today ? "" : dlong(n.day) + " · ") + (n.rest != null ? "Score " + n.rest : "") + (n.debt ? " · " + hmShort(n.debt) + " debt" : ""); meter("slp-m", n.asleep / (n.need || 480) * 100); }
-  else { $("slp").textContent = "--"; $("slp-n").textContent = "No night recorded yet"; meter("slp-m", 0); }
-  $("str").textContent = d ? d.strain.toFixed(1) : "--"; meter("str-m", d ? d.strain / 21 * 100 : 0, "var(--gold)");
-  $("str-n").textContent = d ? d.active + " active min today" : "Today so far";
+  if (n) { $("slp").textContent = hmShort(n.asleep); $("slp-n").textContent = (s.night_today ? "Last night" : dlong(n.day)) + (n.rest != null ? " · " + n.rest : ""); orb("slp-m", n.asleep / (n.need || 480) * 100, "var(--deep)"); }
+  else { $("slp").textContent = "--"; $("slp-n").textContent = "No night yet"; orb("slp-m", 0, "var(--deep)"); }
+  $("str").textContent = d ? d.strain.toFixed(1) : "--"; orb("str-m", d ? d.strain / 21 * 100 : 0, "var(--gold)");
+  $("str-n").textContent = d ? d.active + " active min" : "Today so far";
 
   const il = n && n.illness, alarm = il && (il.level === "mild" || il.level === "raised");
   $("watch").hidden = !alarm;
   if (alarm) { $("watch-v").textContent = ILL[il.level]; $("watch-n").textContent = cap(il.signals.join(", ")) + ". An early indication, not a diagnosis."; }
-  val("v-rhr", n && n.rhr, "bpm"); $("v-rhr-n").textContent = s.base.rhr ? "Your normal " + s.base.rhr : "Last night";
-  val("v-hrv", n && n.hrv, "ms"); $("v-hrv-n").textContent = s.base.hrv ? "Your normal " + s.base.hrv : "Last night";
-  if (n && n.temp_dev != null) { $("v-temp").innerHTML = (n.temp_dev > 0 ? "+" : n.temp_dev < 0 ? "−" : "±") + Math.abs(n.temp_dev).toFixed(1) + "<small>°C</small>"; $("v-temp-n").textContent = n.temp.toFixed(1) + " °C last night"; }
-  else { val("v-temp", n && n.temp ? n.temp.toFixed(1) : null, "°C"); $("v-temp-n").textContent = n && n.temp ? "Change shows after 3 nights" : "From the strap's history"; }
+
+  /* your cards */
+  const br = s.base.rhr, bh = s.base.hrv, sm = v => v == null ? null : v;
+  TD.rhr = { v: sm(n && n.rhr), u: "bpm", sub: br ? "Your normal " + br : "Resting heart rate", pct: n && n.rhr && br ? clamp(55 + (br - n.rhr) * 6, 8, 100) : 50 };
+  TD.hrv = { v: sm(n && n.hrv), u: "ms", sub: bh ? "Your normal " + bh : "Heart rate variability", pct: n && n.hrv && bh ? clamp(55 + (n.hrv - bh) / bh * 120, 8, 100) : 50 };
+  TD.temp = n && n.temp_dev != null ? { v: (n.temp_dev > 0 ? "+" : n.temp_dev < 0 ? "−" : "±") + Math.abs(n.temp_dev).toFixed(1), u: "°C", sub: n.temp.toFixed(1) + " °C last night", pct: clamp(50 + n.temp_dev * 40, 8, 100) }
+    : { v: n && n.temp ? n.temp.toFixed(1) : null, u: "°C", sub: n && n.temp ? "Change shows after 3 nights" : "Skin temperature", pct: 50 };
+  TD.rest = { v: n && n.rest != null ? n.rest : null, u: "", sub: "Duration, efficiency, depth", pct: n && n.rest };
+  TD.debt = { v: n && n.debt != null ? (n.debt ? hmShort(n.debt) : "None") : null, u: n && n.debt ? "h" : "", sub: n && n.need ? "Need " + hmShort(n.need) + " a night" : "Sleep owed", pct: n && n.debt != null ? clamp(100 - n.debt / 1.2, 8, 100) : 50 };
+  TD.eff = { v: n && n.efficiency, u: "%", sub: "Asleep while in bed", pct: n && n.efficiency };
+  TD.active = { v: d ? d.active : null, u: "min", sub: "Active today", pct: d ? clamp(d.active / 0.6, 4, 100) : 0 };
+  TD.watch = { v: !il ? null : il.level === "learning" ? il.nights + "/14" : { normal: "Normal", mild: "Mild", raised: "Raised" }[il.level] || "--", u: "",
+    sub: il && il.level === "learning" ? "Learning your baseline" : "Illness signals", pct: !il ? 0 : il.level === "learning" ? il.nights / 14 * 100 : { normal: 100, mild: 55, raised: 25 }[il.level] };
+  TD.battery = { v: s.battery, u: "%", sub: s.pack && s.pack.soc != null ? "Pack " + Math.round(s.pack.soc) + "%" : "Strap battery", pct: s.battery };
+  fillTiles();
 }
+
+/* ---- your cards: a list you can reorder and hide (Customise) ---- */
+const TILES = { rhr: ["Resting HR", "trends:rhr", "var(--gold)"], hrv: ["HRV", "trends:hrv", "var(--deep)"], temp: ["Skin temp", "", "var(--wake)"],
+  rest: ["Sleep score", "sleep", "var(--rem)"], debt: ["Sleep debt", "sleep", "var(--deep)"], eff: ["Efficiency", "sleep", "var(--lite)"],
+  active: ["Active minutes", "trends:strain", "var(--gold)"], watch: ["Health watch", "sleep", "var(--green)"], battery: ["Strap battery", "settings", "var(--green)"] };
+const TILE_DEF = { order: ["rhr", "hrv", "temp", "rest", "debt", "watch", "active", "eff", "battery"], hidden: ["active", "eff", "battery"] };
+const TD = {};
+let editing = false, tileSig = "";
+function cardPrefs() {
+  const c = (theme && theme.cards) || {}, order = (c.order || []).filter(k => TILES[k]);
+  for (const k of TILE_DEF.order) if (!order.includes(k)) order.push(k);
+  return { order, hidden: (c.hidden || TILE_DEF.hidden).filter(k => TILES[k]) };
+}
+function goTo(spec) { const [v, m] = spec.split(":"); if (m) { metric = m; ls.set("metric", m); } location.hash = v; if (v === "trends") loadTrend(); window.scrollTo(0, 0); }
+function buildTiles() {
+  const pr = cardPrefs(), box = $("tiles"), list = editing ? pr.order : pr.order.filter(k => !pr.hidden.includes(k));
+  const sig = JSON.stringify([editing, list, pr.hidden]); if (sig === tileSig) return; tileSig = sig;
+  box.classList.toggle("editing", editing); box.innerHTML = "";
+  list.forEach((k, idx) => {
+    const [name, go, col] = TILES[k], el = document.createElement("div"), off = pr.hidden.includes(k);
+    el.className = "tile" + (off ? " off" : ""); el.dataset.k = k;
+    el.innerHTML = '<span class="orb"><i class="liq" style="--c:' + col + '"></i></span><span class="tx"><b></b><span id="ts-' + k + '"></span></span><span class="tv" id="tv-' + k + '">--</span>' +
+      (go ? '<span class="chev">›</span>' : "") + '<span class="ed"><button type="button" data-a="up" aria-label="Move up">↑</button><button type="button" data-a="down" aria-label="Move down">↓</button><button type="button" data-a="vis">' + (off ? "Show" : "Hide") + "</button></span>";
+    el.querySelector("b").textContent = name;
+    const ed = el.querySelectorAll(".ed button"); ed[0].disabled = idx === 0; ed[1].disabled = idx === list.length - 1;
+    el.onclick = e => {
+      const a = e.target.closest("button") && e.target.closest("button").dataset.a;
+      if (!editing) { if (go) goTo(go); return; }
+      if (!a) return;
+      const o = pr.order.slice(), i = o.indexOf(k); let h = pr.hidden.slice();
+      if (a === "up" && i > 0) [o[i - 1], o[i]] = [o[i], o[i - 1]];
+      if (a === "down" && i < o.length - 1) [o[i + 1], o[i]] = [o[i], o[i + 1]];
+      if (a === "vis") h = off ? h.filter(x => x !== k) : [...h, k];
+      theme.cards = { order: o, hidden: h }; saveTheme();
+    };
+    box.append(el);
+  });
+  fillTiles();
+}
+function fillTiles() {
+  for (const k of Object.keys(TILES)) {
+    const t = TD[k], v = $("tv-" + k); if (!v || !t) continue;
+    v.innerHTML = t.v == null ? "--" : t.v + (t.u ? "<small>" + t.u + "</small>" : "");
+    $("ts-" + k).textContent = t.sub;
+    const lq = v.parentNode.querySelector(".liq"), pc = clamp(t.pct == null ? 0 : t.pct, 0, 100); lq.style.height = pc + "%"; lq.style.visibility = pc > 0.5 ? "" : "hidden";
+  }
+}
+$("cards-edit").onclick = () => { editing = !editing; $("cards-edit").textContent = editing ? "Done" : "Customise"; buildTiles(); };
 
 /* ---- sleep ---- */
 const LANE = { wake: 0, rem: 1, light: 2, deep: 3 }, SN = { wake: "Awake", rem: "REM", light: "Light", deep: "Deep" };
@@ -650,22 +818,26 @@ async function loadNights() { nights = await api("/api/nights"); showNight(Math.
 
 /* ---- trends ---- */
 const MU = { recovery: ["%", "Recovery"], hrv: ["ms", "Heart rate variability"], rhr: ["bpm", "Resting heart rate"], sleep: ["", "Time asleep"], rest: ["", "Sleep score"], temp: ["°C", "Skin temperature"], steps: ["", "Steps"], strain: ["", "Strain"] };
-let metric = ["recovery", "hrv", "rhr", "sleep", "strain"].includes(ls.get("metric")) ? ls.get("metric") : "recovery", span = ls.get("span") || "30";
+let metric = ["recovery", "hrv", "rhr", "sleep", "strain"].includes(ls.get("metric")) ? ls.get("metric") : "recovery", span = ls.get("span");
+const SPANS = { 7: "Past week", 30: "Past month", 90: "Past 3 months", 180: "Past 6 months", 365: "Past year" };
+if (!SPANS[span]) span = "30";
 document.querySelectorAll("#metrics button").forEach(b => b.onclick = () => { metric = b.dataset.m; ls.set("metric", metric); loadTrend(); });
 document.querySelectorAll("#spans button").forEach(b => b.onclick = () => { span = b.dataset.d; ls.set("span", span); loadTrend(); });
 const fmtM = (m, v) => m === "sleep" ? hmShort(v) : m === "temp" ? v.toFixed(1) : m === "strain" ? v.toFixed(1) : Math.round(v).toLocaleString();
 async function loadTrend() {
   seg("metrics", "m", metric); seg("spans", "d", span);
   const s = await api("/api/trend?metric=" + metric + "&days=" + span), [u, name] = MU[metric];
-  $("t-label").textContent = name + " · " + span + "-day average";
-  $("t-note").innerHTML = "";
-  if (!s.length) { $("t-avg").textContent = "--"; drawTrend([], "Nothing recorded in this range yet"); return; }
+  const withU = v => fmtM(metric, v) + (u ? "<small>" + u + "</small>" : "");
+  $("t-label").textContent = name; $("t-count").textContent = SPANS[span];
+  if (!s.length) {
+    $("t-latest").textContent = "--"; $("t-asof").textContent = "Nothing recorded in this range yet";
+    for (const k of ["t-min", "t-avg", "t-max"]) $(k).textContent = "--";
+    drawTrend([], "Longer ranges fill in as your history grows"); return;
+  }
   const vs = s.map(p => p[1]), avg = vs.reduce((a, b) => a + b, 0) / vs.length;
-  $("t-avg").innerHTML = fmtM(metric, avg) + (u ? "<small style='font-size:20px;color:var(--sub);font-weight:600;margin-left:8px;letter-spacing:0'>" + u + "</small>" : "");
-  const a = document.createElement("span"); a.textContent = "Latest " + fmtM(metric, vs[vs.length - 1]) + (u ? " " + u : "");
-  const b = document.createElement("span"); b.textContent = "Range " + fmtM(metric, Math.min(...vs)) + "–" + fmtM(metric, Math.max(...vs));
-  const c = document.createElement("span"); c.textContent = vs.length + (vs.length === 1 ? " day" : " days");
-  $("t-note").append(a, b, c);
+  $("t-latest").innerHTML = withU(vs[vs.length - 1]);
+  $("t-asof").textContent = "As of " + new Date(s[s.length - 1][0] * 1000).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" }) + " · " + vs.length + (vs.length === 1 ? " day" : " days") + " recorded";
+  $("t-min").innerHTML = withU(Math.min(...vs)); $("t-avg").innerHTML = withU(avg); $("t-max").innerHTML = withU(Math.max(...vs));
   const dec = metric === "temp" || metric === "strain";
   drawTrend(s, "", u, { gap: 86400 * 1.6, fmtX: dshort, xlabel: dshort, minStep: 86400, minSpan: dec ? 1 : metric === "steps" ? 1000 : metric === "sleep" ? 60 : 10,
     fmt: v => fmtM(metric, v), yfmt: v => metric === "sleep" ? hmShort(v) : dec ? v.toFixed(1) : Math.round(v).toLocaleString() });
@@ -705,7 +877,7 @@ $("sync").onclick = async () => { await post("/api/sync"); toast("Syncing"); };
 /* ---- tap a card to open its detail ---- */
 document.querySelectorAll("[data-go]").forEach(c => {
   c.tabIndex = 0; c.setAttribute("role", "link");
-  const go = () => { const [v, m] = c.dataset.go.split(":"); if (m) { metric = m; ls.set("metric", m); } location.hash = v; if (v === "trends") loadTrend(); window.scrollTo(0, 0); };
+  const go = () => goTo(c.dataset.go);
   c.onclick = go; c.onkeydown = e => { if (e.key === "Enter") go(); };
 });
 
@@ -713,7 +885,9 @@ document.querySelectorAll("[data-go]").forEach(c => {
 let view = "today";
 function show(v) {
   if (!["today", "sleep", "trends", "settings"].includes(v)) v = "today";
-  view = v;
+  view = v; document.body.dataset.v = v;
+  $("vtitle").textContent = { today: "Today", sleep: "Sleep", trends: "Trends", settings: "Settings" }[v];
+  $("vdate").textContent = v === "today" ? new Date().toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" }) : "";
   document.querySelectorAll("[data-view]").forEach(s => s.hidden = s.dataset.view !== v);
   document.querySelectorAll("#tabs a").forEach(a => a.dataset.v === v ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
   if (v === "today") loadHR();
@@ -729,7 +903,7 @@ async function tick() {
     const s = await api("/api/now"); renderNow(s); renderSync(s);
     const key = s.night ? s.night.day + s.night.asleep : null;
     if (key !== lastNight) { lastNight = key; if (view === "sleep") loadNights(); }
-  } catch (e) { $("dot").className = "dot"; $("status").textContent = "Pulse is not running"; }
+  } catch (e) { $("dot").className = "ic"; $("status").textContent = "Pulse is not running"; }
   busy = false;
 }
 window.addEventListener("hashchange", () => show(location.hash.slice(1)));
@@ -769,6 +943,7 @@ function applyTheme() {
   document.querySelectorAll("[data-lbl]").forEach(el => el.textContent = (t.labels || {})[el.dataset.lbl] || LBL[el.dataset.lbl]);
   MU.recovery[1] = (t.labels || {}).recovery || "Recovery"; MU.strain[1] = (t.labels || {}).strain || "Strain";
   if (!$("cust").hidden) fillCustom();
+  buildTiles();
 }
 function saveTheme() {
   applyTheme(); $("cust-saved").textContent = "Saving…";
