@@ -420,6 +420,7 @@ html[data-fin="frosted"] header { background: var(--page); }
       <div class="label">Data</div>
       <div class="rows">
         <div class="row"><span>Stored on this iPhone</span><span id="s-days">--</span></div>
+        <div class="row"><span>Kept since</span><span id="s-since">--</span></div>
       </div>
       <div class="actions"><span><button class="btn line" type="button" id="export">Export backup</button> <button class="btn line" type="button" id="import">Import</button></span></div>
       <p class="note">Import accepts a Pulse backup or the history file from the Mac (WHOOP --export).</p>
@@ -822,6 +823,7 @@ $("connect").onclick = doConnect; $("connect2").onclick = doConnect;
 setInterval(() => { const c = P.st.link === "connected"; $("connect-card").hidden = c; $("connect2").textContent = c ? "Reconnect" : "Connect"; }, 1000);
 if (!navigator.bluetooth && !location.search.includes("demo")) { $("connect-n").textContent = "Open this page in the Bluefy app to connect to your strap. Safari cannot use Bluetooth."; }
 if (location.search.includes("demo")) ready.then(() => doConnect());
+else ready.then(() => P.autoConnect()).then(ok => { if (ok) tick(); }).catch(() => {});
 document.addEventListener("visibilitychange", () => { if (!document.hidden && P.link && P.st.link === "disconnected") P.reconnect(); });
 
 /* ---- backup and import ---- */
@@ -838,7 +840,9 @@ $("import-file").onchange = async e => {
   catch (err) { toast(err.message); }
   e.target.value = "";
 };
-setInterval(() => { if (view === "settings") { const n = P.store.keys.size; $("s-days").textContent = n ? n + (n === 1 ? " day" : " days") : "Nothing yet"; } }, 1500);
+setInterval(() => { if (view === "settings") { const f = P.store.get("first_seen"), v = P.store.get("visits") || 1;
+  $("s-since").textContent = f ? new Date(f * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + " · " + v + (v === 1 ? " visit" : " visits") : "--"; }
+  if (view === "settings") { const n = P.store.keys.size; $("s-days").textContent = n ? n + (n === 1 ? " day" : " days") : "Nothing yet"; } }, 1500);
 
 /* ---- Apple Health through Shortcuts ---- */
 async function sendHealth(resend) {

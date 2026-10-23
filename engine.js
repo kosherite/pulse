@@ -583,6 +583,9 @@ class Pulse {
   async init() {
     await this.store.open();
     this.pendingBad = this.store.get("pending_bad", []);
+    if (!this.store.get("first_seen")) await this.store.put("first_seen", now());
+    await this.store.put("visits", (this.store.get("visits") || 0) + 1);
+    try { this.persisted = navigator.storage && navigator.storage.persisted ? await navigator.storage.persisted() : null; } catch (e) { this.persisted = null; }
     setInterval(() => this.flush(), 10000);
   }
   fresh() { return this.st.bpm != null && now() - this.st.last < 5; }
@@ -601,6 +604,21 @@ class Pulse {
     }
     this.st.link = "connected";
     await this.session();
+  }
+  // Reconnect without a tap: Bluefy (3.2+) remembers devices this site was allowed to use.
+  async autoConnect() {
+    if (this.link || !root.navigator || !navigator.bluetooth || !navigator.bluetooth.getDevices) return false;
+    const target = this.conf().target, devs = await navigator.bluetooth.getDevices();
+    const dev = devs.find(d => target && d.name === target) || devs.find(d => /whoop/i.test(d.name || "")) || null;
+    if (!dev) return false;
+    this.link = new BleLink(dev, () => this.onDisconnect());
+    this.st.link = "connecting";
+    for (let i = 0; i < 3; i++) {
+      try { await this.link.open(); this.st.link = "connected"; await this.session(); return true; }
+      catch (e) { await sleep(2000); }
+    }
+    this.st.link = "disconnected"; this.scheduleReconnect(5000);
+    return false;
   }
   onDisconnect() {
     this.st.link = "disconnected"; this.st.bpm = null; this.reasm.clear();
@@ -900,7 +918,7 @@ class Pulse {
     return { from: t0, to: t, gap: 30, points: pts };
   }
 }
-const VERSION = "web-2026.10.22-2";
+const VERSION = "web-2026.10.22-3";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function isoLocal(t) {
   const d = new Date(t * 1000), p = n => String(n).padStart(2, "0"), off = -d.getTimezoneOffset();
