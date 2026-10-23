@@ -309,6 +309,7 @@ body:not([data-v="today"]) header.top { margin-bottom: 20px; }
   box-shadow: inset 0 -12px 24px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.12); }
 .orb b { position: relative; z-index: 1; font-size: clamp(24px, 7.4vw, 34px); font-weight: 700; letter-spacing: -0.03em; color: var(--ink);
   text-shadow: 0 1px 10px color-mix(in srgb, var(--page) 70%, transparent); }
+.orb.full b { color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.35); }
 .olab { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; margin-top: 4px; }
 .olab::after { content: " ›"; color: var(--sub); letter-spacing: 0; }
 .onote { font-size: 11px; color: var(--sub); text-align: center; line-height: 14px; min-height: 28px; padding: 0 2px;
@@ -362,6 +363,7 @@ body:not([data-v="today"]) header.top { margin-bottom: 20px; }
 .toast { bottom: calc(96px + env(safe-area-inset-bottom)); }
 @media (prefers-reduced-motion: reduce) { .orb .liq::before, .orb .liq::after, #ring-sync.spin svg { animation: none; } .orb .liq { transition: none; } }
 @media (max-width: 560px) { .ttl h1 { font-size: 32px; } .orbs { padding: 18px 6px 14px; } }
+@media (min-width: 760px) { .orb { width: 132px; } .orb b { font-size: 40px; } .orbs { padding: 28px 16px 20px; } }
 
 .group { max-width: 1040px; margin: 0 auto; background: var(--surface); border: var(--card-edge); box-shadow: var(--card-shadow); border-radius: 18px; padding: 0 16px; }
 .group > .row, .group > details.more { border-top: 1px solid var(--line); padding: 13px 0; min-height: 50px; }
@@ -389,6 +391,7 @@ details.more .cust { border-top: 0; padding-top: 4px; }
 .explain.one details[open] summary::after { content: "›"; transform: rotate(90deg); }
 .synclog { font-size: var(--t2); color: var(--sub); padding-bottom: 12px; display: grid; gap: 6px; }
 .synclog b { color: var(--ink); font-weight: 600; }
+.explain.one .steps li { padding-left: 40px; }
 </style>
 <style id="custom"></style>
 <script>(function(){var d=document.documentElement;d.dataset.pal="sage";d.dataset.fin="lift";try{var t=JSON.parse(localStorage.getItem("pulse.theme")||"null");if(t){d.dataset.pal=t.palette;d.dataset.fin=t.finish;document.getElementById("custom").textContent=localStorage.getItem("pulse.css")||"";}}catch(e){}})();</script>
@@ -666,7 +669,7 @@ seg("ranges", "r", range);
 async function loadHR() { try { const r = await api("/api/hr?range=" + range); drawHR(r.points, "Waiting for your strap", "bpm", { from: r.from, to: r.to, gap: r.gap }); } catch (e) {} }
 
 function ring(id, pct, color) { const a = $(id).querySelector(".arc"); a.style.strokeDasharray = Math.max(0, Math.min(100, pct || 0)) + " 100"; a.style.stroke = color || "var(--green)"; }
-function orb(id, pct, color) { const l = $(id); l.style.height = Math.max(0, Math.min(100, pct || 0)) + "%"; l.style.visibility = pct > 0.5 ? "" : "hidden"; l.style.setProperty("--c", color || "var(--green)"); }
+function orb(id, pct, color) { const l = $(id); l.style.height = Math.max(0, Math.min(100, pct || 0)) + "%"; l.style.visibility = pct > 0.5 ? "" : "hidden"; l.parentNode.classList.toggle("full", pct > 55); l.style.setProperty("--c", color || "var(--green)"); }
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 function renderNow(s) {
   const on = s.live;
@@ -861,7 +864,7 @@ function fillSettings(s) {
 async function loadSettings() { fillSettings(await api("/api/settings")); }
 function renderSync(s) {
   $("s-sync").textContent = { syncing: "Syncing " + (s.sync_pct || 0) + "%", synced: "Up to date", pairing: "Needs pairing", error: "Problem", stalled: "Paused, retrying", waiting: s.link === "connected" ? "Starting" : "Waiting for strap" }[s.sync] || s.sync;
-  if (s.link !== "connected") $("s-sync").textContent = s.link === "connecting" ? "Connecting" : "Not connected";
+  if (s.link && s.link !== "connected") $("s-sync").textContent = s.link === "not found" ? "Strap not found" : s.link === "connecting" ? "Connecting" : "Not connected";
   $("s-last").textContent = s.last_sync ? ago(s.last_sync) : "Never";
   $("s-bat").textContent = s.battery == null ? "Connect to read" : s.battery + "%";
   meter("s-bat-m", s.battery || 0, s.battery != null && s.battery < 20 ? "var(--gold)" : "var(--green)");
@@ -993,7 +996,6 @@ document.querySelectorAll("#pal button").forEach(b => b.onclick = () => { theme.
 document.querySelectorAll("#fin button").forEach(b => b.onclick = () => { theme.finish = b.dataset.f; saveTheme(); });
 for (const k of ["radius", "gap", "text"]) $("s-" + k).oninput = e => { theme[k] = +e.target.value; saveTheme(); };
 document.querySelectorAll("[data-name]").forEach(i => i.oninput = () => { theme.labels = theme.labels || {}; if (i.value.trim()) theme.labels[i.dataset.name] = i.value; else delete theme.labels[i.dataset.name]; saveTheme(); });
-
 $("cust-reset-c").onclick = () => { const c = theme.colors[theme.palette]; if (c) delete c[dark() ? "dark" : "light"]; $("cust-colors").dataset.built = ""; saveTheme(); setTimeout(fillCustom, 50); };
 $("cust-reset").onclick = () => { if (!confirm("Reset colours, shape, size and names to the Pulse defaults?")) return; theme = { palette: "sage", finish: "lift", hidden: ["goldman", "charcoal"], colors: {}, radius: 24, gap: 16, text: 100, labels: {} }; $("cust-colors").dataset.built = ""; saveTheme(); setTimeout(fillCustom, 50); };
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { $("cust-colors").dataset.built = ""; if (!$("cust").hidden) fillCustom(); });

@@ -941,7 +941,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.22-6";
+const VERSION = "web-2026.10.23-1";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function isoLocal(t) {
   const d = new Date(t * 1000), p = n => String(n).padStart(2, "0"), off = -d.getTimezoneOffset();
