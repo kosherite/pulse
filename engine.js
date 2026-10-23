@@ -621,6 +621,7 @@ class Pulse {
     return false;
   }
   onDisconnect() {
+    this.inSession = false; this.note("Disconnected");
     this.st.link = "disconnected"; this.st.bpm = null; this.reasm.clear();
     if (this.st.sync === "syncing") { this.logStats("disconnected"); this.stats = null; this.st.sync = "stalled"; }
     clearInterval(this.timer);
@@ -654,14 +655,16 @@ class Pulse {
     this.store.put("link_log", log).catch(() => {});
   }
   async session() {
-    this.sessionAt = now(); this.rx = now(); this.framesThisLink = 0;
+    this.sessionAt = now(); this.rx = now(); this.framesThisLink = 0; this.inSession = true; this.st.step = "Opening heart rate";
     this.note("Connected to " + (this.link.dev && this.link.dev.name || "strap"));
     try { await this.link.notify("heart_rate", "heart_rate_measurement", d => this.onHR(d)); this.note("Live heart rate on"); }
     catch (e) { this.note("Live heart rate unavailable: " + errText(e)); }
     // On iPhone the WHOOP service is encrypted: the strap only accepts subscriptions after the hello,
     // written with a response so iOS can run (or reuse) the pairing. Subscribing first fails silently.
-    try { await this.link.write(HELLO, true, 60000); this.note("Handshake accepted"); }
+    this.st.step = "Pairing with the strap";
+    try { await this.link.write(HELLO, true, 30000); this.note("Handshake accepted"); }
     catch (e) { this.note("Handshake refused: " + errText(e)); }
+    this.st.step = "Opening data channels";
     let subs = 0, lastErr = null;
     for (let attempt = 0; attempt < 3 && subs === 0; attempt++) {
       if (attempt) await sleep(1500);
@@ -676,6 +679,7 @@ class Pulse {
       this.st.sync = "pairing";
       this.st.sync_note = "Your strap isn't paired with this iPhone, so it won't share history or battery. Close the WHOOP app, tap the strap until its lights flash blue, then tap Reconnect and accept the pairing request.";
     }
+    this.st.step = "Setting the strap's clock";
     await this.write(setClock(now(), 3)).catch(e => this.note("Set clock failed: " + errText(e)));
     await sleep(500);
     await this.write(command(C.GET_CLOCK, 4)).catch(() => {});
@@ -683,6 +687,7 @@ class Pulse {
     await this.write(command(C.R10_R11, 6), false).catch(() => {});
     await sleep(1000);
     this.readBattery();
+    this.inSession = false; this.st.step = null;
     if (subs) this.startSync().catch(e => { this.st.sync = "error"; this.st.sync_note = String(e.message || e).slice(0, 80); this.note("Sync failed to start: " + errText(e)); });
     let kicks = 0, stalledAt = 0, tick = 0;
     clearInterval(this.timer);
@@ -921,7 +926,13 @@ class Pulse {
       if (body && body.sync_every) { if (![5, 15, 30, 60].includes(+body.sync_every)) throw new Error("Pick 5, 15, 30 or 60 minutes."); await this.store.put("conf", Object.assign(c, { sync_every: +body.sync_every })); }
       return Object.assign({}, this.conf(), { version: VERSION, days: this.store.keys.size, records: this.store.get("records", 0), web: true }, this.strapStatus());
     }
-    if (p === "/api/sync") { this.st.want_sync = true; return { ok: true }; }
+    if (p === "/api/sync") {
+      const stuck = this.inSession ? now() - this.sessionAt > 60 : !["synced", "stalled", "syncing"].includes(this.st.sync);
+      if (this.link && this.st.link === "connected" && stuck) { this.note("Sync now: restarting the connection"); this.inSession = false; this.link.drop(); }
+      else if (!this.link || this.st.link === "disconnected") this.wake();
+      else this.st.want_sync = true;
+      return { ok: true };
+    }
     if (p === "/api/theme") {
       if (body) await this.store.put("theme", body);
       return Object.assign({ palette: "sage", finish: "lift", hidden: ["goldman", "charcoal"], colors: {}, radius: 24, gap: 16, text: 100, labels: {} }, this.store.get("theme", {}));
@@ -941,7 +952,7 @@ class Pulse {
     const zone = b => [0.5, 0.6, 0.7, 0.85].filter(x => b / (220 - c.age) >= x).length;
     let nightOut = null;
     if (last) { nightOut = {}; for (const k of ["day", "start", "end", "asleep", "efficiency", "rhr", "hrv", "temp", "temp_dev", "recovery", "baseline_n", "method", "deep", "rem", "light", "awake", "rest", "debt", "need", "illness"]) nightOut[k] = last[k]; }
-    return Object.assign({ live: this.fresh(), bpm: this.fresh() ? st.bpm : null, zone: this.fresh() ? zone(st.bpm) : null, link: st.link,
+    return Object.assign({ live: this.fresh(), bpm: this.fresh() ? st.bpm : null, zone: this.fresh() ? zone(st.bpm) : null, link: st.link, step: this.inSession ? st.step : null, version: VERSION,
       battery: st.battery, target: c.target, sync: st.sync, sync_pct: st.sync_pct, sync_seen: st.sync_seen, sync_ok: st.sync_ok, sync_note: st.sync_note,
       last_sync: this.store.get("last_sync"), night: nightOut, night_today: !!night, base: { rhr: base("rhr"), hrv: base("hrv") }, day, now: now() }, this.strapStatus());
   }
@@ -969,7 +980,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-2";
+const VERSION = "web-2026.10.23-3";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const errText = e => String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").slice(0, 90);
 function isoLocal(t) {
@@ -982,7 +993,7 @@ function isoLocal(t) {
 class BleLink {
   constructor(dev, onLost) { this.dev = dev; this.onLost = onLost; this.chars = new Map(); this.cbs = new Map(); this.hooked = new WeakSet(); this.chain = Promise.resolve(); dev.addEventListener("gattserverdisconnected", () => onLost()); }
   // Web Bluetooth allows one GATT operation at a time; queue them all
-  op(fn, ms = 15000) {
+  op(fn, ms = 8000) {
     const run = () => Promise.race([fn(), new Promise((_, no) => setTimeout(() => no(new Error("timed out")), ms))]);
     const p = this.chain.then(run, run); this.chain = p.catch(() => {}); return p;
   }

@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon.png">
 <title>Pulse</title>
-<script src="engine.js"></script>
+<script src="engine.js?v=1792788715"></script>
 <style>@font-face{font-family:Inter;font-weight:400;font-display:swap;src:url(fonts/Inter-Regular.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:500;font-display:swap;src:url(fonts/Inter-Medium.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:600;font-display:swap;src:url(fonts/Inter-SemiBold.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:700;font-display:swap;src:url(fonts/Inter-Bold.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:800;font-display:swap;src:url(fonts/Inter-ExtraBold.woff2) format('woff2')}.connect { background: var(--green-soft); }
 .actions > span { display: inline-flex; gap: 8px; flex-wrap: wrap; }
 .howto { margin: 0 0 12px 20px; padding: 0; color: var(--sub); font-size: var(--t2); line-height: 20px; }
@@ -864,7 +864,7 @@ function fillSettings(s) {
 }
 async function loadSettings() { fillSettings(await api("/api/settings")); }
 function renderSync(s) {
-  $("s-sync").textContent = { syncing: "Syncing " + (s.sync_pct || 0) + "%", synced: "Up to date", pairing: "Needs pairing", error: "Problem", stalled: "Paused, retrying", waiting: s.link === "connected" ? "Starting" : "Waiting for strap" }[s.sync] || s.sync;
+  $("s-sync").textContent = { syncing: "Syncing " + (s.sync_pct || 0) + "%", synced: "Up to date", pairing: "Needs pairing", error: "Problem", stalled: "Paused, retrying", waiting: s.link === "connected" ? (s.step ? s.step + "…" : "Starting") : "Waiting for strap" }[s.sync] || s.sync;
   if (s.link && s.link !== "connected") $("s-sync").textContent = s.link === "not found" ? "Strap not found" : s.link === "connecting" ? "Connecting" : "Not connected";
   $("s-last").textContent = s.last_sync ? ago(s.last_sync) : "Never";
   $("s-bat").textContent = s.battery == null ? "Connect to read" : s.battery + "%";
@@ -1036,6 +1036,9 @@ setInterval(() => { if (view === "settings") { const f = P.store.get("first_seen
   $("s-since").textContent = f ? new Date(f * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + " · " + v + (v === 1 ? " visit" : " visits") : "--"; }
   if (view === "settings") { const n = P.store.keys.size; $("s-days").textContent = n ? n + (n === 1 ? " day" : " days") : "Nothing yet"; } }, 1500);
 
+/* ---- what the connection is doing right now ---- */
+setInterval(async () => { if (view !== "settings") return; try { const s = await api("/api/now");
+  $("s-ver").textContent = s.version; } catch (e) {} }, 1000);
 /* ---- sync history (Settings → About) ---- */
 function fillLog() {
   const log = P.store.get("sync_log", []).slice(-6).reverse(), box = $("s-log"); box.innerHTML = "";
