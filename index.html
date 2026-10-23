@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon.png">
 <title>Pulse</title>
-<script src="engine.js?v=1792791749"></script>
+<script src="engine.js?v=1792792517"></script>
 <style>@font-face{font-family:Inter;font-weight:400;font-display:swap;src:url(fonts/Inter-Regular.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:500;font-display:swap;src:url(fonts/Inter-Medium.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:600;font-display:swap;src:url(fonts/Inter-SemiBold.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:700;font-display:swap;src:url(fonts/Inter-Bold.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:800;font-display:swap;src:url(fonts/Inter-ExtraBold.woff2) format('woff2')}.connect { background: var(--green-soft); }
 .actions > span { display: inline-flex; gap: 8px; flex-wrap: wrap; }
 .howto { margin: 0 0 12px 20px; padding: 0; color: var(--sub); font-size: var(--t2); line-height: 20px; }
@@ -1065,7 +1065,7 @@ async function sendHealth(resend) {
     if (!h.counts.hr && !h.counts.rhr && !h.counts.hrv) { toast("Nothing new to send"); return; }
     await navigator.clipboard.writeText(JSON.stringify(h.payload));
     await P.healthSent(h.mark);
-    $("h-note").textContent = "Copied " + h.counts.hr + " heart rate, " + h.counts.rhr + " resting and " + h.counts.hrv + " HRV values. Opening Shortcuts… If it does not open, run Pulse to Health from the Shortcuts app.";
+    $("h-note").textContent = "Copied " + h.counts.hr + " heart rate, " + h.counts.rhr + " resting and " + h.counts.hrv + " HRV values. Opening Shortcuts… If the shortcut didn't run, tap Send to Health again within 15 minutes to resend this batch.";
     location.href = "shortcuts://run-shortcut?name=" + encodeURIComponent("Pulse to Health");
     fillHealth();
   } catch (e) { toast(String(e.message || e)); }

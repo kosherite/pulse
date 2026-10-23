@@ -916,7 +916,10 @@ class Pulse {
    * Web pages cannot write to Health, but a Shortcut can. Pulse hands the Shortcut a small JSON
    * (heart rate as 10-minute averages, resting heart rate and HRV once per night) on the clipboard. */
   async healthPayload(resend) {
-    const last = resend ? {} : this.store.get("health_last", {}), t = now(), from = Math.max(last.hr || 0, t - 7 * 86400);
+    // a second tap soon after a send re-sends that batch: Pulse can't tell whether the shortcut actually ran
+    let last = resend ? {} : this.store.get("health_last", {}); const t = now();
+    if (!resend && last.at && t - last.at < 900 && last.prev) last = last.prev;
+    const from = Math.max(last.hr || 0, t - 7 * 86400);
     await this.store.loadSpan(from, t);
     const rows = this.store.minutes(from, t).filter(r => r[1] && r[0] + 60 <= t - 60);
     const hr = [], slots = new Map();
@@ -931,7 +934,11 @@ class Pulse {
     if (nights.length && nights[nights.length - 1].day === localDay(t) && t - nights[nights.length - 1].end < 3 * 3600) mark.night = last.night || "";
     return { payload: { pulse: 1, hr, rhr, hrv }, mark, counts: { hr: hr.length, rhr: rhr.length, hrv: hrv.length } };
   }
-  async healthSent(mark) { await this.store.put("health_last", Object.assign({}, mark, { at: now() })); }
+  async healthSent(mark) {
+    const cur = this.store.get("health_last", {}), t = now();
+    const prev = cur.at && t - cur.at < 900 && cur.prev ? cur.prev : { hr: cur.hr || 0, night: cur.night || "" };
+    await this.store.put("health_last", Object.assign({}, mark, { at: t, prev }));
+  }
 
   /* --- the page's requests (same answers the Mac server gave) --- */
   async api(path, body) {
@@ -1005,7 +1012,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-8";
+const VERSION = "web-2026.10.23-9";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
