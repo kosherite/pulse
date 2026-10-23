@@ -746,6 +746,7 @@ class Pulse {
     if (!await this.ensureClock()) {
       this.st.sync_note = "The strap did not confirm its clock. Readings will be re-dated when it does.";
       this.note(this.framesThisLink ? "Clock not confirmed" : "No reply from the strap to the clock check");
+      if (!this.framesThisLink) this.st.sync_note = "The strap accepts the connection but isn't answering Pulse's commands. If Pulse is running on your Mac, it's probably holding the strap: quit it (WHOOP --uninstall, or turn the Mac's Bluetooth off), then tap Reconnect.";
     }
     if (this.stats && this.stats.frames) this.logStats("restarted");
     this.stats = { started: now(), frames: 0, ok: 0, undecoded: 0, bad_time: 0, crc_bad: 0, versions: {}, metas: {}, t_min: null, t_max: null };
@@ -987,7 +988,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-5";
+const VERSION = "web-2026.10.23-6";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
