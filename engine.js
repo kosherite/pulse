@@ -637,9 +637,19 @@ class Pulse {
     }, delay);
   }
   async reconnect() { clearTimeout(this.retry); this.scheduleReconnect(10); }
+  // called when Pulse comes back on screen: iOS pauses pages in the background, so reconnect or catch up now
+  async wake() {
+    if (!this.link) return this.autoConnect();
+    if (this.st.link === "disconnected") return this.reconnect();
+    if (this.st.link !== "connected") return;
+    if (now() - (this.rx || 0) > 20) { this.link.drop(); return; }
+    if (this.st.sync === "syncing" && now() - this.activity > 10) { this.startSync().catch(() => {}); return; }
+    if (this.st.sync !== "syncing") this.st.want_sync = true;
+  }
   async write(data, response = true) { await this.link.write(data, response); }
 
   async session() {
+    this.sessionAt = now(); this.rx = now();
     try { await this.link.notify("heart_rate", "heart_rate_measurement", d => this.onHR(d)); } catch (e) { /* live heart rate not offered */ }
     for (const u of NOTIFY) await this.link.notify(SVC, u, d => this.onFrame(u, d)).catch(() => {});
     await this.write(HELLO);
@@ -663,8 +673,10 @@ class Pulse {
         if (kicks < 3) { kicks++; this.startSync().catch(() => {}); }
         else { this.logStats("stalled"); this.stats = null; Object.assign(this.st, { sync: "stalled", sync_pct: null }); stalledAt = now(); }
       }
+      // a link that says "connected" but has delivered nothing for 2 minutes (common after iOS pauses the page) is dead: rebuild it
+      if (now() - (this.rx || 0) > 120 && now() - this.sessionAt > 120) { this.logStats("silent link"); this.stats = null; this.link.drop(); return; }
       const due = (this.st.sync === "synced" && now() - (this.store.get("last_sync") || 0) > this.conf().sync_every * 60) ||
-        (this.st.sync === "stalled" && now() - stalledAt > 300);
+        (this.st.sync === "stalled" && now() - stalledAt > 60);
       if (["synced", "stalled"].includes(this.st.sync) && (this.st.want_sync || due)) { this.st.want_sync = false; kicks = 0; this.startSync().catch(() => {}); }
     }, 1000);
   }
@@ -674,7 +686,7 @@ class Pulse {
     const [bpm, rr] = parseHR(d);
     if (bpm < 30 || bpm > 220) return;
     const t = Math.floor(now());
-    this.st.bpm = bpm; this.st.last = now();
+    this.st.bpm = bpm; this.st.last = now(); this.rx = now();
     this.live.push([t, bpm]); while (this.live.length && this.live[0][0] < t - 3700) this.live.shift();
     this.liveSecs = this.liveSecs || [];
     this.liveSecs.push([t, bpm, rr.length ? rr : null, null, null, null, null, null, null, 0, null, null, null]);
@@ -710,6 +722,7 @@ class Pulse {
     const log = this.store.get("sync_log", []).slice(-19); log.push(this.stats); this.store.put("sync_log", log);
   }
   onFrame(key, data) {
+    this.rx = now();
     if (!this.reasm.has(key)) this.reasm.set(key, new Reassembler());
     for (const f of this.reasm.get(key).feed(data)) {
       if (f.length < 11) continue;
@@ -928,7 +941,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.22-5";
+const VERSION = "web-2026.10.22-6";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function isoLocal(t) {
   const d = new Date(t * 1000), p = n => String(n).padStart(2, "0"), off = -d.getTimezoneOffset();
@@ -938,11 +951,12 @@ function isoLocal(t) {
 
 /* ------------------------------------------------------------------ Bluetooth wrapper */
 class BleLink {
-  constructor(dev, onLost) { this.dev = dev; this.onLost = onLost; this.chars = new Map(); this.chain = Promise.resolve(); dev.addEventListener("gattserverdisconnected", () => onLost()); }
+  constructor(dev, onLost) { this.dev = dev; this.onLost = onLost; this.chars = new Map(); this.cbs = new Map(); this.hooked = new WeakSet(); this.chain = Promise.resolve(); dev.addEventListener("gattserverdisconnected", () => onLost()); }
   // Web Bluetooth allows one GATT operation at a time; queue them all
   op(fn) { const p = this.chain.then(fn, fn); this.chain = p.catch(() => {}); return p; }
   async open() { this.chars.clear(); this.gatt = await this.dev.gatt.connect(); }
   async reopen() { await this.open(); }
+  drop() { try { if (this.dev.gatt.connected) this.dev.gatt.disconnect(); else this.onLost(); } catch (e) { this.onLost(); } }
   async char(svc, ch) {
     const k = svc + "/" + ch;
     if (!this.chars.has(k)) { const sv = await this.gatt.getPrimaryService(svc); this.chars.set(k, await sv.getCharacteristic(ch)); }
@@ -950,8 +964,10 @@ class BleLink {
   }
   notify(svc, ch, cb) {
     return this.op(async () => {
-      const c = await this.char(svc, ch);
-      c.addEventListener("characteristicvaluechanged", e => { const v = e.target.value; cb(new Uint8Array(v.buffer, v.byteOffset, v.byteLength).slice()); });
+      const c = await this.char(svc, ch), k = svc + "/" + ch;
+      this.cbs.set(k, cb);
+      // a second listener on the same object would deliver every packet twice and corrupt the history stream
+      if (!this.hooked.has(c)) { this.hooked.add(c); c.addEventListener("characteristicvaluechanged", e => { const v = e.target.value, f = this.cbs.get(k); if (f) f(new Uint8Array(v.buffer, v.byteOffset, v.byteLength).slice()); }); }
       await c.startNotifications();
     });
   }
@@ -971,6 +987,7 @@ class FakeLink {
   constructor(p) { this.p = p; this.cbs = new Map(); this.start = Math.floor(now()) - 72 * 3600; this.cursor = this.start; }
   async notify(svc, ch, cb) { this.cbs.set(ch, cb); if (ch === "heart_rate_measurement") setInterval(() => cb(new Uint8Array([0, Math.round(this.body(now()).hr)])), 1000); }
   async read() { return new Uint8Array([88]); }
+  drop() {}
   body(t) {
     const d = new Date(t * 1000), h = d.getHours() + d.getMinutes() / 60, asleep = h >= 23.17 || h < 6.92, walking = (h >= 8 && h < 8.4) || (h >= 17.5 && h < 18.2);
     const rnd = mulberry(Math.floor(t / 7));
