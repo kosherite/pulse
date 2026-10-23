@@ -647,7 +647,15 @@ class Pulse {
     if (this.st.sync === "syncing" && now() - this.activity > 10) { this.startSync().catch(() => {}); return; }
     if (this.st.sync !== "syncing") this.st.want_sync = true;
   }
-  async write(data, response = true) { await this.link.write(data, response); }
+  // Confirmed writes are what the Mac uses; if iPhone rejects one, send it unconfirmed (what NOOP's iOS app does
+  // for ordinary commands) and keep doing so for the rest of this connection.
+  async write(data, response = true) {
+    if (response && !this.noResp) {
+      try { return await this.link.write(data, true); }
+      catch (e) { this.noResp = true; this.note("Confirmed write refused (" + errText(e) + "); switching to unconfirmed writes"); }
+    }
+    return this.link.write(data, false);
+  }
 
   // one line per connection step, kept for Settings → About → Connection log
   note(msg) {
@@ -655,7 +663,7 @@ class Pulse {
     this.store.put("link_log", log).catch(() => {});
   }
   async session() {
-    this.sessionAt = now(); this.rx = now(); this.framesThisLink = 0; this.inSession = true; this.st.step = "Opening heart rate";
+    this.sessionAt = now(); this.rx = now(); this.framesThisLink = 0; this.inSession = true; this.noResp = false; this.st.step = "Opening heart rate";
     this.note("Connected to " + (this.link.dev && this.link.dev.name || "strap"));
     try { await this.link.notify("heart_rate", "heart_rate_measurement", d => this.onHR(d)); this.note("Live heart rate on"); }
     catch (e) { this.note("Live heart rate unavailable: " + errText(e)); }
@@ -688,7 +696,7 @@ class Pulse {
     await sleep(1000);
     this.readBattery();
     this.inSession = false; this.st.step = null;
-    if (subs) this.startSync().catch(e => { this.st.sync = "error"; this.st.sync_note = String(e.message || e).slice(0, 80); this.note("Sync failed to start: " + errText(e)); });
+    if (subs) this.startSync().catch(e => { this.st.sync = "error"; this.st.sync_note = "Sync failed: " + errText(e); this.note("Sync failed to start: " + errText(e)); });
     let kicks = 0, stalledAt = 0, tick = 0;
     clearInterval(this.timer);
     this.timer = setInterval(async () => {
@@ -927,8 +935,11 @@ class Pulse {
       return Object.assign({}, this.conf(), { version: VERSION, days: this.store.keys.size, records: this.store.get("records", 0), web: true }, this.strapStatus());
     }
     if (p === "/api/sync") {
-      const stuck = this.inSession ? now() - this.sessionAt > 60 : !["synced", "stalled", "syncing"].includes(this.st.sync);
-      if (this.link && this.st.link === "connected" && stuck) { this.note("Sync now: restarting the connection"); this.inSession = false; this.link.drop(); }
+      if (this.link && this.st.link === "connected" && this.inSession && now() - this.sessionAt > 60) { this.note("Sync now: set-up hung, restarting the connection"); this.inSession = false; this.link.drop(); }
+      else if (this.link && this.st.link === "connected" && !this.inSession && !["synced", "stalled", "syncing"].includes(this.st.sync)) {
+        this.note("Sync now: starting a sync");
+        this.startSync().catch(e => { this.st.sync = "error"; this.st.sync_note = "Sync failed: " + errText(e); this.note("Sync failed: " + errText(e)); });
+      }
       else if (!this.link || this.st.link === "disconnected") this.wake();
       else this.st.want_sync = true;
       return { ok: true };
@@ -980,9 +991,11 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-3";
+const VERSION = "web-2026.10.23-4";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const errText = e => String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").slice(0, 90);
+const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
+const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
+  return (/^\d+$/.test(t) ? "Bluetooth error " + t + (BT_CODES[t] ? " (" + BT_CODES[t] + ")" : "") : t).slice(0, 90); };
 function isoLocal(t) {
   const d = new Date(t * 1000), p = n => String(n).padStart(2, "0"), off = -d.getTimezoneOffset();
   return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) +
