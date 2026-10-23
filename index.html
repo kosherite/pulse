@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon.png">
 <title>Pulse</title>
-<script src="engine.js?v=1792792517"></script>
+<script src="engine.js?v=1792792880"></script>
 <style>@font-face{font-family:Inter;font-weight:400;font-display:swap;src:url(fonts/Inter-Regular.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:500;font-display:swap;src:url(fonts/Inter-Medium.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:600;font-display:swap;src:url(fonts/Inter-SemiBold.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:700;font-display:swap;src:url(fonts/Inter-Bold.woff2) format('woff2')}@font-face{font-family:Inter;font-weight:800;font-display:swap;src:url(fonts/Inter-ExtraBold.woff2) format('woff2')}.connect { background: var(--green-soft); }
 .actions > span { display: inline-flex; gap: 8px; flex-wrap: wrap; }
 .howto { margin: 0 0 12px 20px; padding: 0; color: var(--sub); font-size: var(--t2); line-height: 20px; }
@@ -537,7 +537,7 @@ details.more .cust { border-top: 0; padding-top: 4px; }
     <div class="row"><span>On this iPhone</span><span id="s-days">--</span></div>
     <div class="row"><span>Kept since</span><span id="s-since">--</span></div>
     <div class="row"><span>Sent to Apple Health</span><span id="h-last">Never</span></div>
-    <div class="row btnrow"><button class="link" type="button" id="h-send">Send to Health</button><button class="link" type="button" id="export">Back up</button><button class="link" type="button" id="import">Restore</button></div>
+    <div class="row btnrow"><button class="link" type="button" id="h-send">Send to Health</button><button class="link" type="button" id="h-all">Send all history</button><button class="link" type="button" id="export">Back up</button><button class="link" type="button" id="import">Restore</button></div>
   </div>
   <p class="note foot" id="h-note"></p>
   <input type="file" id="import-file" accept=".json,application/json" hidden>
@@ -547,7 +547,7 @@ details.more .cust { border-top: 0; padding-top: 4px; }
     <div class="explain one">
       <details><summary>How the scores work</summary><p><b>Recovery</b> (0 to 100) compares last night's heart rate variability, resting heart rate, sleep and skin temperature with your previous 30 nights. <b>Strain</b> (0 to 21) weights each minute of the day by how hard your heart worked. <b>Sleep score</b> (0 to 100) combines time asleep against your need, efficiency, deep and REM share, and regular timing. Sleep stages follow the open-source NOOP method. <b>Health watch</b> starts after 14 nights and flags when resting heart rate, HRV and skin temperature move together the way they do before illness. These are estimates, not WHOOP's figures or a diagnosis.</p></details>
       <details><summary>Your data</summary><p>The strap records once a second and holds about three days. Pulse collects those readings over Bluetooth while it is open in Bluefy and stores them only on this iPhone. Back up now and then: deleting Bluefy or its website data deletes them. Restore accepts a Pulse backup or the history file from the Mac.</p></details>
-      <details><summary>Apple Health shortcut</summary><p>Build it once in the Shortcuts app. Create a shortcut named exactly <b>Pulse to Health</b> and add, in order:</p>
+      <details><summary>Apple Health shortcut</summary><p>Send to Health sends what is new; Send all history sends everything Pulse holds: heart rate (10-minute averages), resting heart rate, HRV and sleep stages. Both need the <b>Pulse to Health</b> shortcut, signed once on a Mac. To build a heart-rate-only version by hand instead, create a shortcut named exactly <b>Pulse to Health</b> and add, in order:</p>
         <ol class="howto">
           <li><b>Get Clipboard</b></li>
           <li><b>Get Dictionary from Input</b> (input: Clipboard)</li>
@@ -557,7 +557,7 @@ details.more .cust { border-top: 0; padding-top: 4px; }
           <li>Still inside: <b>Log Health Sample</b>, type <b>Heart Rate</b>, Value = <b>v</b>, Date = <b>d</b></li>
           <li>After End Repeat, repeat steps 3 to 6 with key <b>rhr</b> (Resting Heart Rate) and key <b>hrv</b> (Heart Rate Variability), picking the Dictionary from step 2 again.</li>
         </ol>
-        <p>Run it once from Shortcuts and allow Health access. After that, Send to Health opens it for you. <button class="link" type="button" id="h-resend">Resend the last 7 days</button></p></details>
+        <p>Run it once from Shortcuts and allow Health access. After that, Send to Health opens it for you.</p></details>
       <details><summary>Sync history</summary><div id="s-log" class="synclog"></div></details>
       <details><summary>Connection log</summary><div id="s-link" class="synclog"></div></details>
     </div>
@@ -1062,16 +1062,16 @@ setInterval(() => { if (view === "settings") { fillLog(); fillLinkLog(); } }, 30
 async function sendHealth(resend) {
   try {
     await ready; const h = await P.healthPayload(resend);
-    if (!h.counts.hr && !h.counts.rhr && !h.counts.hrv) { toast("Nothing new to send"); return; }
+    if (!h.counts.hr && !h.counts.rhr && !h.counts.hrv && !h.counts.sleep) { toast("Already sent. Use Send all history to send everything again"); return; }
     await navigator.clipboard.writeText(JSON.stringify(h.payload));
     await P.healthSent(h.mark);
-    $("h-note").textContent = "Copied " + h.counts.hr + " heart rate, " + h.counts.rhr + " resting and " + h.counts.hrv + " HRV values. Opening Shortcuts… If the shortcut didn't run, tap Send to Health again within 15 minutes to resend this batch.";
+    $("h-note").textContent = "Copied " + h.counts.hr.toLocaleString() + " heart rate readings, " + h.counts.rhr + " resting heart rates, " + h.counts.hrv + " HRV values and " + h.counts.sleep + " nights of sleep. Opening Shortcuts" + (h.counts.hr > 1000 ? "; a large send takes a few minutes, keep Shortcuts open." : ".") + " If the shortcut didn't run, tap Send to Health again within 15 minutes.";
     location.href = "shortcuts://run-shortcut?name=" + encodeURIComponent("Pulse to Health");
     fillHealth();
   } catch (e) { toast(String(e.message || e)); }
 }
 function fillHealth() { const h = P.store.get("health_last"); $("h-last").textContent = h && h.at ? ago(h.at) : "Never"; }
-$("h-send").onclick = () => sendHealth(false); $("h-resend").onclick = () => sendHealth(true);
+$("h-send").onclick = () => sendHealth(false); $("h-all").onclick = () => sendHealth(true);
 ready.then(fillHealth); setInterval(() => { if (view === "settings") fillHealth(); }, 5000);
 </script>
 </body>

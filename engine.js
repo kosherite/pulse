@@ -915,24 +915,29 @@ class Pulse {
   /* --- Apple Health, through the Shortcuts app ---
    * Web pages cannot write to Health, but a Shortcut can. Pulse hands the Shortcut a small JSON
    * (heart rate as 10-minute averages, resting heart rate and HRV once per night) on the clipboard. */
+  // resend = everything Pulse holds; otherwise everything not yet sent (all history the first time)
   async healthPayload(resend) {
     // a second tap soon after a send re-sends that batch: Pulse can't tell whether the shortcut actually ran
     let last = resend ? {} : this.store.get("health_last", {}); const t = now();
     if (!resend && last.at && t - last.at < 900 && last.prev) last = last.prev;
-    const from = Math.max(last.hr || 0, t - 7 * 86400);
+    const firstDay = this.store.dayKeys()[0];
+    const from = Math.max(last.hr || 0, firstDay ? dayStart(firstDay) : t - 7 * 86400);
     await this.store.loadSpan(from, t);
     const rows = this.store.minutes(from, t).filter(r => r[1] && r[0] + 60 <= t - 60);
+    this.store.evict();
     const hr = [], slots = new Map();
     for (const r of rows) { const k = r[0] - r[0] % 600; if (!slots.has(k)) slots.set(k, []); slots.get(k).push(r[1]); }
     for (const [k, v] of [...slots].sort((a, b) => a[0] - b[0])) if (k + 600 <= t - 60 && k + 600 > (last.hr || 0)) hr.push({ d: isoLocal(k + 300), v: Math.round(sum(v) / v.length) });
-    const nights = (await this.an.all(this.conf())).nights.filter(n => n.day > (last.night || "") && n.day >= localDay(t - 7 * 86400) && n.day < localDay(t + 86400));
+    // only settled nights: last night may still change while today's data arrives
+    const nights = (await this.an.all(this.conf())).nights.filter(n => n.day > (last.night || "") && n.day < localDay(t + 86400) && !(n.day === localDay(t) && t - n.end < 3 * 3600));
     const rhr = nights.filter(n => n.rhr).map(n => ({ d: isoLocal(n.end), v: n.rhr }));
     const hrv = nights.filter(n => n.hrv).map(n => ({ d: isoLocal(n.end), v: n.hrv }));
-    const mark = { hr: slots.size ? Math.max(...[...slots.keys()].filter(k => k + 600 <= t - 60), last.hr || 0) + 600 : last.hr || 0,
+    // sleep stages as Health's own categories: light sleep is "Core" in Health
+    const SV = { wake: "Awake", light: "Core", deep: "Deep", rem: "REM" }, sleep = [];
+    for (const n of nights) for (const [a, z, st] of n.stages || []) if (SV[st] && z > a) sleep.push({ s: isoLocal(a), e: isoLocal(z), v: SV[st] });
+    const mark = { hr: hr.length ? Math.max(...[...slots.keys()].filter(k => k + 600 <= t - 60)) + 600 : last.hr || 0,
       night: nights.length ? nights[nights.length - 1].day : last.night || "" };
-    // only settled nights count as sent: last night may still change while today's data arrives
-    if (nights.length && nights[nights.length - 1].day === localDay(t) && t - nights[nights.length - 1].end < 3 * 3600) mark.night = last.night || "";
-    return { payload: { pulse: 1, hr, rhr, hrv }, mark, counts: { hr: hr.length, rhr: rhr.length, hrv: hrv.length } };
+    return { payload: { pulse: 2, hr, rhr, hrv, sleep }, mark, counts: { hr: hr.length, rhr: rhr.length, hrv: hrv.length, sleep: nights.filter(n => (n.stages || []).length).length } };
   }
   async healthSent(mark) {
     const cur = this.store.get("health_last", {}), t = now();
@@ -1012,7 +1017,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-9";
+const VERSION = "web-2026.10.23-10";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
