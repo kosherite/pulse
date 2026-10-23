@@ -666,8 +666,13 @@ class Pulse {
     // On iPhone the WHOOP service is encrypted: the strap only accepts subscriptions after the hello,
     // written with a response so iOS can run (or reuse) the pairing. Subscribing first fails silently.
     this.st.step = "Pairing with the strap";
-    try { await this.link.write(HELLO, true, 30000); this.note("Handshake accepted"); }
-    catch (e) { this.note("Handshake refused: " + errText(e)); }
+    let paired = true;
+    this.link.way = null;
+    try { await this.link.writeOnly(HELLO, "with", 30000); this.note("Handshake accepted (secure link)"); }
+    catch (e) {
+      paired = false; this.note("Secure link refused: " + errText(e) + " (strap not paired with this device)");
+      this.link.write(HELLO, false).catch(() => {});
+    }
     this.st.step = "Opening data channels";
     let subs = 0, lastErr = null;
     for (let attempt = 0; attempt < 3 && subs === 0; attempt++) {
@@ -677,11 +682,12 @@ class Pulse {
         catch (e) { lastErr = e; }
       }
     }
-    if (subs) this.note("Strap data channels open (" + subs + " of " + NOTIFY.length + ")");
+    if (subs && paired) this.note("Strap data channels open (" + subs + " of " + NOTIFY.length + ")");
     else {
+      subs = 0;
       this.note("Strap data channels refused: " + errText(lastErr));
       this.st.sync = "pairing";
-      this.st.sync_note = "Your strap isn't paired with this iPhone, so it won't share history or battery. Close the WHOOP app, tap the strap until its lights flash blue, then tap Reconnect and accept the pairing request.";
+      this.st.sync_note = "Your strap isn't paired with this device, so it only shares live heart rate. Tap the strap until its lights flash blue (pairing mode), then tap Reconnect and accept the pairing request.";
     }
     this.st.step = "Setting the strap's clock";
     await this.write(setClock(now(), 3)).catch(e => this.note("Set clock failed: " + errText(e)));
@@ -988,7 +994,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-6";
+const VERSION = "web-2026.10.23-7";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
@@ -1024,6 +1030,13 @@ class BleLink {
       await c.startNotifications();
     });
   }
+  writeOnly(data, how, ms) {
+    return this.op(async () => {
+      const c = await this.char(SVC, CMD), buf = new Uint8Array(data).buffer;
+      if (how === "with") return c.writeValueWithResponse ? c.writeValueWithResponse(buf) : c.writeValue(buf);
+      return c.writeValueWithoutResponse ? c.writeValueWithoutResponse(buf) : c.writeValue(buf);
+    }, ms);
+  }
   write(data, response = true, ms) {
     return this.op(async () => {
       const c = await this.char(SVC, CMD);
@@ -1057,6 +1070,7 @@ class FakeLink {
   constructor(p) { this.p = p; this.cbs = new Map(); this.start = Math.floor(now()) - 72 * 3600; this.cursor = this.start; }
   async notify(svc, ch, cb) { this.cbs.set(ch, cb); if (ch === "heart_rate_measurement") setInterval(() => cb(new Uint8Array([0, Math.round(this.body(now()).hr)])), 1000); }
   async read() { return new Uint8Array([88]); }
+  writeOnly(d) { return this.write(d); }
   drop() {}
   body(t) {
     const d = new Date(t * 1000), h = d.getHours() + d.getMinutes() / 60, asleep = h >= 23.17 || h < 6.92, walking = (h >= 8 && h < 8.4) || (h >= 17.5 && h < 18.2);
