@@ -648,20 +648,42 @@ class Pulse {
   }
   async write(data, response = true) { await this.link.write(data, response); }
 
+  // one line per connection step, kept for Settings → About → Connection log
+  note(msg) {
+    const log = this.store.get("link_log", []).slice(-39); log.push({ at: now(), msg });
+    this.store.put("link_log", log).catch(() => {});
+  }
   async session() {
-    this.sessionAt = now(); this.rx = now();
-    try { await this.link.notify("heart_rate", "heart_rate_measurement", d => this.onHR(d)); } catch (e) { /* live heart rate not offered */ }
-    for (const u of NOTIFY) await this.link.notify(SVC, u, d => this.onFrame(u, d)).catch(() => {});
-    await this.write(HELLO);
-    await sleep(800);
-    await this.write(setClock(now(), 3));
+    this.sessionAt = now(); this.rx = now(); this.framesThisLink = 0;
+    this.note("Connected to " + (this.link.dev && this.link.dev.name || "strap"));
+    try { await this.link.notify("heart_rate", "heart_rate_measurement", d => this.onHR(d)); this.note("Live heart rate on"); }
+    catch (e) { this.note("Live heart rate unavailable: " + errText(e)); }
+    // On iPhone the WHOOP service is encrypted: the strap only accepts subscriptions after the hello,
+    // written with a response so iOS can run (or reuse) the pairing. Subscribing first fails silently.
+    try { await this.link.write(HELLO, true, 60000); this.note("Handshake accepted"); }
+    catch (e) { this.note("Handshake refused: " + errText(e)); }
+    let subs = 0, lastErr = null;
+    for (let attempt = 0; attempt < 3 && subs === 0; attempt++) {
+      if (attempt) await sleep(1500);
+      for (const u of NOTIFY) {
+        try { await this.link.notify(SVC, u, d => this.onFrame(u, d)); subs++; }
+        catch (e) { lastErr = e; }
+      }
+    }
+    if (subs) this.note("Strap data channels open (" + subs + " of " + NOTIFY.length + ")");
+    else {
+      this.note("Strap data channels refused: " + errText(lastErr));
+      this.st.sync = "pairing";
+      this.st.sync_note = "Your strap isn't paired with this iPhone, so it won't share history or battery. Close the WHOOP app, tap the strap until its lights flash blue, then tap Reconnect and accept the pairing request.";
+    }
+    await this.write(setClock(now(), 3)).catch(e => this.note("Set clock failed: " + errText(e)));
     await sleep(500);
-    await this.write(command(C.GET_CLOCK, 4));
-    await this.write(command(C.REALTIME_HR, 5), false);
-    await this.write(command(C.R10_R11, 6), false);
+    await this.write(command(C.GET_CLOCK, 4)).catch(() => {});
+    await this.write(command(C.REALTIME_HR, 5), false).catch(() => {});
+    await this.write(command(C.R10_R11, 6), false).catch(() => {});
     await sleep(1000);
     this.readBattery();
-    this.startSync().catch(e => { this.st.sync = "error"; this.st.sync_note = String(e.message || e).slice(0, 80); });
+    if (subs) this.startSync().catch(e => { this.st.sync = "error"; this.st.sync_note = String(e.message || e).slice(0, 80); this.note("Sync failed to start: " + errText(e)); });
     let kicks = 0, stalledAt = 0, tick = 0;
     clearInterval(this.timer);
     this.timer = setInterval(async () => {
@@ -680,7 +702,10 @@ class Pulse {
       if (["synced", "stalled"].includes(this.st.sync) && (this.st.want_sync || due)) { this.st.want_sync = false; kicks = 0; this.startSync().catch(() => {}); }
     }, 1000);
   }
-  async readBattery() { try { const v = await this.link.read("battery_service", "battery_level"); this.st.battery = v[0]; } catch (e) { /* not offered */ } }
+  async readBattery() {
+    try { const v = await this.link.read("battery_service", "battery_level"); this.st.battery = v[0]; }
+    catch (e) { if (!this.batteryErr) this.note("Battery read failed: " + errText(e)); this.batteryErr = true; }
+  }
 
   onHR(d) {
     const [bpm, rr] = parseHR(d);
@@ -709,7 +734,10 @@ class Pulse {
   }
   async startSync() {
     try { this.seq = (this.seq + 1) & 0xFF; await this.write(command(C.PACK_INFO, this.seq, [1])); } catch (e) { /* optional */ }
-    if (!await this.ensureClock()) this.st.sync_note = "The strap did not confirm its clock. Readings will be re-dated when it does.";
+    if (!await this.ensureClock()) {
+      this.st.sync_note = "The strap did not confirm its clock. Readings will be re-dated when it does.";
+      this.note(this.framesThisLink ? "Clock not confirmed" : "No reply from the strap to the clock check");
+    }
     if (this.stats && this.stats.frames) this.logStats("restarted");
     this.stats = { started: now(), frames: 0, ok: 0, undecoded: 0, bad_time: 0, crc_bad: 0, versions: {}, metas: {}, t_min: null, t_max: null };
     this.st.sync_seen = this.st.sync_ok = 0; this.first = null;
@@ -722,7 +750,7 @@ class Pulse {
     const log = this.store.get("sync_log", []).slice(-19); log.push(this.stats); this.store.put("sync_log", log);
   }
   onFrame(key, data) {
-    this.rx = now();
+    this.rx = now(); if (!this.framesThisLink++) this.note("Strap is sending data");
     if (!this.reasm.has(key)) this.reasm.set(key, new Reassembler());
     for (const f of this.reasm.get(key).feed(data)) {
       if (f.length < 11) continue;
@@ -941,8 +969,9 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-1";
+const VERSION = "web-2026.10.23-2";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const errText = e => String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").slice(0, 90);
 function isoLocal(t) {
   const d = new Date(t * 1000), p = n => String(n).padStart(2, "0"), off = -d.getTimezoneOffset();
   return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) +
@@ -953,7 +982,10 @@ function isoLocal(t) {
 class BleLink {
   constructor(dev, onLost) { this.dev = dev; this.onLost = onLost; this.chars = new Map(); this.cbs = new Map(); this.hooked = new WeakSet(); this.chain = Promise.resolve(); dev.addEventListener("gattserverdisconnected", () => onLost()); }
   // Web Bluetooth allows one GATT operation at a time; queue them all
-  op(fn) { const p = this.chain.then(fn, fn); this.chain = p.catch(() => {}); return p; }
+  op(fn, ms = 15000) {
+    const run = () => Promise.race([fn(), new Promise((_, no) => setTimeout(() => no(new Error("timed out")), ms))]);
+    const p = this.chain.then(run, run); this.chain = p.catch(() => {}); return p;
+  }
   async open() { this.chars.clear(); this.gatt = await this.dev.gatt.connect(); }
   async reopen() { await this.open(); }
   drop() { try { if (this.dev.gatt.connected) this.dev.gatt.disconnect(); else this.onLost(); } catch (e) { this.onLost(); } }
@@ -971,13 +1003,13 @@ class BleLink {
       await c.startNotifications();
     });
   }
-  write(data, response = true) {
+  write(data, response = true, ms) {
     return this.op(async () => {
       const c = await this.char(SVC, CMD);
       if (response && c.writeValueWithResponse) return c.writeValueWithResponse(data);
       if (!response && c.writeValueWithoutResponse) return c.writeValueWithoutResponse(data);
       return c.writeValue(data);
-    });
+    }, ms);
   }
   read(svc, ch) { return this.op(async () => { const v = await (await this.char(svc, ch)).readValue(); return new Uint8Array(v.buffer, v.byteOffset, v.byteLength).slice(); }); }
 }

@@ -559,6 +559,7 @@ details.more .cust { border-top: 0; padding-top: 4px; }
         </ol>
         <p>Run it once from Shortcuts and allow Health access. After that, Send to Health opens it for you. <button class="link" type="button" id="h-resend">Resend the last 7 days</button></p></details>
       <details><summary>Sync history</summary><div id="s-log" class="synclog"></div></details>
+      <details><summary>Connection log</summary><div id="s-link" class="synclog"></div></details>
     </div>
     <div class="row"><span>Version</span><span id="s-ver">--</span></div>
   </div>
@@ -1048,7 +1049,12 @@ function fillLog() {
     box.append(d);
   }
 }
-setInterval(() => { if (view === "settings") fillLog(); }, 3000); ready.then(fillLog);
+function fillLinkLog() {
+  const log = P.store.get("link_log", []).slice(-15).reverse(), box = $("s-link"); box.innerHTML = "";
+  if (!log.length) { box.textContent = "Nothing yet."; return; }
+  for (const x of log) { const d = document.createElement("div"); d.innerHTML = "<b></b> · <span></span>"; d.querySelector("b").textContent = tm(x.at); d.querySelector("span").textContent = x.msg; box.append(d); }
+}
+setInterval(() => { if (view === "settings") { fillLog(); fillLinkLog(); } }, 3000); ready.then(() => { fillLog(); fillLinkLog(); });
 /* ---- Apple Health through Shortcuts ---- */
 async function sendHealth(resend) {
   try {
