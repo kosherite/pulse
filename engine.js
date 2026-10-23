@@ -913,12 +913,22 @@ class Pulse {
       return { from: t0, to: t, gap: 600, points: decimate(pts, 288) };
     }
     const t0 = t - +rng;
-    let pts = decimate(this.live.filter(x => x[0] >= t0), { 60: 60, 600: 120, 3600: 240 }[rng] || 120);
+    // stored strap seconds + live readings (live wins), then minute rows where neither has data,
+    // so the short charts survive a reload instead of starting at the moment the page opened
+    const by = new Map();
+    for (let m = t0 - t0 % 60; m <= t; m += 60)
+      for (const s of await this.store.secsFor(m, this.secMem)) if (s[1] && s[0] >= t0) by.set(s[0], s[1]);
+    for (const [tt, b] of this.live) if (tt >= t0 && b) by.set(tt, b);
+    const covered = new Set([...by.keys()].map(x => x - x % 60));
+    await this.store.load(localDay(t0)); await this.store.load(localDay(t));
+    for (const r of this.store.minutes(t0 - t0 % 60, t + 60)) if (r[1] && !covered.has(r[0]) && r[0] + 30 >= t0) by.set(r[0] + 30, round(r[1], 1));
+    const merged = [...by.entries()].sort((a, b) => a[0] - b[0]);
+    let pts = decimate(merged, { 60: 60, 600: 120, 3600: 240 }[rng] || 120);
     if (rng !== "60") pts = pts.map(([tt], i) => { const w = pts.slice(Math.max(0, i - 1), i + 2); return [tt, round(sum(w.map(x => x[1])) / w.length, 1)]; });
-    return { from: t0, to: t, gap: 30, points: pts };
+    return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.22-3";
+const VERSION = "web-2026.10.22-4";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function isoLocal(t) {
   const d = new Date(t * 1000), p = n => String(n).padStart(2, "0"), off = -d.getTimezoneOffset();

@@ -528,7 +528,9 @@ function makeChart(box) {
     const off = -new Date(t0 * 1000).getTimezoneOffset() * 60;
     const xl = o.xlabel || (xs >= 86400 ? dshort : xs >= 3600 ? hourLabel : tm);
     for (let t = Math.ceil((t0 + off) / xs) * xs - off; t <= t1; t += xs) {
-      const pct = (t - t0) / span * 100, lab = document.createElement("span");
+      const pct = (t - t0) / span * 100;
+      if (pct > 92) continue;                      /* a label hugging the right edge collides with its neighbour */
+      const lab = document.createElement("span");
       lab.textContent = xl(t); lab.style.left = pct + "%";
       lab.style.transform = pct < 6 ? "none" : pct > 94 ? "translateX(-100%)" : "translateX(-50%)";
       X.append(lab);
