@@ -356,6 +356,20 @@ function nightFor(rows, day) {
   seg = rows.filter(r => r.t >= a && r.t < z);
   const inside = t => runs.some(([x, y]) => x <= t && t < y);
   const labels = stageMinutes(seg, a, z).map(([t, s]) => [t, inside(t) ? s : "wake"]);
+  // lying still but awake: 'light sleep' with heart rate 15% (at least 8 bpm) above the sleeping level for 3+ minutes is wake
+  const sleepHr = lowestAvg(seg.filter(r => r.hr).map(r => r.hr), 30);
+  if (sleepHr) {
+    const lim = Math.max(sleepHr * 1.15, sleepHr + 8), hrAt = new Map(seg.map(r => [r.t, r.hr]));
+    let run = [];
+    const close = () => { if (run.length >= 3) for (const k of run) labels[k][1] = "wake"; run = []; };
+    labels.forEach(([t, s], k) => { const h = hrAt.get(t); if (h && h > lim && s === "light") run.push(k); else close(); });
+    close();
+  }
+  // wake at either end is time in bed, not sleep
+  while (labels.length && labels[0][1] === "wake") labels.shift();
+  while (labels.length && labels[labels.length - 1][1] === "wake") labels.pop();
+  if (!labels.length) return null;
+  a = labels[0][0]; z = labels[labels.length - 1][0] + 60;
   const total = labels.length, count = { deep: 0, rem: 0, light: 0, wake: 0 };
   for (const [, s] of labels) count[s]++;
   const asleep = total - count.wake;
@@ -531,7 +545,7 @@ class Store {
 class Analysis {
   constructor(store) { this.s = store; this.ver = -1; this.cache = null; this.saved = null; }
   // results for settled days (older than two days) are kept in storage, so their minutes never need loading again
-  settled() { if (!this.saved) this.saved = Object.assign({}, this.s.get("analysis_v1", {})); return this.saved; }
+  settled() { if (!this.saved) this.saved = Object.assign({}, this.s.get("analysis_v2", {})); return this.saved; }
   invalidate(days) { const c = this.settled(); for (const d of days) { if (c[d] || c[addDays(d, 1)]) this.dirty = true; delete c[d]; delete c[addDays(d, 1)]; } if (days.length) this.ver = -1; }
   all(conf) {                                        // one computation at a time; callers share it
     if (this.running) return this.running;
@@ -559,7 +573,8 @@ class Analysis {
         const prev = nights.filter(x => x.temp).slice(-30);
         n.temp_dev = n.temp && prev.length >= 3 ? round(n.temp - median(prev.map(x => x.temp)), 2) : null;
         const need = sleepNeed(nights, conf.age);
-        n.need = Math.round(need * 60); n.rest = restScore(n, need, consistency(n, nights)); n.debt = sleepDebt([...nights, n], need);
+        const cons = consistency(n, nights); n.consistency = cons == null ? null : Math.round(100 * cons);
+        n.need = Math.round(need * 60); n.rest = restScore(n, need, cons); n.debt = sleepDebt([...nights, n], need);
         n.recovery = charge(n, nights); n.baseline_n = nights.filter(x => x.hrv).length; n.illness = illness(n, nights);
         nights.push(n);
       }
@@ -568,7 +583,7 @@ class Analysis {
       if (sum_) days.push(sum_);
       if (!recent && !saved[day]) { saved[day] = { n: raw, s: sum_ }; wrote = true; }
     }
-    if (wrote || this.dirty) { this.dirty = false; await this.s.put("analysis_v1", saved); }
+    if (wrote || this.dirty) { this.dirty = false; await this.s.put("analysis_v2", saved); }
     this.s.evict();
     this.cache = { nights, days }; this.ver = this.s.version; this.cacheDay = today;
     return this.cache;
@@ -667,7 +682,7 @@ class Pulse {
   }
   async session() {
     this.sessionAt = now(); this.rx = now(); this.framesThisLink = 0; this.inSession = true; this.noResp = false; this.st.step = "Opening heart rate";
-    this.note("Connected to " + (this.link.dev && this.link.dev.name || "strap"));
+    this.note("Connected to the strap");
     try { await this.link.notify("heart_rate", "heart_rate_measurement", d => this.onHR(d)); this.note("Live heart rate on"); }
     catch (e) { this.note("Live heart rate unavailable: " + errText(e)); }
     // On iPhone the WHOOP service is encrypted: the strap only accepts subscriptions after the hello,
@@ -884,6 +899,12 @@ class Pulse {
     } finally { this.flushing = false; }
   }
 
+  async deleteAll() {
+    try { if (this.link && this.link.dev && this.link.dev.gatt.connected) this.link.dev.gatt.disconnect(); } catch (e) { /* ignore */ }
+    try { this.store.db && this.store.db.close(); } catch (e) { /* ignore */ }
+    await new Promise(res => { const r = indexedDB.deleteDatabase(this.store.name); r.onsuccess = r.onerror = r.onblocked = () => res(); });
+    try { localStorage.clear(); } catch (e) { /* ignore */ }
+  }
   /* --- backups and the one-time import from the Mac --- */
   async exportBackup() {
     const days = {};
@@ -1017,7 +1038,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.23-10";
+const VERSION = "2.0.0";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
