@@ -12,5 +12,7 @@ Open the published page in a browser with Web Bluetooth (on iPhone, Bluefy), tap
 your strap. The strap must be in pairing mode the first time.
 
 Pulse is an independent project and is not affiliated with WHOOP. Scores are estimates, not medical
-advice. The strap protocol and sleep-staging method follow [NOOP](https://github.com/ryanbr/noop)
-(PolyForm Noncommercial 1.0.0), so Pulse is for personal, non-commercial use.
+advice.
+
+Licensed under the PolyForm Noncommercial License 1.0.0, for personal and non-commercial use. The full
+terms and credits are in `LICENSE`, `NOTICE` and `ATTRIBUTION.md` on the `main` branch.

@@ -2,7 +2,7 @@
  *
  * Talks to a WHOOP 5.0 strap over Web Bluetooth, keeps per-minute history in IndexedDB, and computes
  * sleep, recovery, strain, workouts and reviews on the device. Nothing leaves the browser.
- * Protocol and sleep-staging method after NOOP (github.com/ryanbr/noop, PolyForm Noncommercial 1.0.0).
+ * Licensed under the PolyForm Noncommercial License 1.0.0; see LICENSE, NOTICE and ATTRIBUTION.md on the main branch.
  */
 (function (root) {
 "use strict";
@@ -176,7 +176,7 @@ function respRegularity(beats) {
 }
 const rowObj = r => { const o = {}; MIN_COLS.forEach((k, i) => { o[k] = r[i] === undefined ? null : r[i]; }); return o; };
 
-/* ------------------------------------------------------------------ sleep (after NOOP SleepStager + V2) */
+/* ------------------------------------------------------------------ sleep detection and staging */
 const STILL_WIN = 15, STILL_FRAC = 0.70, MAX_GAP = 20, MERGE_MIN = 15, MIN_SLEEP = 60;
 const HR_BAND = 1.05, QUIET_BAND = 1.30, BRIDGE_ACTIVE = 30, BRIDGE_ACTIVE_INBAND = 60, CHAIN_GAP = 90;
 const STAGES = ["deep", "rem", "light", "wake"];
@@ -384,7 +384,7 @@ function nightFor(rows, day) {
     hrv: hrv.length >= 10 ? Math.round(median(hrv)) : null, temp: temps.length >= 30 ? round(median(temps), 2) : null, stages };
 }
 
-/* ------------------------------------------------------------------ scores (after NOOP) */
+/* ------------------------------------------------------------------ scores */
 function baseline(vals, floor) {
   const v = vals.filter(x => x != null).slice(-30);
   if (v.length < 4) return null;
@@ -1032,7 +1032,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "1.0.0";
+const VERSION = "1.0.1";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
