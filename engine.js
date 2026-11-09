@@ -1,9 +1,8 @@
-/* Pulse engine for the browser (Bluefy on iPhone).
+/* Pulse engine.
  *
- * A JavaScript port of pulse.py: the WHOOP 5.0 protocol (after NOOP), per-minute storage in IndexedDB,
- * NOOP-style sleep detection and staging, and the scores. The page talks to it through Pulse.api(path),
- * which answers the same requests the Mac server did, so the interface is shared.
- * Protocol details come from NOOP (github.com/ryanbr/noop, PolyForm Noncommercial 1.0.0 - personal use).
+ * Talks to a WHOOP 5.0 strap over Web Bluetooth, keeps per-minute history in IndexedDB, and computes
+ * sleep, recovery, strain, workouts and reviews on the device. Nothing leaves the browser.
+ * Protocol and sleep-staging method after NOOP (github.com/ryanbr/noop, PolyForm Noncommercial 1.0.0).
  */
 (function (root) {
 "use strict";
@@ -433,17 +432,33 @@ function sleepDebt(history, needH) {
   for (const n of history.slice(-14)) if (n.asleep > 0) { const d = 0.55 * Math.max(0, need + debt - n.asleep); debt = d < 10 ? 0 : d; }
   return Math.round(debt);
 }
-function illness(n, history) {
-  if (history.length < 14) return { level: "learning", score: null, signals: [], nights: history.length };
-  const out = []; let score = 0;
-  for (const [key, label, floor, sign] of [["rhr", "resting heart rate up", 2, 1], ["temp", "skin temperature up", 0.3, 1], ["hrv", "heart rate variability down", 5, -1]]) {
-    const b = baseline(history.map(x => x[key]), floor);
-    if (!b || n[key] == null) continue;
-    const over = sign * zscore(n[key], b) - 2;
-    if (over > 0) { out.push(label); score += Math.min(40, 22 * over); }
+// A workout is ten or more minutes with heart rate above 40% of the way from resting to maximum
+// (gaps of up to two minutes allowed). Heart rate recovery is the drop from the final minute of effort
+// to one minute after it, read between the two following minute averages.
+function findWorkouts(rows, rest, hmax) {
+  const thr = rest + 0.4 * (hmax - rest), byT = new Map(rows.map(r => [r.t, r])), out = [];
+  const hard = r => r && r.hr && r.hr >= thr && !(r.asleep > 30);
+  let start = null, last = null;
+  const close = () => {
+    if (start != null && last - start >= 540) {
+      let seg = rows.filter(r => r.t >= start && r.t <= last && r.hr);
+      // the effort ends where heart rate starts falling away, not where it finally crosses the threshold
+      const level = sum(seg.map(r => r.hr)) / seg.length;
+      while (seg.length > 9 && seg[seg.length - 1].hr < 0.9 * level) seg = seg.slice(0, -1);
+      last = seg[seg.length - 1].t;
+      const hrs = seg.map(r => r.hr), end = byT.get(last), a = byT.get(last + 60), b = byT.get(last + 120);
+      const hrr = end && a && b && a.hr && b.hr ? Math.round(end.hr - (a.hr + b.hr) / 2) : null;
+      out.push({ start, end: last + 60, mins: Math.round((last + 60 - start) / 60), avg: Math.round(sum(hrs) / hrs.length),
+        max: Math.round(Math.max(...seg.map(r => r.hr_max || r.hr))), hrr: hrr != null && hrr > 0 ? hrr : null });
+    }
+    start = last = null;
+  };
+  for (const r of rows) {
+    if (hard(r)) { if (start == null) start = r.t; last = r.t; }
+    else if (last != null && r.t - last > 120) close();
   }
-  score = Math.min(100, score);
-  return { level: out.length < 2 || score < 25 ? "normal" : score < 50 ? "mild" : "raised", score: Math.round(score), signals: out, nights: history.length };
+  close();
+  return out;
 }
 function daySummary(rows, day, age, rhr) {
   if (!rows.length) return null;
@@ -451,14 +466,15 @@ function daySummary(rows, day, age, rhr) {
   let trimp = 0;
   for (const h of hrs) { const p = 100 * (h - rest) / Math.max(1, hmax - rest); trimp += p >= 90 ? 5 : p >= 80 ? 4 : p >= 70 ? 3 : p >= 60 ? 2 : p >= 50 ? 1 : 0; }
   const effort = hrs.length >= 10 ? 100 * Math.log(trimp + 1) / Math.log(7201) : 0;
-  return { day, steps: sum(rows.map(r => r.steps || 0)), active: Math.round(sum(rows.map(r => (r.walk || 0) + (r.run || 0))) / 60),
+  const workouts = findWorkouts(rows, rest, hmax), rec = workouts.map(w => w.hrr).filter(v => v != null);
+  return { day, workouts, hrr: rec.length ? Math.round(sum(rec) / rec.length) : null, steps: sum(rows.map(r => r.steps || 0)), active: Math.round(sum(rows.map(r => (r.walk || 0) + (r.run || 0))) / 60),
     effort: Math.round(effort), strain: round(effort * 0.21, 1), avg: hrs.length ? Math.round(sum(hrs) / hrs.length) : null, worn: hrs.length };
 }
 
 /* ------------------------------------------------------------------ storage (IndexedDB) */
 // stores: days  {day, rows: {t: minuteRowArray}}  - every minute, kept forever
 //         secs  {m, rows: [secTuple]}              - per-second detail for 3 h (to build minute rows and the short charts)
-//         kv    {k, v}                             - settings, theme, sync log, pending clock-reset readings
+//         kv    {k, v}                             - settings, card order, sync log, pending clock-reset readings
 const SEC_KEEP = 3 * 3600;     // minute rows are the permanent record; seconds only bridge chunk edges and feed the 1-hour chart
 class Store {
   constructor(name = "pulse") { this.name = name; this.days = new Map(); this.keys = new Set(); this.dirtyDays = new Set(); this.kv = new Map(); this.version = 0; this.mem = !root.indexedDB; }
@@ -545,7 +561,7 @@ class Store {
 class Analysis {
   constructor(store) { this.s = store; this.ver = -1; this.cache = null; this.saved = null; }
   // results for settled days (older than two days) are kept in storage, so their minutes never need loading again
-  settled() { if (!this.saved) this.saved = Object.assign({}, this.s.get("analysis_v2", {})); return this.saved; }
+  settled() { if (!this.saved) this.saved = Object.assign({}, this.s.get("analysis_v3", {})); return this.saved; }
   invalidate(days) { const c = this.settled(); for (const d of days) { if (c[d] || c[addDays(d, 1)]) this.dirty = true; delete c[d]; delete c[addDays(d, 1)]; } if (days.length) this.ver = -1; }
   all(conf) {                                        // one computation at a time; callers share it
     if (this.running) return this.running;
@@ -575,7 +591,7 @@ class Analysis {
         const need = sleepNeed(nights, conf.age);
         const cons = consistency(n, nights); n.consistency = cons == null ? null : Math.round(100 * cons);
         n.need = Math.round(need * 60); n.rest = restScore(n, need, cons); n.debt = sleepDebt([...nights, n], need);
-        n.recovery = charge(n, nights); n.baseline_n = nights.filter(x => x.hrv).length; n.illness = illness(n, nights);
+        n.recovery = charge(n, nights); n.baseline_n = nights.filter(x => x.hrv).length;
         nights.push(n);
       }
       const rhr = nights.length && nights[nights.length - 1].day === day ? nights[nights.length - 1].rhr : null;
@@ -583,7 +599,7 @@ class Analysis {
       if (sum_) days.push(sum_);
       if (!recent && !saved[day]) { saved[day] = { n: raw, s: sum_ }; wrote = true; }
     }
-    if (wrote || this.dirty) { this.dirty = false; await this.s.put("analysis_v2", saved); }
+    if (wrote || this.dirty) { this.dirty = false; await this.s.put("analysis_v3", saved); }
     this.s.evict();
     this.cache = { nights, days }; this.ver = this.s.version; this.cacheDay = today;
     return this.cache;
@@ -595,7 +611,7 @@ class Pulse {
   constructor() {
     this.store = new Store(); this.an = new Analysis(this.store); this.secMem = new Map();
     this.st = { bpm: null, last: 0, battery: null, link: "disconnected", sync: "waiting", sync_pct: null, sync_note: "",
-      sync_seen: 0, sync_ok: 0, clock_off: null, clock_read_at: 0, pack: null, charging: null, synced_once: false, want_sync: false };
+      sync_seen: 0, clock_off: null, clock_read_at: 0, pack: null, charging: null, want_sync: false };
     this.live = [];                                  // [t, bpm] for the last hour, for the short charts
     this.seq = 10; this.reasm = new Map(); this.recs = []; this.queue = []; this.activity = 0; this.first = null; this.stats = null;
     this.pendingBad = [];                            // readings with a reset clock, waiting for an anchor
@@ -605,9 +621,6 @@ class Pulse {
   async init() {
     await this.store.open();
     this.pendingBad = this.store.get("pending_bad", []);
-    if (!this.store.get("first_seen")) await this.store.put("first_seen", now());
-    await this.store.put("visits", (this.store.get("visits") || 0) + 1);
-    try { this.persisted = navigator.storage && navigator.storage.persisted ? await navigator.storage.persisted() : null; } catch (e) { this.persisted = null; }
     setInterval(() => this.flush(), 10000);
   }
   fresh() { return this.st.bpm != null && now() - this.st.last < 5; }
@@ -616,9 +629,9 @@ class Pulse {
   async connect(demo) {
     if (demo) { this.link = new FakeLink(this); }
     else {
-      if (!navigator.bluetooth) throw new Error("This browser has no Bluetooth. Open Pulse in Bluefy.");
+      if (!navigator.bluetooth) throw new Error("This browser has no Bluetooth.");
       const c = this.conf();
-      // show every nearby device: the strap advertises under its own name (for example "BAS WHOOP")
+      // list every nearby device: straps advertise under the name their owner gave them
       const dev = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: [SVC, "heart_rate", "battery_service"] });
       await this.store.put("conf", Object.assign(c, { target: dev.name || c.target }));
       this.link = new BleLink(dev, () => this.onDisconnect()); this.link.onNote = m => this.note(m);
@@ -627,7 +640,7 @@ class Pulse {
     this.st.link = "connected";
     await this.session();
   }
-  // Reconnect without a tap: Bluefy (3.2+) remembers devices this site was allowed to use.
+  // Reconnect without a tap when the browser remembers devices this site was allowed to use.
   async autoConnect() {
     if (this.link || !root.navigator || !navigator.bluetooth || !navigator.bluetooth.getDevices) return false;
     const target = this.conf().target, devs = await navigator.bluetooth.getDevices();
@@ -669,11 +682,7 @@ class Pulse {
     if (this.st.sync === "syncing" && now() - this.activity > 10) { this.startSync().catch(() => {}); return; }
     if (this.st.sync !== "syncing") this.st.want_sync = true;
   }
-  // Confirmed writes are what the Mac uses; if iPhone rejects one, send it unconfirmed (what NOOP's iOS app does
-  // for ordinary commands) and keep doing so for the rest of this connection.
-  async write(data, response = true) {
-    return this.link.write(data, response);
-  }
+  write(data, response = true) { return this.link.write(data, response); }
 
   // one line per connection step, kept for Settings → About → Connection log
   note(msg) {
@@ -681,7 +690,7 @@ class Pulse {
     this.store.put("link_log", log).catch(() => {});
   }
   async session() {
-    this.sessionAt = now(); this.rx = now(); this.framesThisLink = 0; this.inSession = true; this.noResp = false; this.st.step = "Opening heart rate";
+    this.sessionAt = now(); this.rx = now(); this.framesThisLink = 0; this.inSession = true; this.st.step = "Opening heart rate";
     this.note("Connected to the strap");
     try { await this.link.notify("heart_rate", "heart_rate_measurement", d => this.onHR(d)); this.note("Live heart rate on"); }
     catch (e) { this.note("Live heart rate unavailable: " + errText(e)); }
@@ -745,10 +754,11 @@ class Pulse {
   }
 
   onHR(d) {
+    this.rx = now();
     const [bpm, rr] = parseHR(d);
     if (bpm < 30 || bpm > 220) return;
     const t = Math.floor(now());
-    this.st.bpm = bpm; this.st.last = now(); this.rx = now();
+    this.st.bpm = bpm; this.st.last = now();
     this.live.push([t, bpm]); while (this.live.length && this.live[0][0] < t - 3700) this.live.shift();
     this.liveSecs = this.liveSecs || [];
     this.liveSecs.push([t, bpm, rr.length ? rr : null, null, null, null, null, null, null, 0, null, null, null]);
@@ -770,15 +780,20 @@ class Pulse {
     return false;
   }
   async startSync() {
+    if (this.starting) return;
+    this.starting = true;
+    try { await this._startSync(); } finally { this.starting = false; }
+  }
+  async _startSync() {
     try { this.seq = (this.seq + 1) & 0xFF; await this.write(command(C.PACK_INFO, this.seq, [1])); } catch (e) { /* optional */ }
     if (!await this.ensureClock()) {
       this.st.sync_note = "The strap did not confirm its clock. Readings will be re-dated when it does.";
       this.note(this.framesThisLink ? "Clock not confirmed" : "No reply from the strap to the clock check");
-      if (!this.framesThisLink) this.st.sync_note = "The strap accepts the connection but isn't answering Pulse's commands. If Pulse is running on your Mac, it's probably holding the strap: quit it (WHOOP --uninstall, or turn the Mac's Bluetooth off), then tap Reconnect.";
+      if (!this.framesThisLink) this.st.sync_note = "The strap is connected but isn't answering. Another device may be holding it: close other apps that use the strap, then tap Reconnect.";
     }
     if (this.stats && this.stats.frames) this.logStats("restarted");
     this.stats = { started: now(), frames: 0, ok: 0, undecoded: 0, bad_time: 0, crc_bad: 0, versions: {}, metas: {}, t_min: null, t_max: null };
-    this.st.sync_seen = this.st.sync_ok = 0; this.first = null;
+    this.st.sync_seen = 0; this.first = null;
     Object.assign(this.st, { sync: "syncing", sync_pct: 0 }); this.activity = now();
     this.seq = (this.seq + 1) & 0xFF; await this.write(command(C.HISTORY, this.seq));
   }
@@ -799,7 +814,7 @@ class Pulse {
         const r = decodeRecord(f);
         if (!r) { st.undecoded++; continue; }
         if (r.t < VALID_FROM || r.t > now() + 600) { st.bad_time++; this.recs.push({ bad: true, r }); continue; }
-        st.ok++; this.st.sync_ok = st.ok; st.t_min = Math.min(st.t_min || r.t, r.t); st.t_max = Math.max(st.t_max || r.t, r.t);
+        st.ok++; st.t_min = Math.min(st.t_min || r.t, r.t); st.t_max = Math.max(st.t_max || r.t, r.t);
         this.recs.push({ r });
         this.first = this.first || r.t;
         this.st.sync_pct = Math.min(99, Math.round(100 * (r.t - this.first) / Math.max(1, now() - this.first)));
@@ -835,12 +850,16 @@ class Pulse {
       while (this.queue.length) {
         const [end, recs, done] = this.queue.shift();
         try { await this.save(recs); }                                   // save first...
-        catch (e) { Object.assign(this.st, { sync: "error", sync_note: "Could not save: " + e }); continue; }   // ...never confirm unsaved data
+        catch (e) {                                                      // ...never confirm unsaved data, or anything after it
+          this.queue.length = 0; this.logStats("save failed"); this.stats = null;
+          Object.assign(this.st, { sync: "error", sync_pct: null, sync_note: "Could not save readings (" + errText(e) + "). Free some storage, then tap Sync now." });
+          return;
+        }
         if (end) { this.seq = (this.seq + 1) & 0xFF; await this.write(ack(end, this.seq)); }      // ...then let the strap free it
         if (done) {
           this.logStats("done"); this.stats = null;
           await this.flush();
-          Object.assign(this.st, { sync: "synced", sync_pct: null, synced_once: true }); this.histEdge = null;
+          Object.assign(this.st, { sync: "synced", sync_pct: null }); this.histEdge = null;
           if (!this.repairNote) this.st.sync_note = "";
           this.repairNote = null;
           await this.store.put("last_sync", now());
@@ -876,8 +895,6 @@ class Pulse {
       for (const m of ms) this.dirtyMinutes.add(m);
       const newest = Math.max(...good.map(r => r.t));
       this.histEdge = Math.max(this.histEdge || 0, newest);
-      if (newest > (this.store.get("strap_newest") || 0)) await this.store.put("strap_newest", newest);
-      await this.store.put("records", (this.store.get("records") || 0) + good.length);
     }
   }
   async flush() {
@@ -905,7 +922,7 @@ class Pulse {
     await new Promise(res => { const r = indexedDB.deleteDatabase(this.store.name); r.onsuccess = r.onerror = r.onblocked = () => res(); });
     try { localStorage.clear(); } catch (e) { /* ignore */ }
   }
-  /* --- backups and the one-time import from the Mac --- */
+  /* --- export and import --- */
   async exportBackup() {
     const days = {};
     for (const d of this.store.dayKeys()) {
@@ -918,7 +935,7 @@ class Pulse {
   }
   async importBackup(text) {
     const j = JSON.parse(text);
-    if (!j.cols || !j.days) throw new Error("This is not a Pulse backup.");
+    if (!j.cols || !j.days) throw new Error("This is not a Pulse export.");
     const map = MIN_COLS.map(c => j.cols.indexOf(c));
     let n = 0;
     for (const day of Object.keys(j.days)) for (const r of Object.values(j.days[day])) {
@@ -928,80 +945,54 @@ class Pulse {
       if (have && have.has(row[0]) && (have.get(row[0])[15] || 0) >= (row[15] || 0)) continue;     // keep richer local rows
       this.store.setMinute(row); n++;
     }
-    for (const k of ["theme", "conf"]) if (j.kv && j.kv[k] && !this.store.get(k)) await this.store.put(k, j.kv[k]);
+    for (const k of ["conf", "cards"]) if (j.kv && j.kv[k] && !this.store.get(k)) await this.store.put(k, j.kv[k]);
     const changed = await this.store.saveDays(); this.an.invalidate(changed); this.store.evict();
     return n;
   }
 
-  /* --- Apple Health, through the Shortcuts app ---
-   * Web pages cannot write to Health, but a Shortcut can. Pulse hands the Shortcut a small JSON
-   * (heart rate as 10-minute averages, resting heart rate and HRV once per night) on the clipboard. */
-  // resend = everything Pulse holds; otherwise everything not yet sent (all history the first time)
-  async healthPayload(resend) {
-    // a second tap soon after a send re-sends that batch: Pulse can't tell whether the shortcut actually ran
-    let last = resend ? {} : this.store.get("health_last", {}); const t = now();
-    if (!resend && last.at && t - last.at < 900 && last.prev) last = last.prev;
-    const firstDay = this.store.dayKeys()[0];
-    const from = Math.max(last.hr || 0, firstDay ? dayStart(firstDay) : t - 7 * 86400);
-    await this.store.loadSpan(from, t);
-    const rows = this.store.minutes(from, t).filter(r => r[1] && r[0] + 60 <= t - 60);
-    this.store.evict();
-    const hr = [], slots = new Map();
-    for (const r of rows) { const k = r[0] - r[0] % 600; if (!slots.has(k)) slots.set(k, []); slots.get(k).push(r[1]); }
-    for (const [k, v] of [...slots].sort((a, b) => a[0] - b[0])) if (k + 600 <= t - 60 && k + 600 > (last.hr || 0)) hr.push({ d: isoLocal(k + 300), v: Math.round(sum(v) / v.length) });
-    // only settled nights: last night may still change while today's data arrives
-    const nights = (await this.an.all(this.conf())).nights.filter(n => n.day > (last.night || "") && n.day < localDay(t + 86400) && !(n.day === localDay(t) && t - n.end < 3 * 3600));
-    const rhr = nights.filter(n => n.rhr).map(n => ({ d: isoLocal(n.end), v: n.rhr }));
-    const hrv = nights.filter(n => n.hrv).map(n => ({ d: isoLocal(n.end), v: n.hrv }));
-    // sleep stages as Health's own categories: light sleep is "Core" in Health
-    const SV = { wake: "Awake", light: "Core", deep: "Deep", rem: "REM" }, sleep = [];
-    for (const n of nights) for (const [a, z, st] of n.stages || []) if (SV[st] && z > a) sleep.push({ s: isoLocal(a), e: isoLocal(z), v: SV[st] });
-    const mark = { hr: hr.length ? Math.max(...[...slots.keys()].filter(k => k + 600 <= t - 60)) + 600 : last.hr || 0,
-      night: nights.length ? nights[nights.length - 1].day : last.night || "" };
-    return { payload: { pulse: 2, hr, rhr, hrv, sleep }, mark, counts: { hr: hr.length, rhr: rhr.length, hrv: hrv.length, sleep: nights.filter(n => (n.stages || []).length).length } };
+  /* --- what the page asks for --- */
+  async now() { const c = this.conf(); return this.snapshot(c, await this.an.all(c)); }
+  async nights() { return [...(await this.an.all(this.conf())).nights].reverse().slice(0, 60); }
+  async trend(metric, days = 30) {
+    const src = { recovery: ["nights", "recovery"], hrv: ["nights", "hrv"], rhr: ["nights", "rhr"], sleep: ["nights", "asleep"], strain: ["days", "strain"], hrr: ["days", "hrr"] }[metric] || ["nights", "recovery"];
+    const cut = localDay(now() - days * 86400);
+    return (await this.an.all(this.conf()))[src[0]].filter(x => x.day > cut && x[src[1]] != null).map(x => [dayStart(x.day) + 43200, x[src[1]]]);
   }
-  async healthSent(mark) {
-    const cur = this.store.get("health_last", {}), t = now();
-    const prev = cur.at && t - cur.at < 900 && cur.prev ? cur.prev : { hr: cur.hr || 0, night: cur.night || "" };
-    await this.store.put("health_last", Object.assign({}, mark, { at: t, prev }));
+  // The last `days` days against the `days` before them: averages, what moved, best and hardest day.
+  async review(days = 7) {
+    const a = await this.an.all(this.conf()), today = localDay(now());
+    const from = addDays(today, -(days - 1)), prevFrom = addDays(from, -days);
+    const inNow = x => x.day >= from && x.day <= today, inPrev = x => x.day >= prevFrom && x.day < from;
+    const avg = (list, k) => { const v = list.map(x => x[k]).filter(x => x != null); return v.length ? sum(v) / v.length : null; };
+    const defs = [["recovery", "Recovery", "nights", "recovery", 1], ["sleep", "Sleep", "nights", "asleep", 1], ["hrv", "HRV", "nights", "hrv", 1],
+      ["rhr", "Resting HR", "nights", "rhr", -1], ["strain", "Strain", "days", "strain", 0], ["hrr", "HR recovery", "days", "hrr", 1]];
+    const metrics = defs.map(([key, name, src, field, good]) => {
+      const cur = avg(a[src].filter(inNow), field), prev = avg(a[src].filter(inPrev), field);
+      const change = cur != null && prev ? (cur - prev) / Math.abs(prev) : null;
+      const verdict = change == null || !good || Math.abs(change) < 0.03 ? "same" : change * good > 0 ? "better" : "worse";
+      return { key, name, now: cur, prev, change, verdict };
+    });
+    const nights = a.nights.filter(inNow), rank = nights.filter(n => n.recovery != null).length >= 2 ? "recovery" : "rest";
+    const ranked = nights.filter(n => n[rank] != null).sort((x, y) => x[rank] - y[rank]);
+    const workouts = a.days.filter(inNow).reduce((t, d) => t + (d.workouts || []).length, 0);
+    return { days, from, to: today, metrics, nights: nights.length, workouts, rankedBy: rank,
+      best: ranked.length > 1 ? { day: ranked[ranked.length - 1].day, value: ranked[ranked.length - 1][rank] } : null,
+      worst: ranked.length > 1 ? { day: ranked[0].day, value: ranked[0][rank] } : null };
   }
-
-  /* --- the page's requests (same answers the Mac server gave) --- */
-  async api(path, body) {
-    const u = new URL(path, "https://pulse.local"), q = Object.fromEntries(u.searchParams), p = u.pathname, c = this.conf();
-    if (p === "/api/now") return this.apiNow(c, await this.an.all(c));
-    if (p === "/api/hr") return this.apiHr(q.range || "600");
-    if (p === "/api/nights") return [...(await this.an.all(c)).nights].reverse().slice(0, 60);
-    if (p === "/api/trend") {
-      const src = { recovery: ["nights", "recovery"], hrv: ["nights", "hrv"], rhr: ["nights", "rhr"], sleep: ["nights", "asleep"], rest: ["nights", "rest"], temp: ["nights", "temp"], steps: ["days", "steps"], strain: ["days", "strain"] }[q.metric] || ["nights", "recovery"];
-      const cut = localDay(now() - (+q.days || 30) * 86400);
-      return (await this.an.all(c))[src[0]].filter(x => x.day > cut && x[src[1]] != null).map(x => [dayStart(x.day) + 43200, x[src[1]]]);
+  syncNow() {
+    if (this.link && this.st.link === "connected" && this.inSession && now() - this.sessionAt > 60) { this.note("Sync now: set-up hung, restarting the connection"); this.inSession = false; this.link.drop(); }
+    else if (this.link && this.st.link === "connected" && !this.inSession && !["synced", "stalled", "syncing"].includes(this.st.sync)) {
+      this.note("Sync now: starting a sync");
+      this.startSync().catch(e => { this.st.sync = "error"; this.st.sync_note = "Sync failed: " + errText(e); this.note("Sync failed: " + errText(e)); });
     }
-    if (p === "/api/settings") {
-      if (body && body.sync_every) { if (![5, 15, 30, 60].includes(+body.sync_every)) throw new Error("Pick 5, 15, 30 or 60 minutes."); await this.store.put("conf", Object.assign(c, { sync_every: +body.sync_every })); }
-      return Object.assign({}, this.conf(), { version: VERSION, days: this.store.keys.size, records: this.store.get("records", 0), web: true }, this.strapStatus());
-    }
-    if (p === "/api/sync") {
-      if (this.link && this.st.link === "connected" && this.inSession && now() - this.sessionAt > 60) { this.note("Sync now: set-up hung, restarting the connection"); this.inSession = false; this.link.drop(); }
-      else if (this.link && this.st.link === "connected" && !this.inSession && !["synced", "stalled", "syncing"].includes(this.st.sync)) {
-        this.note("Sync now: starting a sync");
-        this.startSync().catch(e => { this.st.sync = "error"; this.st.sync_note = "Sync failed: " + errText(e); this.note("Sync failed: " + errText(e)); });
-      }
-      else if (!this.link || this.st.link === "disconnected") this.wake();
-      else this.st.want_sync = true;
-      return { ok: true };
-    }
-    if (p === "/api/theme") {
-      if (body) await this.store.put("theme", body);
-      return Object.assign({ palette: "sage", finish: "lift", hidden: ["goldman", "charcoal"], colors: {}, radius: 24, gap: 16, text: 100, labels: {} }, this.store.get("theme", {}));
-    }
-    throw new Error("not found: " + p);
+    else if (!this.link || this.st.link === "disconnected") this.wake();
+    else this.st.want_sync = true;
   }
-  strapStatus() {
-    const pack = this.st.pack && now() - this.st.pack.at < 900 ? this.st.pack : null;
-    return { strap_newest: this.store.get("strap_newest"), clock_off: this.st.clock_off != null ? this.st.clock_off : this.store.get("clock_off"), not_saving: false, pack, charging: this.st.charging };
+  async setAge(age) {
+    await this.store.put("conf", Object.assign(this.conf(), { age: Math.max(13, Math.min(100, Math.round(age) || 30)) }));
+    this.an.cache = null; this.an.saved = {}; await this.store.put("analysis_v3", {});
   }
-  apiNow(c, a) {
+  snapshot(c, a) {
     const st = this.st, today = localDay(now());
     const night = [...a.nights].reverse().find(n => n.day === today), last = night || a.nights[a.nights.length - 1] || null;
     const day = a.days.find(d => d.day === today) || null;
@@ -1009,12 +1000,15 @@ class Pulse {
     const base = k => { const v = prev.map(n => n[k]).filter(Boolean); return v.length >= 3 ? Math.round(median(v)) : null; };
     const zone = b => [0.5, 0.6, 0.7, 0.85].filter(x => b / (220 - c.age) >= x).length;
     let nightOut = null;
-    if (last) { nightOut = {}; for (const k of ["day", "start", "end", "asleep", "efficiency", "rhr", "hrv", "temp", "temp_dev", "recovery", "baseline_n", "method", "deep", "rem", "light", "awake", "rest", "debt", "need", "illness"]) nightOut[k] = last[k]; }
-    return Object.assign({ live: this.fresh(), bpm: this.fresh() ? st.bpm : null, zone: this.fresh() ? zone(st.bpm) : null, link: st.link, step: this.inSession ? st.step : null, version: VERSION,
-      battery: st.battery, target: c.target, sync: st.sync, sync_pct: st.sync_pct, sync_seen: st.sync_seen, sync_ok: st.sync_ok, sync_note: st.sync_note,
-      last_sync: this.store.get("last_sync"), night: nightOut, night_today: !!night, base: { rhr: base("rhr"), hrv: base("hrv") }, day, now: now() }, this.strapStatus());
+    if (last) { nightOut = {}; for (const k of ["day", "start", "end", "asleep", "efficiency", "rhr", "hrv", "temp", "temp_dev", "recovery", "baseline_n", "method", "deep", "rem", "light", "awake", "rest", "debt", "need", "consistency"]) nightOut[k] = last[k]; }
+    const pack = st.pack && now() - st.pack.at < 900 ? st.pack : null;
+    const lastWorkout = [...a.days].reverse().flatMap(d => [...(d.workouts || [])].reverse()).find(w => w.hrr != null) || null;
+    return { live: this.fresh(), bpm: this.fresh() ? st.bpm : null, zone: this.fresh() ? zone(st.bpm) : null, link: st.link, step: this.inSession ? st.step : null,
+      battery: st.battery, pack, sync: st.sync, sync_pct: st.sync_pct, sync_seen: st.sync_seen, sync_note: st.sync_note,
+      clock_off: st.clock_off != null ? st.clock_off : this.store.get("clock_off"),
+      last_sync: this.store.get("last_sync"), night: nightOut, night_today: !!night, base: { rhr: base("rhr"), hrv: base("hrv") }, day, lastWorkout };
   }
-  async apiHr(rng) {
+  async heartRate(rng) {
     const t = now();
     if (rng === "day") {
       const t0 = dayStart(localDay(t));
@@ -1038,16 +1032,11 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "web-2026.10.29-1";
+const VERSION = "1.0.0";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();
   return (/^\d+$/.test(t) ? "Bluetooth error " + t + (BT_CODES[t] ? " (" + BT_CODES[t] + ")" : "") : t).slice(0, 90); };
-function isoLocal(t) {
-  const d = new Date(t * 1000), p = n => String(n).padStart(2, "0"), off = -d.getTimezoneOffset();
-  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) +
-    (off >= 0 ? "+" : "-") + p(Math.floor(Math.abs(off) / 60)) + ":" + p(Math.abs(off) % 60);
-}
 
 /* ------------------------------------------------------------------ Bluetooth wrapper */
 class BleLink {
@@ -1119,7 +1108,7 @@ class FakeLink {
   body(t) {
     const d = new Date(t * 1000), h = d.getHours() + d.getMinutes() / 60, asleep = h >= 23.17 || h < 6.92, walking = (h >= 8 && h < 8.4) || (h >= 17.5 && h < 18.2);
     const rnd = mulberry(Math.floor(t / 7));
-    const hr = asleep ? 54 + 4 * Math.sin(h * 1.7) + rnd() * 4 - 2 : walking ? 104 + rnd() * 12 - 6 : 70 + 6 * Math.sin(h / 3) + rnd() * 8 - 4;
+    const hr = asleep ? 54 + 4 * Math.sin(h * 1.7) + rnd() * 4 - 2 : walking ? 124 + rnd() * 12 - 6 : 70 + 6 * Math.sin(h / 3) + rnd() * 8 - 4;
     return { hr, asleep: asleep && rnd() > 0.04, walking, temp: (asleep ? 34.1 : 32) + rnd() * 0.4 - 0.2 };
   }
   record(t, steps) {
@@ -1152,6 +1141,6 @@ function seal(f) { const n = f.length - 8; f[2] = n & 255; f[3] = n >> 8; f[4] =
 function meta(kind, end) { const f = new Uint8Array(36); f[0] = 0xAA; f[1] = 1; f[8] = T.META; f[10] = kind; if (end) f.set(le32(end), 21); return seal(f); }
 
 const api = { Pulse, VERSION, command, frameOk, Reassembler, decodeRecord, decodeMeta, decodePack, crc16, crc32, minuteRow, secTuple, rowObj,
-  respRegularity, findSessions, stageMinutes, nightFor, restScore, charge, sleepDebt, sleepNeed, consistency, illness, daySummary, decimate, median, MIN_COLS, localDay, dayStart };
+  respRegularity, findSessions, stageMinutes, nightFor, restScore, charge, sleepDebt, sleepNeed, consistency, daySummary, findWorkouts, decimate, median, MIN_COLS, localDay, dayStart };
 if (typeof module !== "undefined" && module.exports) module.exports = api; else root.PulseEngine = api;
 })(typeof self !== "undefined" ? self : globalThis);
