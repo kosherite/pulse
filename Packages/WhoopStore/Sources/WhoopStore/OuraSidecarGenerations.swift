@@ -10,7 +10,7 @@ import Foundation
 /// WHY THIS EXISTS — the rule it replaces was `LARGEST WINS`, and largest is the wrong criterion.
 /// The wake drain flushes the whole night's bank in one burst, so on an ordinary morning the biggest
 /// generation is whichever session happened to drain the most — routinely NOT the one holding the
-/// night. Measured on `noop-master-iOS-v11.1.1-260905-0714.zip`: the shipped `oura-raw.jsonl` spanned
+/// night. Measured on `pulse-master-iOS-v11.1.1-260905-0714.zip`: the shipped `oura-raw.jsonl` spanned
 /// `2026-09-04 10:58:22 → 12:03:47 UTC` — the previous day's post-reinstall backfill, which was
 /// simply the fattest file on disk. That morning's own 07:08 drain, the one carrying the night's
 /// banked records (including the single `0x5c` of the day and the hypnogram), was in a different

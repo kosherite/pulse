@@ -5,14 +5,14 @@ import StrandAnalytics
 
 /// #155 — Apple-Health-free export for sideloaded iOS installs. A free (7-day) signing identity
 /// can't carry the HealthKit entitlement, so HealthKitBridge never runs for sideloaders. Instead,
-/// NOOP drops a plain-text file at Documents/noop_sync.txt (exposed to Files/Shortcuts via
+/// Pulse drops a plain-text file at Documents/pulse_sync.txt (exposed to Files/Shortcuts via
 /// UIFileSharingEnabled) and the reporter's pre-built Siri Shortcut reads it and logs the rows into
 /// Apple Health. One line per 15-minute window — `HR,HRV,Steps,yyyy-MM-dd HH:mm` — en_US_POSIX,
 /// LOCAL time (the Shortcut parses dates in the device zone), empty fields keep their commas so
 /// column positions are fixed, NO header.
 ///
 /// Reads ONLY the strap source (`repo.deviceId`) — never `apple-health` (a Shortcut-logged value
-/// must not round-trip back in on the next HealthKit/export import) and never the `-noop` computed
+/// must not round-trip back in on the next HealthKit/export import) and never the `-pulse` computed
 /// source.
 ///
 /// Mirrors CsvExport's shape: a platform-neutral enum in Strand/Data/ that compiles into the macOS
@@ -20,12 +20,12 @@ import StrandAnalytics
 /// StrandiOSApp and the opt-in toggle in ShortcutExportSettingsView.
 enum ShortcutHealthExport {
 
-    /// Opt-in gate (default OFF — every automation in NOOP is optional).
-    static let enabledKey = "noop.shortcutSync.enabled"
+    /// Opt-in gate (default OFF — every automation in Pulse is optional).
+    static let enabledKey = "pulse.shortcutSync.enabled"
     /// Exclusive end of the last successfully written coverage, unix seconds. Advances ONLY after
     /// a successful file write, so a failed export retries the same span next time.
-    static let watermarkKey = "noop.shortcutSync.lastExportTs"
-    static let fileName = "noop_sync.txt"
+    static let watermarkKey = "pulse.shortcutSync.lastExportTs"
+    static let fileName = "pulse_sync.txt"
     /// Aggregation window: 15 minutes, epoch-aligned — the same boundaries hrBuckets(900) groups by.
     static let windowSeconds = 900
     /// Catch-up bound: never reach further back than 7 days, even on a first run or after a long gap.

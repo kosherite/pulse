@@ -39,7 +39,7 @@ final class PiiRedactionTests: XCTestCase {
 
     /// The rule must not touch ids or ordinary text that merely contain "whoop".
     func testNameRuleLeavesIdsAndPlainTextAlone() {
-        XCTAssertEqual(LiveState.redactPii("my-whoop and my-whoop-noop"), "my-whoop and my-whoop-noop")
+        XCTAssertEqual(LiveState.redactPii("my-whoop and my-whoop-pulse"), "my-whoop and my-whoop-pulse")
         XCTAssertEqual(LiveState.redactPii("no pii here"), "no pii here")
     }
 

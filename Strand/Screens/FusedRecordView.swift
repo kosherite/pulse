@@ -9,15 +9,15 @@ import StrandAnalytics
 // metric it shows the BEST-sourced value, a provenance pill naming the source, the plain published
 // reason from MetricArbitrationPolicy ("counts directly" / "best stager"), and the inline agreement
 // state from FusionResolver (agree / minor delta / conflict). When two sources disagree it offers a
-// conflict-compare sheet that lists EVERY source's value side by side and which one NOOP is using and
+// conflict-compare sheet that lists EVERY source's value side by side and which one Pulse is using and
 // why — it NEVER silently merges or averages.
 //
 // SELF-CONTAINED: the view takes a fully-resolved `FusedRecord` via init (the Repository adapter that
 // pulls today's per-source metrics and runs `FusionResolver.resolve` lives in Wave 3 — see
 // `wiringNeeded`). It does no I/O and never touches AppModel/Repository directly, so it compiles and
 // previews from a fixture. This file owns only PRESENTATION: a metric label, a value formatter, and
-// the row/sheet chrome — all built from the locked component set (NoopCard / StatePill / SourceBadge /
-// ScoreStatePill / SectionHeader) and tokens (StrandPalette / StrandFont / NoopMetrics).
+// the row/sheet chrome — all built from the locked component set (PulseCard / StatePill / SourceBadge /
+// ScoreStatePill / SectionHeader) and tokens (StrandPalette / StrandFont / PulseMetrics).
 //
 // Wellness framing only: a source is "higher-trust for this metric" with a plain reason; we never say
 // a number is accurate / correct / clinical, never flag a value as concerning. "Everything stays on
@@ -83,7 +83,7 @@ struct FusedRecordView: View {
             title: "Your Data, Fused",
             subtitle: subtitle
         ) {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 if isMultiSource { dayBadgeRow }
 
                 if record.rows.isEmpty {
@@ -93,7 +93,7 @@ struct FusedRecordView: View {
                         symbol: "square.stack.3d.up"
                     )
                 } else {
-                    NoopCard(padding: 0) {
+                    PulseCard(padding: 0) {
                         VStack(spacing: 0) {
                             ForEach(Array(record.rows.enumerated()), id: \.element.id) { index, row in
                                 FusedMetricRowView(
@@ -103,7 +103,7 @@ struct FusedRecordView: View {
                                 )
                                 if index < record.rows.count - 1 {
                                     Divider().overlay(StrandPalette.hairline)
-                                        .padding(.leading, NoopMetrics.cardPadding)
+                                        .padding(.leading, PulseMetrics.cardPadding)
                                 }
                             }
                         }
@@ -119,7 +119,7 @@ struct FusedRecordView: View {
         .sheet(item: $comparing) { row in
             ConflictCompareSheet(row: row)
                 #if os(iOS)
-                .noopSheetPresentation(largeFirst: false)
+                .pulseSheetPresentation(largeFirst: false)
                 #else
                 .frame(width: 480, height: 600)
                 #endif
@@ -252,7 +252,7 @@ private struct FusedMetricRowView: View {
                 agreementLine
             }
         }
-        .padding(.horizontal, NoopMetrics.cardPadding)
+        .padding(.horizontal, PulseMetrics.cardPadding)
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
@@ -321,8 +321,8 @@ private struct FusedMetricRowView: View {
 
 // MARK: - Conflict-compare sheet
 
-/// A small read-only sheet: every source's value for the metric, side by side, with the one NOOP is
-/// using marked and its trust reason named. NOOP never adjudicates which is "correct" — it shows the
+/// A small read-only sheet: every source's value for the metric, side by side, with the one Pulse is
+/// using marked and its trust reason named. Pulse never adjudicates which is "correct" — it shows the
 /// spread and explains its best-signal pick. Transparency, not diagnosis.
 private struct ConflictCompareSheet: View {
     let row: FusedRow
@@ -332,8 +332,8 @@ private struct ConflictCompareSheet: View {
 
     var body: some View {
         ScreenScaffold(title: LocalizedStringKey(row.label), subtitle: "Your bands report different numbers. Here's every source, and the one Pulse is using.") {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
-                NoopCard {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
+                PulseCard {
                     VStack(spacing: 0) {
                         ForEach(Array(point.contributors.enumerated()), id: \.offset) { index, contrib in
                             ContributorRow(
@@ -364,7 +364,7 @@ private struct ConflictCompareSheet: View {
                 }
 
                 Button("Done") { dismiss() }
-                    .buttonStyle(.noopSecondary)
+                    .buttonStyle(.pulseSecondary)
                     .padding(.top, 4)
             }
         }

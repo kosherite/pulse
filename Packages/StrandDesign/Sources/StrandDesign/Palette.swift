@@ -37,13 +37,13 @@ public extension Color {
         // liquid layer resolves on every frame: `Color.liquidComponents()` asks for
         // `NSColor(self).usingColorSpace(.sRGB)` (`LiquidCore.swift`), which re-invokes this closure,
         // which used to run `trimmingCharacters` + `Scanner.scanHexInt64` over a string. A reporter
-        // profiling NOOP at a third to half a CPU core on macOS found `Color.sRGBComponents(hex:)` and
+        // profiling Pulse at a third to half a CPU core on macOS found `Color.sRGBComponents(hex:)` and
         // `closure #1 in Color.init(light:dark:)` among the hot leaves (#2393).
         //
         // A cache would also have removed the cost, and a cache is the wrong shape for it: it needs a
         // key, a lock (a dynamic provider can resolve off the main thread) and an eviction story, to
         // re-derive per frame a value that cannot change after this line. The tokens are `static let`
-        // (`NoopVisualStyle`, `StrandPalette`), so this runs once per token for the life of the process.
+        // (`PulseVisualStyle`, `StrandPalette`), so this runs once per token for the life of the process.
         // One declaration rather than two `let`s: watchOS resolves straight to the dark hex, so a separate
         // `lightComponents` would be unused on that platform and warn. A pair that is always read as a
         // whole has no such half.
@@ -87,17 +87,17 @@ public enum StrandPalette {
 
     // MARK: Surfaces — deep navy canvas, tinted frosted cards
     // Background is a near-black navy (NOT pure black); cards float just above it.
-    public static var surfaceBase: Color { NoopVisualStyle.canvas }
-    public static var surfaceRaised: Color { NoopVisualStyle.surface }
-    public static var surfaceOverlay: Color { NoopVisualStyle.surfaceTop }
-    public static var surfaceInset: Color { NoopVisualStyle.inset }
-    public static var hairline: Color { NoopVisualStyle.border }
-    public static var hairlineStrong: Color { NoopVisualStyle.borderHighlight }
+    public static var surfaceBase: Color { PulseVisualStyle.canvas }
+    public static var surfaceRaised: Color { PulseVisualStyle.surface }
+    public static var surfaceOverlay: Color { PulseVisualStyle.surfaceTop }
+    public static var surfaceInset: Color { PulseVisualStyle.inset }
+    public static var hairline: Color { PulseVisualStyle.border }
+    public static var hairlineStrong: Color { PulseVisualStyle.borderHighlight }
 
     // MARK: Text — deep navy-ink on paper / cool off-white on navy
-    public static var textPrimary: Color { NoopVisualStyle.primaryText }
-    public static var textSecondary: Color { NoopVisualStyle.secondaryText }
-    public static var textTertiary: Color { NoopVisualStyle.tertiaryText }
+    public static var textPrimary: Color { PulseVisualStyle.primaryText }
+    public static var textSecondary: Color { PulseVisualStyle.secondaryText }
+    public static var textTertiary: Color { PulseVisualStyle.tertiaryText }
 
     // MARK: Text ON a permanently-dark surface (scheme-invariant)
     // Use these — NOT textPrimary/Secondary/Tertiary — for labels/pills drawn over a fill that is pinned
@@ -120,13 +120,13 @@ public enum StrandPalette {
     public static var heroBorder: Color { Color.clear }
 
     // MARK: Glow — ambient bloom behind heroes / charts (additive on dark; faint warm on light)
-    public static var glowAmbient: Color { NoopVisualStyle.mintGlow.opacity(0.28) }
+    public static var glowAmbient: Color { PulseVisualStyle.mintGlow.opacity(0.28) }
 
     // MARK: Accent — chrome anchor (links, selection, focus, generic accent). USER-SELECTABLE (mint /
     // WHOOP blue / custom) via `accentChoice` below, default mint (#1068). Only the chrome accent is
     // user-themed — the recovery/strain/sleep DATA worlds follow `chartStyle`, never this.
     /// The user's chrome-accent choice. Set from `@AppStorage(AccentColor.storageKey)` at the app root
-    /// via `.noopAccent(...)`; the four accessors below branch on it. Default mint.
+    /// via `.pulseAccent(...)`; the four accessors below branch on it. Default mint.
     public static var accentChoice: AccentColor = .mint
     /// The custom accent's hex, used only when `accentChoice == .custom`. Set alongside `accentChoice`.
     public static var customAccentHex: String = AccentColor.defaultCustomHex
@@ -367,7 +367,7 @@ public enum StrandPalette {
         sample(stops: recoveryStops, at: score / 100.0)
     }
 
-    /// Sample the strain ("Effort") gradient at a value on NOOP's 0...100 Effort scale.
+    /// Sample the strain ("Effort") gradient at a value on Pulse's 0...100 Effort scale.
     public static func strainColor(_ strain: Double) -> Color {
         sample(stops: strainStops, at: strain / 100.0)
     }
@@ -413,7 +413,7 @@ public enum StrandPalette {
     // keeps `sleepStageColor`. (#sleep-chart-style)
     //
     // WHY THERE IS A LIGHT VARIANT. Both source apps are dark-tuned, so the ramps shipped flat — the same
-    // hex in both schemes. On the light card those bands are drawn on near-white (`NoopVisualStyle.surface`
+    // hex in both schemes. On the light card those bands are drawn on near-white (`PulseVisualStyle.surface`
     // = #FFFFFF; a real Sleep-screen capture samples #FEFEFF), and measured there the Oura ramp collapses:
     // three of its four bands fall under the 3:1 non-text minimum and `awake` #EAE3D3 sits at **1.28:1**,
     // i.e. not drawn. That is not a rare band — on one real ring night awake was 64% of the chart.
@@ -456,10 +456,10 @@ public enum StrandPalette {
         static let garmin = [garminAwake, garminREM, garminLight, garminDeep]
     }
 
-    /// A sleep-stage colour in a chosen ramp: NOOP's own tokens, Oura's (Ribbon), or Garmin's (Garmin Fill).
+    /// A sleep-stage colour in a chosen ramp: Pulse's own tokens, Oura's (Ribbon), or Garmin's (Garmin Fill).
     public static func sleepStageColor(_ stage: SleepStage, palette: SleepStagePalette) -> Color {
         switch palette {
-        case .noop: return sleepStageColor(stage)
+        case .pulse: return sleepStageColor(stage)
         case .oura:
             switch stage {
             case .awake: return oSleepAwake

@@ -20,7 +20,7 @@ struct StrandApp: App {
         DemoSyncHarness.applyLaunchArgsIfNeeded()
         #endif
         // Foreground presentation: without a delegate, macOS suppresses a notification's banner while the
-        // app is frontmost, so a reminder tested with NOOP open would show nothing. Mirrors iOS.
+        // app is frontmost, so a reminder tested with Pulse open would show nothing. Mirrors iOS.
         UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
         // K5: tapping a scheduled morning-brief notification routes to Coach via the shared NavRouter.
         let router = NavRouter()
@@ -67,7 +67,7 @@ struct StrandApp: App {
                 // Settings change intentionally becomes active only after the documented reopen.
                 .environment(\.locale, AppLanguage.activeLocale)
                 .chartStyle(chartStyleRaw)
-                .noopAccent(accentRaw, customHex: accentCustomHex)
+                .pulseAccent(accentRaw, customHex: accentCustomHex)
                 .pulseTheme(pulsePaletteRaw, pulseFinishRaw)
                 // Dynamic Type now scales the prose/label roles (StrandFont). Cap the upper end so the
                 // fixed-geometry tiles/gauges stay legible at the largest accessibility sizes rather than

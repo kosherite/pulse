@@ -7,7 +7,7 @@ import WhoopStore
 /// previous build still read?**
 ///
 /// The session snapshot is the only thing this feature persists outside SQLite (UserDefaults,
-/// `noop.activeLiftSession`), so it is the only place an app-layer change can strand something the
+/// `pulse.activeLiftSession`), so it is the only place an app-layer change can strand something the
 /// old build wrote. A schema change is the other half of that question and is answered by the
 /// migration, not here.
 final class LiftSessionPersistenceTests: XCTestCase {
@@ -39,10 +39,10 @@ final class LiftSessionPersistenceTests: XCTestCase {
         """.utf8)
     }
 
-    /// iOS closes NOOP in the background and relaunches it — four times in one gym session (21 Sep 2026).
+    /// iOS closes Pulse in the background and relaunches it — four times in one gym session (21 Sep 2026).
     /// The session is picked up as the process starts, before any screen, and says so in the strap log.
     @MainActor
-    func testASessionIsPickedUpAgainWhenNOOPStartsAndSaysSo() throws {
+    func testASessionIsPickedUpAgainWhenPulseStartsAndSaysSo() throws {
         let defaults = try XCTUnwrap(UserDefaults(suiteName: "LiftSessionPersistenceTests.resume"))
         defer { defaults.removePersistentDomain(forName: "LiftSessionPersistenceTests.resume") }
         var lines: [String] = []
@@ -62,7 +62,7 @@ final class LiftSessionPersistenceTests: XCTestCase {
         XCTAssertTrue(c.isActive)
         XCTAssertFalse(c.isPresented, "it comes back as the bar, not as a sheet")
         XCTAssertTrue(claimed, "the strap's double-tap is the session's again")
-        XCTAssertEqual(lines, ["Lift Log: session picked up again after NOOP restarted"])
+        XCTAssertEqual(lines, ["Lift Log: session picked up again after Pulse restarted"])
 
         c.resumeSaved(from: defaults)
         XCTAssertEqual(lines.count, 1, "a running session is not picked up twice")

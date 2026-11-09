@@ -12,7 +12,7 @@ import Charts
 // hover affordance mirror `TrendChart`; this view adds the marker layers and pins
 // the x-axis to the HR window so markers never stretch the timeline.
 //
-// Colours stay in NOOP's Titanium & Gold language (burnt-orange HR line, gold
+// Colours stay in Pulse's Titanium & Gold language (burnt-orange HR line, gold
 // recovery, amber strain, blue sleep) rather than copying WHOOP's blue. Tokens
 // only — never hardcode hex.
 
@@ -76,7 +76,7 @@ public struct OverviewHRChart: View {
     @Binding public var zoomDomain: ClosedRange<Date>?
     public var zoomBounds: ClosedRange<Date>?
 
-    /// Tint for the workout glyph badges (NOOP's warm strain accent by default).
+    /// Tint for the workout glyph badges (Pulse's warm strain accent by default).
     public var workoutTint: Color
 
     private let averageValue: Double
@@ -649,7 +649,7 @@ private struct MarkerLabel: View {
             .foregroundStyle(color)
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
-            .background(NoopPanelSurface(cornerRadius: 6, elevated: true, surfaceOpacity: 0.92))
+            .background(PulsePanelSurface(cornerRadius: 6, elevated: true, surfaceOpacity: 0.92))
             .fixedSize()
             .allowsHitTesting(false)
     }
@@ -666,7 +666,7 @@ private struct SleepBandLabel: View {
         .foregroundStyle(StrandPalette.sleepLight)
         .padding(.horizontal, 6)
         .padding(.vertical, 3)
-        .background(NoopPanelSurface(cornerRadius: 6, elevated: true, surfaceOpacity: 0.92))
+        .background(PulsePanelSurface(cornerRadius: 6, elevated: true, surfaceOpacity: 0.92))
         .fixedSize()
         .allowsHitTesting(false)
     }
@@ -702,7 +702,7 @@ private struct ZoomPanModifier: ViewModifier {
     /// Reset the window, snapping when Reduce Motion is on and easing otherwise.
     private func resetZoom() {
         guard isZoomed() else { return }
-        withAnimation(NoopMotion.gated(StrandMotion.interactive, reduced: reduceMotion)) { reset() }
+        withAnimation(PulseMotion.gated(StrandMotion.interactive, reduced: reduceMotion)) { reset() }
     }
 
     func body(content: Content) -> some View {

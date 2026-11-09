@@ -19,7 +19,7 @@ enum TestReportFlow {
 
     /// Pure decisions, no side effects, so they are testable on any actor.
     enum Plan {
-        /// noop-<profile>-<platform>-v<version>-<yyMMdd-HHmm>.zip (spec section 5.1). Delegates the
+        /// pulse-<profile>-<platform>-v<version>-<yyMMdd-HHmm>.zip (spec section 5.1). Delegates the
         /// stamp to FileExport.bundleName so the filename matches the export layer exactly.
         static func bundleName(profile: TestDomain, platform: String, version: String,
                                date: Date = Date()) -> String {

@@ -495,7 +495,7 @@ extension WhoopStore {
         init(ts: Int) { self.ts = ts; self.cols = Array(repeating: "", count: 16) }
     }
 
-    /// Export the decoded per-sample sensor streams NOOP already stores to ONE combined long-format CSV
+    /// Export the decoded per-sample sensor streams Pulse already stores to ONE combined long-format CSV
     /// (header + one row per sample, all streams interleaved and sorted by ts ascending). On-device,
     /// plain text, no BLE hex, a diagnostic so power users / external devs can prototype sleep/activity/
     /// VBT algorithms on real data without a BLE stream (#308/#276/#322).
@@ -621,7 +621,7 @@ extension WhoopStore {
         let stamp = Int(Date().timeIntervalSince1970)
         // Inside the app's own bundle-named scratch folder; see the note in AppleHealthImporter and #2446.
         let scratch = FileManager.default.temporaryDirectory
-            .appendingPathComponent((Bundle.main.bundleIdentifier ?? "com.noopapp.noop") + ".scratch",
+            .appendingPathComponent((Bundle.main.bundleIdentifier ?? "com.pulseapp.pulse") + ".scratch",
                                     isDirectory: true)
         try? FileManager.default.createDirectory(at: scratch, withIntermediateDirectories: true)
         let url = scratch.appendingPathComponent("raw-sensors-\(stamp).csv")

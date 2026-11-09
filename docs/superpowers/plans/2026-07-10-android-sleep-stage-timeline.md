@@ -16,7 +16,7 @@ nights keep the flat strip + `StageBreakdownRows` footer. The dot `StageLegend` 
 
 Everything lives in the two files that already own this UI:
 
-- `android/app/src/main/java/com/noop/ui/SleepScreen.kt`
+- `android/app/src/main/java/com/pulse/ui/SleepScreen.kt`
   - **Pure logic** (internal top-level functions, JVM-unit-testable — same pattern as the existing
     `parsePersistedSegments` + `SleepStageSegmentsTest`):
     - `StageInterval` — one contiguous stage run in seconds-from-onset.
@@ -30,8 +30,8 @@ Everything lives in the two files that already own this UI:
     (single-Canvas hatched track + segments — PERF: no per-segment `Box`es), `StageInsight`
     (fixed-height caption), `ClockLabelRow` (extracted from `HypnogramWithAxis`), hero card body
     rewrite, `StageLegend` deletion.
-- `android/app/src/main/java/com/noop/ui/Theme.kt` — new `Metrics` constants.
-- Tests in `android/app/src/test/java/com/noop/ui/` (JUnit4, plain JVM, `org.junit.Assert`).
+- `android/app/src/main/java/com/pulse/ui/Theme.kt` — new `Metrics` constants.
+- Tests in `android/app/src/test/java/com/pulse/ui/` (JUnit4, plain JVM, `org.junit.Assert`).
 
 **Data flow (unchanged upstream):** `selectNight` → model `groupSegments` →
 `realSegments = segments.map { it.stage to (it.end - it.start) / 60f }` (`SleepScreen.kt:2912`) →
@@ -42,7 +42,7 @@ the strip does today; totals/percentages stay on the raw `Stages` numbers — sm
 
 ```bash
 # Run one test class (from repo root):
-cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.noop.ui.StageDisplaySmoothingTest"
+cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.pulse.ui.StageDisplaySmoothingTest"
 # Compile check (UI tasks):
 cd android && ./gradlew :app:compileFullDebugKotlin
 # Full unit suite:
@@ -60,10 +60,10 @@ walk cumulative fractions across the night span (design §Real-stage nights, ite
 
 ### Step 1: Write the failing test
 
-Create `android/app/src/test/java/com/noop/ui/StageTimelineIntervalsTest.kt`:
+Create `android/app/src/test/java/com/pulse/ui/StageTimelineIntervalsTest.kt`:
 
 ```kotlin
-package com.noop.ui
+package com.pulse.ui
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -137,7 +137,7 @@ class StageTimelineIntervalsTest {
 ### Step 2: Run it — confirm it fails
 
 ```bash
-cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.noop.ui.StageTimelineIntervalsTest"
+cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.pulse.ui.StageTimelineIntervalsTest"
 ```
 
 Expected: **compilation failure** (`stageIntervalsFromWeights` / `StageInterval` unresolved). That is
@@ -145,7 +145,7 @@ the red step.
 
 ### Step 3: Implement
 
-In `android/app/src/main/java/com/noop/ui/SleepScreen.kt`, find
+In `android/app/src/main/java/com/pulse/ui/SleepScreen.kt`, find
 `internal data class PersistedSegment` (currently line 3151) and the `parsePersistedSegments`
 function that follows it. Insert **after** that function:
 
@@ -205,10 +205,10 @@ re-coalescing each pass. Rows use a 90 s floor (design item 2).
 
 ### Step 1: Write the failing test
 
-Create `android/app/src/test/java/com/noop/ui/StageDisplaySmoothingTest.kt`:
+Create `android/app/src/test/java/com/pulse/ui/StageDisplaySmoothingTest.kt`:
 
 ```kotlin
-package com.noop.ui
+package com.pulse.ui
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -334,7 +334,7 @@ class StageDisplaySmoothingTest {
 ### Step 2: Run it — confirm it fails
 
 ```bash
-cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.noop.ui.StageDisplaySmoothingTest"
+cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.pulse.ui.StageDisplaySmoothingTest"
 ```
 
 Expected: compile failure (`displaySmoothed` unresolved).
@@ -420,10 +420,10 @@ lowercase (`"wake"`, `"light"`, …) while rows are labeled `"Awake"` etc.; the 
 
 ### Step 1: Write the failing test
 
-Create `android/app/src/test/java/com/noop/ui/StageRowSpansTest.kt`:
+Create `android/app/src/test/java/com/pulse/ui/StageRowSpansTest.kt`:
 
 ```kotlin
-package com.noop.ui
+package com.pulse.ui
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -482,7 +482,7 @@ class StageRowSpansTest {
 ### Step 2: Run it — confirm it fails
 
 ```bash
-cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.noop.ui.StageRowSpansTest"
+cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.pulse.ui.StageRowSpansTest"
 ```
 
 ### Step 3: Implement
@@ -519,7 +519,7 @@ internal fun stageRowSpans(
 Same command; then run all three new classes together:
 
 ```bash
-cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.noop.ui.Stage*"
+cd android && ./gradlew :app:testFullDebugUnitTest --tests "com.pulse.ui.Stage*"
 ```
 
 ### Step 5: Commit
@@ -534,7 +534,7 @@ git add -A && git commit -m "feat: per-stage row span extraction for the sleep t
 
 ### Step 1: Implement
 
-In `android/app/src/main/java/com/noop/ui/Theme.kt`, find (currently lines 400-401):
+In `android/app/src/main/java/com/pulse/ui/Theme.kt`, find (currently lines 400-401):
 
 ```kotlin
     val stageStripHeight = 34.dp
@@ -570,7 +570,7 @@ git add -A && git commit -m "feat: Metrics constants for the sleep stage-timelin
 
 ## Task 5: Timeline composables (UI)
 
-All in `android/app/src/main/java/com/noop/ui/SleepScreen.kt`. No unit tests (Compose UI); the
+All in `android/app/src/main/java/com/pulse/ui/SleepScreen.kt`. No unit tests (Compose UI); the
 verification gate is `compileDebugKotlin` + Task 7's manual checklist.
 
 ### Step 1: Add one import
@@ -612,7 +612,7 @@ private fun ClockLabelRow(onsetTs: Long, wakeTs: Long) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
             onset,
-            style = NoopType.footnote,
+            style = PulseType.footnote,
             color = Palette.textTertiary,
             textAlign = TextAlign.Start,
             maxLines = 1,
@@ -620,7 +620,7 @@ private fun ClockLabelRow(onsetTs: Long, wakeTs: Long) {
         )
         Text(
             mid,
-            style = NoopType.footnote,
+            style = PulseType.footnote,
             color = Palette.textTertiary,
             textAlign = TextAlign.Center,
             overflow = TextOverflow.Ellipsis,
@@ -629,7 +629,7 @@ private fun ClockLabelRow(onsetTs: Long, wakeTs: Long) {
         )
         Text(
             wake,
-            style = NoopType.footnote,
+            style = PulseType.footnote,
             color = Palette.textTertiary,
             textAlign = TextAlign.End,
             maxLines = 1,
@@ -745,16 +745,16 @@ private fun StageTimelineRow(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 label.uppercase(Locale.getDefault()),
-                style = NoopType.overline,
+                style = PulseType.overline,
                 color = Palette.textPrimary,
                 maxLines = 1,
             )
             Spacer(modifier = Modifier.width(Metrics.space8))
-            Text("$percent%", style = NoopType.captionNumber, color = pctColor, maxLines = 1)
+            Text("$percent%", style = PulseType.captionNumber, color = pctColor, maxLines = 1)
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 durationText(minutes),
-                style = NoopType.captionNumber,
+                style = PulseType.captionNumber,
                 color = Palette.textPrimary,
                 maxLines = 1,
             )
@@ -828,7 +828,7 @@ private fun StageInsight(selectedStage: String?, s: Stages) {
         modifier = Modifier.fillMaxWidth().height(Metrics.stageInsightHeight),
         contentAlignment = Alignment.CenterStart,
     ) {
-        Text(text, style = NoopType.footnote, color = Palette.textTertiary, maxLines = 2)
+        Text(text, style = PulseType.footnote, color = Palette.textTertiary, maxLines = 2)
     }
 }
 
@@ -844,9 +844,9 @@ private fun stageInsightLine(label: String, minutes: Double, total: Double): Str
 cd android && ./gradlew :app:compileFullDebugKotlin
 ```
 
-Fix only mechanical issues (missing import, typo). If `NoopType.overline` needs the tracking
+Fix only mechanical issues (missing import, typo). If `PulseType.overline` needs the tracking
 applied separately, copy exactly what `StageBreakdownRow` (line ~1180) does — it uses
-`NoopType.overline` directly.
+`PulseType.overline` directly.
 
 ### Step 5: Commit
 
@@ -877,7 +877,7 @@ In `SleepScreen.kt`, inside `Hero` (line ~772), find the block starting at
                 trailing = durationText(s.asleep),
                 tint = Palette.restColor,
                 footer = {
-                    // WHOOP-style stage rows in the NOOP pip language: swatch + UPPERCASE stage +
+                    // WHOOP-style stage rows in the Pulse pip language: swatch + UPPERCASE stage +
                     // coloured % + a segmented PipBar of the share-of-night + right-aligned duration.
                     // Same minutes/percentages the old "label · value" footer carried — no new numbers.
                     // Mirrors the macOS SleepView.stageBreakdownRows. (PipBar)
@@ -911,7 +911,7 @@ In `SleepScreen.kt`, inside `Hero` (line ~772), find the block starting at
                 } else {
                     Text(
                         "No stage breakdown for this night.",
-                        style = NoopType.subhead,
+                        style = PulseType.subhead,
                         color = Palette.textTertiary,
                     )
                 }
@@ -969,7 +969,7 @@ Replace it with:
                     } else {
                         Text(
                             "No stage breakdown for this night.",
-                            style = NoopType.subhead,
+                            style = PulseType.subhead,
                             color = Palette.textTertiary,
                         )
                     }

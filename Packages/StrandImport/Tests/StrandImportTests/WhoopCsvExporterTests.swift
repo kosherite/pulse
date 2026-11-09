@@ -4,7 +4,7 @@ import WhoopStore
 
 /// THE round-trip contract: serialize with WhoopCsvExporter, re-parse with the REAL
 /// WhoopExportImporter, assert field-level equality. Mirrors the Android WhoopCsvExporterTest so
-/// the exported zip is re-importable by NOOP on either platform. `@testable` is needed because the
+/// the exported zip is re-importable by Pulse on either platform. `@testable` is needed because the
 /// importer's `parse*` helpers and CSVTable are internal.
 final class WhoopCsvExporterTests: XCTestCase {
 
@@ -139,10 +139,10 @@ final class WhoopCsvExporterTests: XCTestCase {
 
     func testZipArchiveRoundTripsThroughFullImporter() throws {
         let dir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("noop-export-test-\(UUID().uuidString)")
+            .appendingPathComponent("pulse-export-test-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
-        let zipURL = dir.appendingPathComponent("noop-export.zip")
+        let zipURL = dir.appendingPathComponent("pulse-export.zip")
 
         let day = DailyMetric(day: "2026-06-01", totalSleepMin: 420, efficiency: 0.923, deepMin: 95,
                               remMin: 115, lightMin: 210, disturbances: 35, restingHr: 52,
@@ -154,7 +154,7 @@ final class WhoopCsvExporterTests: XCTestCase {
             ("workouts.csv", Data(WhoopCsvExporter.workoutsCSV([]).utf8)),
             ("journal_entries.csv", Data(WhoopCsvExporter.journalCSV([]).utf8)),
             // Sidecar + Source column must be ignored by the importer (it reads only the 4 CSVs).
-            ("noop_metric_series.json", Data("[]".utf8)),
+            ("pulse_metric_series.json", Data("[]".utf8)),
         ]
         try WhoopCsvExporter.writeArchive(entries: entries, to: zipURL)
 

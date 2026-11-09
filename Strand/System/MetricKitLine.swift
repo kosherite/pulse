@@ -1,11 +1,11 @@
 import Foundation
 
-/// The strap-log lines for the reports iOS hands NOOP through MetricKit: one a day about the day before, and one
+/// The strap-log lines for the reports iOS hands Pulse through MetricKit: one a day about the day before, and one
 /// after a crash, a hang, a CPU or disk-write exception, or a slow launch.
 ///
 /// Nothing here is sent anywhere. iOS gathers these numbers on the phone and delivers them to the app; the lines go
-/// only into NOOP's own strap log, which a person exports by hand. They exist so a battery or crash question can be
-/// answered from what the phone measured — how much CPU NOOP used in the background, why iOS closed it — rather than
+/// only into Pulse's own strap log, which a person exports by hand. They exist so a battery or crash question can be
+/// answered from what the phone measured — how much CPU Pulse used in the background, why iOS closed it — rather than
 /// from the phone's Analytics Data files, which a user has to find and share one by one.
 ///
 /// Each line says only what iOS reported: a field MetricKit left out is left out of the line, not printed as zero.

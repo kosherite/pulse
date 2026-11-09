@@ -16,7 +16,7 @@ import Foundation
 //   • `TrendsReportData` — pulls the five metric series out of the Repository's
 //     DailyMetric history and calls RangeReportEngine.build for a range.
 //   • `TrendsReportPage` — the laid-out SwiftUI page (the thing rendered to PDF),
-//     built ENTIRELY from the locked StrandDesign component system (NoopCard,
+//     built ENTIRELY from the locked StrandDesign component system (PulseCard,
 //     SectionHeader, Sparkline, the colour worlds) so it matches every other surface.
 //   • `TrendsReportSheet` — the in-app range picker + "Export" CTA presented from Trends.
 //
@@ -201,7 +201,7 @@ struct TrendsReportPage: View {
     static let pageWidth: CGFloat = 612
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+        VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
             header
             if report.isEmpty {
                 emptyState
@@ -211,7 +211,7 @@ struct TrendsReportPage: View {
             }
             footer
         }
-        .padding(NoopMetrics.space8)
+        .padding(PulseMetrics.space8)
         .frame(width: Self.pageWidth, alignment: .leading)
         .background(StrandPalette.surfaceBase)
         .environment(\.colorScheme, .dark)
@@ -222,10 +222,10 @@ struct TrendsReportPage: View {
     private var header: some View {
         // Report chrome uses the same shared panel surface as the in-app cards.
         ZStack(alignment: .leading) {
-            NoopPanelSurface(tint: StrandPalette.accent,
-                             cornerRadius: NoopMetrics.cardRadius,
+            PulsePanelSurface(tint: StrandPalette.accent,
+                             cornerRadius: PulseMetrics.cardRadius,
                              elevated: true)
-            VStack(alignment: .leading, spacing: NoopMetrics.space1) {
+            VStack(alignment: .leading, spacing: PulseMetrics.space1) {
                 HStack(alignment: .firstTextBaseline) {
                     BrandMark(size: 22)
                     Text("Pulse").font(StrandFont.overline).tracking(StrandFont.overlineTracking)
@@ -240,7 +240,7 @@ struct TrendsReportPage: View {
                     .font(StrandFont.subhead)
                     .foregroundStyle(StrandPalette.textSecondary)
             }
-            .padding(NoopMetrics.cardPadding)
+            .padding(PulseMetrics.cardPadding)
         }
     }
 
@@ -254,11 +254,11 @@ struct TrendsReportPage: View {
     // MARK: Headlines
 
     private var headlines: some View {
-        NoopCard(tint: StrandPalette.chargeColor) {
-            VStack(alignment: .leading, spacing: NoopMetrics.rowSpacing) {
+        PulseCard(tint: StrandPalette.chargeColor) {
+            VStack(alignment: .leading, spacing: PulseMetrics.rowSpacing) {
                 SectionHeader("What changed", overline: "Summary")
                 ForEach(Array(report.headlines.enumerated()), id: \.offset) { _, line in
-                    HStack(alignment: .top, spacing: NoopMetrics.space2) {
+                    HStack(alignment: .top, spacing: PulseMetrics.space2) {
                         Image(systemName: "sparkles")
                             .font(StrandFont.footnote)
                             .foregroundStyle(StrandPalette.accent)
@@ -275,7 +275,7 @@ struct TrendsReportPage: View {
     // MARK: Per-metric cards
 
     private var metricCards: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Metrics", overline: "By the numbers")
             ForEach(report.metrics, id: \.metric) { stat in
                 metricCard(stat)
@@ -286,8 +286,8 @@ struct TrendsReportPage: View {
     private func metricCard(_ stat: MetricRangeStat) -> some View {
         let metric = stat.metric
         let spark = series[metric] ?? []
-        return NoopCard(tint: metric.accent) {
-            VStack(alignment: .leading, spacing: NoopMetrics.rowSpacing) {
+        return PulseCard(tint: metric.accent) {
+            VStack(alignment: .leading, spacing: PulseMetrics.rowSpacing) {
                 // Title + mean read-out + trend chip.
                 HStack(alignment: .firstTextBaseline) {
                     Text(metric.label).strandOverline()
@@ -351,12 +351,12 @@ struct TrendsReportPage: View {
     // MARK: Empty state
 
     private var emptyState: some View {
-        NoopCard {
-            HStack(alignment: .top, spacing: NoopMetrics.space3) {
+        PulseCard {
+            HStack(alignment: .top, spacing: PulseMetrics.space3) {
                 Image(systemName: "calendar.badge.exclamationmark")
                     .font(StrandFont.headline)
                     .foregroundStyle(StrandPalette.accent)
-                VStack(alignment: .leading, spacing: NoopMetrics.space2) {
+                VStack(alignment: .leading, spacing: PulseMetrics.space2) {
                     Text("Not enough data in this range yet")
                         .font(StrandFont.headline)
                         .foregroundStyle(StrandPalette.textPrimary)
@@ -372,10 +372,10 @@ struct TrendsReportPage: View {
     // MARK: Footer
 
     private var footer: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.space1) {
+        VStack(alignment: .leading, spacing: PulseMetrics.space1) {
             Divider().overlay(StrandPalette.hairline)
             // Provenance legend (#457): a clinician (or anyone) reading this needs to know which numbers
-            // are directly measured vs. NOOP's own derived scores. HRV / Resting HR come off the strap;
+            // are directly measured vs. Pulse's own derived scores. HRV / Resting HR come off the strap;
             // Recovery and Strain are computed on-device and are NOT clinical measures.
             Text("How to read this: HRV, Resting HR, Sleep duration, Respiratory rate and Skin temperature are measured from the strap (skin temp is shown as the deviation from your own baseline). Workouts is the count of activities you logged or that were detected. Recovery, Strain and Stress are Pulse's own on-device scores, not clinical measures: Recovery is a daily readiness composite (HRV, resting HR, sleep and skin-temp trend), Strain is cardiovascular load derived from heart rate, and Stress is a 0-3 autonomic-load index from resting HR and HRV.")
                 .font(StrandFont.footnote)
@@ -500,8 +500,8 @@ struct TrendsReportSheet: View {
     var body: some View {
         let rpt = report
         ScrollView {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
-                VStack(alignment: .leading, spacing: NoopMetrics.space2) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
+                VStack(alignment: .leading, spacing: PulseMetrics.space2) {
                     Text("Export trends report")
                         .font(StrandFont.title2)
                         .foregroundStyle(StrandPalette.textPrimary)
@@ -511,7 +511,7 @@ struct TrendsReportSheet: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                VStack(alignment: .leading, spacing: NoopMetrics.space2) {
+                VStack(alignment: .leading, spacing: PulseMetrics.space2) {
                     Text("Range").strandOverline()
                     SegmentedPillControl(ReportRange.allCases, selection: $range) { $0.label }
                     Text(range.longName)
@@ -521,7 +521,7 @@ struct TrendsReportSheet: View {
 
                 // A scaled-down live preview of the page so the user sees exactly what
                 // they'll get before exporting.
-                VStack(alignment: .leading, spacing: NoopMetrics.space2) {
+                VStack(alignment: .leading, spacing: PulseMetrics.space2) {
                     Text("Preview").strandOverline()
                     page(for: rpt)
                         .scaleEffect(0.46, anchor: .topLeading)
@@ -537,7 +537,7 @@ struct TrendsReportSheet: View {
 
                 // WHOOP primary action — routed through the unified button system (filled blue accent,
                 // white ink, no glow). The label swaps to "Preparing…" while a PDF is being written.
-                NoopButton(exporting ? "Preparing…" : "Export PDF",
+                PulseButton(exporting ? "Preparing…" : "Export PDF",
                            systemImage: "square.and.arrow.up", kind: .primary, fullWidth: true) {
                     export(rpt)
                 }
@@ -548,7 +548,7 @@ struct TrendsReportSheet: View {
                     .foregroundStyle(StrandPalette.textTertiary)
             }
             .screenPadding()
-            .padding(.vertical, NoopMetrics.space6)
+            .padding(.vertical, PulseMetrics.space6)
         }
         #if os(iOS)
         // #697/#horizontal-swipe parity, see ScreenScaffold.
@@ -557,7 +557,7 @@ struct TrendsReportSheet: View {
         .background(StrandPalette.surfaceBase)
         .frame(width: 460, height: 640)
         #if os(iOS)
-        .noopSheetPresentation(largeFirst: true)
+        .pulseSheetPresentation(largeFirst: true)
         #endif
         // Load the stored daily stress series for the Stress row (#457). The same
         // "my-whoop" series the Stress screen prioritises; the report never re-derives it.

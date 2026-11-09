@@ -1,6 +1,6 @@
-# Contributing to NOOP
+# Contributing to Pulse
 
-Thanks for your interest in contributing. NOOP is a standalone, fully **offline**
+Thanks for your interest in contributing. Pulse is a standalone, fully **offline**
 companion app for WHOOP 4.0 and 5.0 / MG straps — it pairs over Bluetooth, stores
 everything on-device in SQLite, and computes recovery / strain / HRV / sleep
 locally. No servers, no accounts, no data leaving the device.
@@ -11,7 +11,7 @@ metric / screen / command / migration, and the commit conventions — lives in
 [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md). Read that before opening a
 non-trivial PR.
 
-> NOOP is not affiliated with, endorsed by, or connected to WHOOP, Inc., and is
+> Pulse is not affiliated with, endorsed by, or connected to WHOOP, Inc., and is
 > not a medical device. See [`DISCLAIMER.md`](DISCLAIMER.md).
 
 ---
@@ -44,7 +44,7 @@ xcodegen generate         # regenerate after any project.yml or file add/remove
 open Strand.xcodeproj     # build and run from Xcode
 ```
 
-For a runnable, ad-hoc-signed `NOOP.app` without an Apple ID, see
+For a runnable, ad-hoc-signed `Pulse.app` without an Apple ID, see
 [`docs/BUILD.md`](docs/BUILD.md).
 
 ### Android app
@@ -91,7 +91,7 @@ names. That column is why this table exists:
 | `windows-capture` | **Tools Python CI (Windows)** (`tools-python-windows.yml`) | `Tools/linux-capture/**` |
 | `build-and-test` | **Android CI** (`android.yml`) | `android/**`, the protocol/store test resources, `Strand/Resources/Localizable.xcstrings` |
 | `test (…)`, `tools (…)` | **Swift Packages CI** (`swift-packages.yml`) | `Packages/**`, the `Tools/SleepBench`, `Tools/SleepPSG` and `Tools/Backfill` packages, `android/app/src/test/resources/**`, `Strand/Liquid/LiquidCore.swift` |
-| `build (Strand, …)`, `build (NOOPiOS, …)` | **App build** (`app-build.yml`) | `Strand/**`, `StrandTests/**`, `StrandiOS/**`, `StrandiOSShared/**`, `StrandiOSWidgets/**`, `NOOPWatch/**`, `NOOPWatchComplications/**`, `Packages/**`, `project.yml`, its own workflow file |
+| `build (Strand, …)`, `build (PulseiOS, …)` | **App build** (`app-build.yml`) | `Strand/**`, `StrandTests/**`, `StrandiOS/**`, `StrandiOSShared/**`, `StrandiOSWidgets/**`, `PulseWatch/**`, `PulseWatchComplications/**`, `Packages/**`, `project.yml`, its own workflow file |
 
 Read that as a worked example: an Android-only PR runs Android CI plus the three that always
 run, so a short list of checks does not mean little was checked.
@@ -131,7 +131,7 @@ terms as the project — see [`LICENSE`](LICENSE).
 ## Reporting issues
 
 - **Bugs and feature requests:** open an issue using the templates in
-  [`.github/ISSUE_TEMPLATE`](.github/ISSUE_TEMPLATE). NOOP is on-device, so please
+  [`.github/ISSUE_TEMPLATE`](.github/ISSUE_TEMPLATE). Pulse is on-device, so please
   leave out anything that identifies you.
 - **Security issues:** see [`SECURITY.md`](SECURITY.md).
 

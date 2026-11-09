@@ -2,7 +2,7 @@ import Foundation
 import StrandAnalytics
 import WhoopProtocol
 
-// PortValidation — the check that entitles this harness to say its variant numbers describe NOOP's shipped
+// PortValidation — the check that entitles this harness to say its variant numbers describe Pulse's shipped
 // recipe rather than a lookalike.
 //
 // `RecipePort.swift` re-states `SleepStagerV2` with its constants exposed. That is the only way to ask

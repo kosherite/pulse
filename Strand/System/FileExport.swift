@@ -18,7 +18,7 @@ enum FileExport {
 
     /// A short `yyMMdd-HHmm` wall-clock stamp for export filenames (#510 — maddognik's protocol RE),
     /// so a reporter who saves several strap logs / raw captures in a row gets sortable, non-colliding
-    /// files (e.g. `noop-strap-log-260617-1042.txt`) instead of repeatedly overwriting one name.
+    /// files (e.g. `pulse-strap-log-260617-1042.txt`) instead of repeatedly overwriting one name.
     /// Locale-independent (POSIX) so the stamp is stable on every machine.
     static func timestamp(_ date: Date = Date()) -> String {
         let f = DateFormatter()
@@ -28,17 +28,17 @@ enum FileExport {
     }
 
     /// Compose a timestamped suggested filename — `<prefix>-<yyMMdd-HHmm>.<ext>`
-    /// (e.g. `timestampedName("noop-strap-log", ext: "txt")` → `noop-strap-log-260617-1042.txt`).
+    /// (e.g. `timestampedName("pulse-strap-log", ext: "txt")` → `pulse-strap-log-260617-1042.txt`).
     static func timestampedName(_ prefix: String, ext: String) -> String {
         "\(prefix)-\(timestamp()).\(ext)"
     }
 
-    /// Profile-tagged, self-describing bundle filename: `noop-<profile>-<platform>-v<version>-<yyMMdd-HHmm>.zip`
+    /// Profile-tagged, self-describing bundle filename: `pulse-<profile>-<platform>-v<version>-<yyMMdd-HHmm>.zip`
     /// (spec section 5.1). Self-describing at a glance so a maintainer knows the profile, platform and
     /// version before opening the zip. `timestampedName` keeps its old 2-arg form for the existing
     /// strap-log / raw-capture callers; this is the new bundle-name builder.
     static func bundleName(profile: String, platform: String, version: String, date: Date = Date()) -> String {
-        "noop-\(profile)-\(platform)-v\(version)-\(timestamp(date)).zip"
+        "pulse-\(profile)-\(platform)-v\(version)-\(timestamp(date)).zip"
     }
 
     /// Write `text` to a file and let the user choose where it goes.
@@ -55,7 +55,7 @@ enum FileExport {
         // The previous `try?` swallowed write failures, then handed an empty/missing path to the
         // share sheet — the user saw a broken export with no error. Clean up the temp file after the
         // share sheet closes so the temporaryDirectory doesn't accumulate dead exports across runs.
-        let url = NoopScratch.file(suggestedName)
+        let url = PulseScratch.file(suggestedName)
         do {
             try text.write(to: url, atomically: true, encoding: .utf8)
         } catch {
@@ -99,7 +99,7 @@ enum FileExport {
     @MainActor
     static func exportPair(file src: URL, fileSuggestedName: String,
                            text: String, textSuggestedName: String) async {
-        let zipName = timestampedName("noop-export", ext: "zip")
+        let zipName = timestampedName("pulse-export", ext: "zip")
         let entries = await Task.detached(priority: .userInitiated) { () -> [BundleEntry] in
             var entries: [BundleEntry] = [BundleEntry(name: textSuggestedName, data: Data(text.utf8))]
             if FileManager.default.fileExists(atPath: src.path), let fileData = try? Data(contentsOf: src) {
@@ -167,7 +167,7 @@ enum FileExport {
     /// on macOS, share sheet on iOS) and cleans it up.
     static func zipData(entries: [BundleEntry], baseName: String) -> URL? {
         guard !entries.isEmpty else { return nil }
-        let url = NoopScratch.file("\(baseName).zip")
+        let url = PulseScratch.file("\(baseName).zip")
         try? FileManager.default.removeItem(at: url)
         guard let archive = try? Archive(url: url, accessMode: .create) else { return nil }
         for entry in entries {

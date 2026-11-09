@@ -22,7 +22,7 @@ import StrandAnalytics
 ///
 /// ONE slot rather than a dictionary, deliberately: every caller resolves for the same active device and the
 /// same local day, so a second slot would only hold a key nothing asks for again. Kotlin twin:
-/// `com.noop.ui.StressLensCache`.
+/// `com.pulse.ui.StressLensCache`.
 @MainActor
 final class StressLensCache {
     static let shared = StressLensCache()

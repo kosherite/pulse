@@ -200,7 +200,7 @@ final class MetricsCacheTests: XCTestCase {
         XCTAssertTrue(rows[0].userEdited, "session is now flagged user-edited")
     }
 
-    func testSetSleepWakeTimeNoopWhenSessionMissing() async throws {
+    func testSetSleepWakeTimePulseWhenSessionMissing() async throws {
         let store = try await WhoopStore.inMemory()
         let changed = try await store.applySleepEdit(deviceId: "devA", detectedStartTs: 9999, newStartTs: 9999, newEndTs: 4200)
         XCTAssertEqual(changed, 0, "no matching session → no rows changed")
@@ -290,7 +290,7 @@ final class MetricsCacheTests: XCTestCase {
     /// Guard: the self-heal must NEVER rewrite an un-edited night (those are already freely re-derivable on
     /// every recompute — touching them is out of scope and would risk clobbering a good import). Scoped to
     /// `userEdited = 1`, so an un-edited row is a no-op.
-    func testUpdateSleepStagesIsNoopOnUneditedRow() async throws {
+    func testUpdateSleepStagesIsPulseOnUneditedRow() async throws {
         let store = try await WhoopStore.inMemory()
         try await store.upsertSleepSessions(
             [CachedSleepSession(startTs: 1000, endTs: 5000, efficiency: 0.9,
@@ -399,7 +399,7 @@ final class MetricsCacheTests: XCTestCase {
 
     /// `insertManualSleepSession` is purely additive: a conflicting onset is a no-op, so it can never
     /// clobber an existing detected/edited session that happens to share that exact onset second.
-    func testInsertManualNapIsNoopOnConflictingOnset() async throws {
+    func testInsertManualNapIsPulseOnConflictingOnset() async throws {
         let store = try await WhoopStore.inMemory()
         try await store.upsertSleepSessions(
             [CachedSleepSession(startTs: 9000, endTs: 12_000, efficiency: 0.9,
@@ -484,20 +484,20 @@ final class MetricsCacheTests: XCTestCase {
                         lightMin: nil, disturbances: nil, restingHr: nil, avgHrv: nil,
                         recovery: nil, strain: nil, exerciseCount: nil)
         }
-        // Computed source ("my-whoop-noop"): four days, three inside [2026-05-10, 2026-05-12].
+        // Computed source ("my-whoop-pulse"): four days, three inside [2026-05-10, 2026-05-12].
         try await store.upsertDailyMetrics(
             [bare("2026-05-09"), bare("2026-05-10"), bare("2026-05-11"), bare("2026-05-12")],
-            deviceId: "my-whoop-noop")
+            deviceId: "my-whoop-pulse")
         // Imported source ("my-whoop"): a day INSIDE the range that must survive.
         try await store.upsertDailyMetrics([bare("2026-05-11")], deviceId: "my-whoop")
 
         let deleted = try await store.deleteDailyMetrics(
-            deviceId: "my-whoop-noop", from: "2026-05-10", to: "2026-05-12")
+            deviceId: "my-whoop-pulse", from: "2026-05-10", to: "2026-05-12")
         XCTAssertEqual(deleted, 3, "only the 3 in-range computed rows are removed")
 
         // Computed: only the out-of-range 2026-05-09 row remains.
         let computed = try await store.dailyMetrics(
-            deviceId: "my-whoop-noop", from: "2026-05-01", to: "2026-05-31")
+            deviceId: "my-whoop-pulse", from: "2026-05-01", to: "2026-05-31")
         XCTAssertEqual(computed.map { $0.day }, ["2026-05-09"])
         // Imported row inside the range is untouched (BLE-only users keep no fallback, imports win).
         let imported = try await store.dailyMetrics(

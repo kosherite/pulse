@@ -4,7 +4,7 @@ import WhoopStore
 // MARK: - MoodStore
 //
 // Daily mood check-ins for the "Mind" section (design:
-// 2026-06-12-noop-mind-mental-health-design.md, Phase 1b).
+// 2026-06-12-pulse-mind-mental-health-design.md, Phase 1b).
 //
 // Storage mirrors the native-journal pattern (Repository.journalDeviceId): mood
 // lives in the existing metric-series tall table under a DEDICATED source id, so
@@ -18,7 +18,7 @@ import WhoopStore
 enum MoodStore {
     /// Dedicated source id for native mood rows (mirrors `Repository.journalDeviceId`
     /// — imports write under their own device ids and can never touch this one).
-    static let moodDeviceId = "noop-mood"
+    static let moodDeviceId = "pulse-mood"
 
     /// metricSeries key for the daily 1–5 mood scalar.
     static let moodKey = "mood"

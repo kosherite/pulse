@@ -53,20 +53,20 @@ final class JournalWorkoutAppleCacheTests: XCTestCase {
     }
 
     func testDeleteJournalTouchesOnlyTheNamedSource() async throws {
-        // The native logging card clears under "noop-journal" only, an identical
+        // The native logging card clears under "pulse-journal" only, an identical
         // (day, question) imported under "my-whoop" must survive the clear.
         let store = try await WhoopStore.inMemory()
         let e = JournalEntry(day: "2026-06-09", question: "Any alcohol?", answeredYes: true, notes: nil)
         try await store.upsertJournal([e], deviceId: "my-whoop")
-        try await store.upsertJournal([e], deviceId: "noop-journal")
+        try await store.upsertJournal([e], deviceId: "pulse-journal")
 
-        let n = try await store.deleteJournal(deviceId: "noop-journal", day: "2026-06-09",
+        let n = try await store.deleteJournal(deviceId: "pulse-journal", day: "2026-06-09",
                                               question: "Any alcohol?")
         XCTAssertEqual(n, 1)
         let imported = try await store.journalEntries(deviceId: "my-whoop",
                                                       from: "2026-06-01", to: "2026-06-30")
         XCTAssertEqual(imported.count, 1, "imported row must be untouched")
-        let native = try await store.journalEntries(deviceId: "noop-journal",
+        let native = try await store.journalEntries(deviceId: "pulse-journal",
                                                     from: "2026-06-01", to: "2026-06-30")
         XCTAssertEqual(native.count, 0)
     }
@@ -121,8 +121,8 @@ final class JournalWorkoutAppleCacheTests: XCTestCase {
         let store = try await WhoopStore.inMemory()
         let e = JournalEntry(day: "2026-06-20", question: "Caffeine (mg)",
                              answeredYes: true, notes: nil, numericValue: 180)
-        try await store.upsertJournal([e], deviceId: "noop-journal")
-        let rows = try await store.journalEntries(deviceId: "noop-journal",
+        try await store.upsertJournal([e], deviceId: "pulse-journal")
+        let rows = try await store.journalEntries(deviceId: "pulse-journal",
                                                   from: "2026-06-01", to: "2026-06-30")
         XCTAssertEqual(rows.count, 1)
         XCTAssertEqual(rows[0].numericValue, 180)
@@ -134,8 +134,8 @@ final class JournalWorkoutAppleCacheTests: XCTestCase {
         let store = try await WhoopStore.inMemory()
         try await store.upsertJournal(
             [JournalEntry(day: "2026-06-20", question: "Alcohol?", answeredYes: false, notes: nil)],
-            deviceId: "noop-journal")
-        let rows = try await store.journalEntries(deviceId: "noop-journal",
+            deviceId: "pulse-journal")
+        let rows = try await store.journalEntries(deviceId: "pulse-journal",
                                                   from: "2026-06-20", to: "2026-06-20")
         XCTAssertEqual(rows.count, 1)
         XCTAssertNil(rows[0].numericValue, "a plain answer carries no numeric reading")
@@ -148,18 +148,18 @@ final class JournalWorkoutAppleCacheTests: XCTestCase {
         let day = "2026-06-21", q = "Water (L)"
         try await store.upsertJournal(
             [JournalEntry(day: day, question: q, answeredYes: true, notes: nil, numericValue: 2)],
-            deviceId: "noop-journal")
+            deviceId: "pulse-journal")
         try await store.upsertJournal(
             [JournalEntry(day: day, question: q, answeredYes: true, notes: nil, numericValue: 3.5)],
-            deviceId: "noop-journal")
-        var rows = try await store.journalEntries(deviceId: "noop-journal", from: day, to: day)
+            deviceId: "pulse-journal")
+        var rows = try await store.journalEntries(deviceId: "pulse-journal", from: day, to: day)
         XCTAssertEqual(rows.count, 1, "same natural key must not duplicate")
         XCTAssertEqual(rows[0].numericValue, 3.5)
         // Overwrite with a plain answer → numericValue clears to nil.
         try await store.upsertJournal(
             [JournalEntry(day: day, question: q, answeredYes: false, notes: nil)],
-            deviceId: "noop-journal")
-        rows = try await store.journalEntries(deviceId: "noop-journal", from: day, to: day)
+            deviceId: "pulse-journal")
+        rows = try await store.journalEntries(deviceId: "pulse-journal", from: day, to: day)
         XCTAssertNil(rows[0].numericValue)
     }
 
@@ -307,18 +307,18 @@ final class JournalWorkoutAppleCacheTests: XCTestCase {
         // other devices and out-of-range rows untouched.
         let store = try await WhoopStore.inMemory()
         func row(_ ts: Int, _ sport: String) -> WorkoutRow {
-            WorkoutRow(startTs: ts, endTs: ts + 600, sport: sport, source: "devA-noop",
+            WorkoutRow(startTs: ts, endTs: ts + 600, sport: sport, source: "devA-pulse",
                        durationS: 600, energyKcal: nil, avgHr: nil, maxHr: nil, strain: nil,
                        distanceM: nil, zonesJSON: nil, notes: nil, steps: nil)
         }
         try await store.upsertWorkouts([row(1_000, "detected"), row(2_000, "detected"),
-                                        row(1_500, "run")], deviceId: "devA-noop")
+                                        row(1_500, "run")], deviceId: "devA-pulse")
         try await store.upsertWorkouts([row(1_200, "detected")], deviceId: "devA")
 
-        let n = try await store.deleteWorkouts(deviceId: "devA-noop", sport: "detected",
+        let n = try await store.deleteWorkouts(deviceId: "devA-pulse", sport: "detected",
                                                from: 0, to: 1_800)
         XCTAssertEqual(n, 1, "only the in-range detected row of the computed source")
-        let left = try await store.workouts(deviceId: "devA-noop", from: 0, to: 10_000, limit: 100)
+        let left = try await store.workouts(deviceId: "devA-pulse", from: 0, to: 10_000, limit: 100)
         XCTAssertEqual(left.map { $0.startTs }.sorted(), [1_500, 2_000])
         let other = try await store.workouts(deviceId: "devA", from: 0, to: 10_000, limit: 100)
         XCTAssertEqual(other.count, 1, "other device untouched")

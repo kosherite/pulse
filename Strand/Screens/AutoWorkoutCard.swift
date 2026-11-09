@@ -10,7 +10,7 @@ import StrandAnalytics
 //
 // It only ever SUGGESTS: tapping Save creates a manual-style "Workout" for the window (via the
 // same manual-save path the edit sheet uses); the X dismisses it durably so it never re-prompts.
-// Nothing is created automatically. Design-Reset compliant — a flat NoopCard using NoopMetrics /
+// Nothing is created automatically. Design-Reset compliant — a flat PulseCard using PulseMetrics /
 // StrandPalette / StrandFont, no gold, matching the other Today cards.
 
 struct AutoWorkoutCard: View {
@@ -41,9 +41,9 @@ struct AutoWorkoutCard: View {
 
     @ViewBuilder
     private func card(for w: DetectedWorkout) -> some View {
-        NoopCard(tint: StrandPalette.accent) {
-            VStack(alignment: .leading, spacing: NoopMetrics.space3) {
-                HStack(spacing: NoopMetrics.space2) {
+        PulseCard(tint: StrandPalette.accent) {
+            VStack(alignment: .leading, spacing: PulseMetrics.space3) {
+                HStack(spacing: PulseMetrics.space2) {
                     Image(systemName: "figure.run")
                         .font(.system(size: 18))
                         .foregroundStyle(StrandPalette.accent)
@@ -58,7 +58,7 @@ struct AutoWorkoutCard: View {
                         Image(systemName: "xmark")
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(StrandPalette.textTertiary)
-                            .padding(NoopMetrics.space1)
+                            .padding(PulseMetrics.space1)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Dismiss this workout suggestion")
@@ -69,7 +69,7 @@ struct AutoWorkoutCard: View {
                     .foregroundStyle(StrandPalette.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                HStack(spacing: NoopMetrics.space3) {
+                HStack(spacing: PulseMetrics.space3) {
                     Button {
                         save(w)
                     } label: {

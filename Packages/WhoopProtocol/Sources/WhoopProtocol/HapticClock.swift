@@ -8,7 +8,7 @@ import Foundation
 /// (`BLEManager.buzzTimeNow()` on Apple, `WhoopBleClient.buzzTimeNow()` on Android) walks the list and
 /// fires each pulse through the EXISTING maverick notification buzz; only the *schedule* of buzzes is
 /// new, the buzz itself is the hardware-confirmed one. The Kotlin twin is
-/// `android/app/src/main/java/com/noop/protocol/HapticClock.kt`; the two pulse lists are pinned
+/// `android/app/src/main/java/com/pulse/protocol/HapticClock.kt`; the two pulse lists are pinned
 /// identical by matching unit tests on both platforms (e.g. 3:25 → the same list).
 ///
 /// Reading the buzzes:

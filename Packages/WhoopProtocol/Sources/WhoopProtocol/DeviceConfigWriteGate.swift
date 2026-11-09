@@ -63,7 +63,7 @@ import Foundation
 /// rejects something is proving it about the real wire path and not about a parallel copy of the rule.
 ///
 /// Pure: no CoreBluetooth, no I/O, no preferences. The app layer supplies the two opt-in booleans. The
-/// Kotlin twin is `com.noop.protocol.DeviceConfigWriteGate` — keep them byte-identical.
+/// Kotlin twin is `com.pulse.protocol.DeviceConfigWriteGate` — keep them byte-identical.
 public enum DeviceConfigWriteGate {
 
     // MARK: - Opcodes
@@ -374,7 +374,7 @@ public struct EcgRawDataGateReport: Equatable, Sendable {
 
 /// The result of one Broadcast-HR (#181) write + mandatory read-back, as a copyable report.
 ///
-/// #1061: the strap-flag write (`whoop_live_hr_in_adv_ind_pkt`) was fire-and-forget — NOOP never read it
+/// #1061: the strap-flag write (`whoop_live_hr_in_adv_ind_pkt`) was fire-and-forget — Pulse never read it
 /// back, so a reporter on FW 50.36.2.0 could not tell whether the firmware ACCEPTED the flag (and simply
 /// doesn't advertise 0x180D) or IGNORED the write. That is inconsistent with this file's own rule — "read-
 /// back is the proof, not the ack" — which the ECG gate on the SAME opcode already follows. So the write

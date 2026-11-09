@@ -10,7 +10,7 @@ import StrandAnalytics
 // table holds one row per (deviceId, day, key), a tap reads the day's running total and re-upserts
 // total + amount, so the stored value IS "the sum of today's hydration logged for this local day".
 //
-// This is the BYTE-PARITY twin of the Android `com.noop.analytics.HydrationStore`: identical source id
+// This is the BYTE-PARITY twin of the Android `com.pulse.analytics.HydrationStore`: identical source id
 // ("hydration"), identical key ("hydration"), identical additive-accumulation logic, identical 7-day
 // history projection (one row per local calendar day, 0 for empty days, oldest first). Per-tap timestamps
 // are intentionally NOT persisted on either platform — the day total is the source of truth and the MVP
@@ -25,18 +25,18 @@ enum HydrationStore {
     static let key = "hydration"
 
     /// Settings opt-in key (default OFF). The dashboard card + detail are hidden while this is false.
-    /// MUST match the Android `NoopPrefs.KEY_HYDRATION_TRACKING` so the toggle reads the same on both.
-    static let enabledKey = "noop.hydrationTracking"
+    /// MUST match the Android `PulsePrefs.KEY_HYDRATION_TRACKING` so the toggle reads the same on both.
+    static let enabledKey = "pulse.hydrationTracking"
 
     /// UserDefaults prefix for the per-day entry list (#798). One JSON array per local day, keyed
-    /// `noop.hydrationEntries.<yyyy-MM-dd>`. Local-only, on-device, never synced - the same privacy posture
+    /// `pulse.hydrationEntries.<yyyy-MM-dd>`. Local-only, on-device, never synced - the same privacy posture
     /// as the day total. The day total in `metricSeries` stays the canonical figure the rest of the app
     /// reads (Today card, ring, 7-day history); the entry list is the editable detail behind it, kept in
     /// sync so deleting/editing an entry re-derives and re-banks the total.
-    static let entriesKeyPrefix = "noop.hydrationEntries."
+    static let entriesKeyPrefix = "pulse.hydrationEntries."
 
     /// AppStorage key for the user's custom container size (ml) (#798). Default `cupML` until set.
-    static let customSizeKey = "noop.hydrationCustomSizeML"
+    static let customSizeKey = "pulse.hydrationCustomSizeML"
 
     /// metricSeries key for water IMPORTED from the platform health store — Apple Health on iOS,
     /// Health Connect on Android (#949). MUST match the Android `KEY_IMPORTED`.
@@ -310,7 +310,7 @@ extension Repository {
     }
 
     /// Today's hydration goal (ml) from the profile sex + today's Effort score. Pure math in
-    /// `HydrationGoal`; this just feeds it the live inputs (today's `strain` is NOOP's 0–100 Effort).
+    /// `HydrationGoal`; this just feeds it the live inputs (today's `strain` is Pulse's 0–100 Effort).
     func hydrationGoalML(profileSex: String) -> Int {
         HydrationGoal.dailyGoalML(sex: profileSex, effort: today?.strain)
     }

@@ -39,10 +39,10 @@ final class HeaderRedactionTests: XCTestCase {
         XCTAssertTrue(safe.contains("whoop-MGB…"), "three-character prefix should remain: \(safe)")
     }
 
-    /// The `-noop` suffix is not identifying and is what separates derived rows from measured ones in the
+    /// The `-pulse` suffix is not identifying and is what separates derived rows from measured ones in the
     /// per-source counts, so it must survive the mask that hides the serial in front of it.
     func testTheComputedSiblingMarkerSurvives() {
-        XCTAssertEqual(LiveState.redactPii("Days: whoop-MGB1234567-noop=25"), "Days: whoop-MGB…-noop=25")
+        XCTAssertEqual(LiveState.redactPii("Days: whoop-MGB1234567-pulse=25"), "Days: whoop-MGB…-pulse=25")
     }
 
     /// Anything too short to be accepted as a serial upstream must not be masked as one here either.
@@ -65,10 +65,10 @@ final class HeaderRedactionTests: XCTestCase {
         XCTAssertTrue(safe.contains("oura-2H3…"), "three-character prefix should remain: \(safe)")
     }
 
-    /// The `-noop` computed-sibling suffix is brand-agnostic (`DeviceRegistryStore.computedSuffix`), so
+    /// The `-pulse` computed-sibling suffix is brand-agnostic (`DeviceRegistryStore.computedSuffix`), so
     /// it must survive the Oura mask exactly as it does the WHOOP one.
     func testTheComputedSiblingMarkerSurvivesForOuraToo() {
-        XCTAssertEqual(LiveState.redactPii("Days: oura-2H3B2405003655-noop=25"), "Days: oura-2H3…-noop=25")
+        XCTAssertEqual(LiveState.redactPii("Days: oura-2H3B2405003655-pulse=25"), "Days: oura-2H3…-pulse=25")
     }
 
     /// An all-digit serial (this repo's own #2075/#2090 evidence: "2038082631034041") must mask the same

@@ -3,7 +3,7 @@ import PackageDescription
 
 // SleepBench — an offline scoring harness for the sleep stagers.
 //
-// Replays `SleepStager` (V1) and `SleepStagerV2` over real, already-decoded nights held in a NOOP
+// Replays `SleepStager` (V1) and `SleepStagerV2` over real, already-decoded nights held in a Pulse
 // SQLite database and scores each hypnogram against whichever independent references that database
 // carries: the wearer's own manual restages (`sleepSession.userEdited = 1`), the strap's own band
 // sleep_state (`sleepStateSample`, the v18 @81 high nibble), and Apple Health sleep.

@@ -18,8 +18,8 @@ final class DetectedWorkoutReconciliationTests: XCTestCase {
         let keys = [
             "profile.dateOfBirth", "profile.age", "profile.sex", "profile.weightKg",
             "profile.heightCm", "profile.hrMaxOverride", "profile.stepTicksPerStep",
-            "noop.analyzeWatermark", "analyzeRecent.stepsMotionCache.v1",
-            "noop.hrvBaselineEpoch", "noop.recoveryBaselineEpoch", UnitPrefs.hrvWindowKey,
+            "pulse.analyzeWatermark", "analyzeRecent.stepsMotionCache.v1",
+            "pulse.hrvBaselineEpoch", "pulse.recoveryBaselineEpoch", UnitPrefs.hrvWindowKey,
             RescoreBackgroundScheduler.owedKey, RescoreBackgroundScheduler.owedTokenKey,
             RescoreBackgroundScheduler.lastPassSecondsKey, DayCycleMode.storageKey,
             PuffinExperiment.experimentalSleepV2Key, PuffinExperiment.motionAwareWakeKey,
@@ -84,7 +84,7 @@ final class DetectedWorkoutReconciliationTests: XCTestCase {
     func testLegacyRowsAreRemovedFromTheirArchivedComputedOwner() async throws {
         try await withPreferences {
             let store = try await WhoopStore.inMemory()
-            let archivedComputedId = "whoop-archived-noop"
+            let archivedComputedId = "whoop-archived-pulse"
             let relabelled = WorkoutRow(
                 startTs: 1_000, endTs: 1_900, sport: "detected", source: archivedComputedId,
                 durationS: 900, energyKcal: 50, avgHr: 130, maxHr: 150, strain: 5,
@@ -193,7 +193,7 @@ final class DetectedWorkoutReconciliationTests: XCTestCase {
             let importedRows = try await store.workouts(
                 deviceId: deviceId, from: start - 1, to: start + 86_400, limit: 100)
             let computedRows = try await store.workouts(
-                deviceId: deviceId + "-noop", from: start - 1, to: start + 86_400, limit: 100)
+                deviceId: deviceId + "-pulse", from: start - 1, to: start + 86_400, limit: 100)
             XCTAssertTrue(importedRows.isEmpty)
             XCTAssertTrue(computedRows.isEmpty,
                           "published and shadow detection must stay read-only until Save")
@@ -219,10 +219,10 @@ final class DetectedWorkoutReconciliationTests: XCTestCase {
 
             let legacy = WorkoutRow(
                 startTs: dayStart + 18 * 3_600, endTs: dayStart + 19 * 3_600,
-                sport: "detected", source: deviceId + "-noop", durationS: 3_600,
+                sport: "detected", source: deviceId + "-pulse", durationS: 3_600,
                 energyKcal: 321, avgHr: 133, maxHr: 172, strain: 11.5,
                 distanceM: nil, zonesJSON: nil, notes: "legacy", steps: nil)
-            _ = try await store.upsertWorkouts([legacy], deviceId: deviceId + "-noop")
+            _ = try await store.upsertWorkouts([legacy], deviceId: deviceId + "-pulse")
 
             let manual = WorkoutRow(
                 startTs: secondStart + 30, endTs: secondStart + duration - 30,
@@ -240,7 +240,7 @@ final class DetectedWorkoutReconciliationTests: XCTestCase {
             await engine.analyzeRecent(maxDays: 2, force: true)
 
             let detected = try await store.workouts(
-                deviceId: deviceId + "-noop", from: dayStart, to: dayStart + 86_399, limit: 100)
+                deviceId: deviceId + "-pulse", from: dayStart, to: dayStart + 86_399, limit: 100)
             XCTAssertEqual(detected, [legacy],
                            "a rescore must preserve old detected history and must not insert a fresh row")
 

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Decodes a `GET_BATTERY_PACK_INFO` (command 151) COMMAND_RESPONSE — the WHOOP 5.0/MG battery pack's
-/// charge, serial and Bluetooth address, read THROUGH the strap (a 4.0 has no pack command). noop already
+/// charge, serial and Bluetooth address, read THROUGH the strap (a 4.0 has no pack command). pulse already
 /// probes `GET_EXTENDED_BATTERY_INFO` (98), but the 5/MG reply to 98 is an undecoded stub; 151 is the
 /// command that actually carries the pack's fuel gauge.
 ///
@@ -119,7 +119,7 @@ public enum BatteryPackInfo {
     /// WHOOP 4.0 path. A 4.0 has no `GET_BATTERY_PACK_INFO` (151); its pack is read via
     /// `GET_EXTENDED_BATTERY_INFO` (98), which reports the pack VOLTAGE (mV) — NOT a charge %. The
     /// voltage sits at payload bytes 7..8 (little-endian), i.e. `frame[cmdOff+8..cmdOff+9]`, confirmed on
-    /// WHOOP4 (#592: a 3970 mV capture); `cmdOff` is 6 on WHOOP4. This is the same offset noop's
+    /// WHOOP4 (#592: a 3970 mV capture); `cmdOff` is 6 on WHOOP4. This is the same offset pulse's
     /// `ExtendedBatteryProbe` reads. Returns an Info carrying only `voltageMv`, or nil when the frame is
     /// not a 98 response with a voltage payload.
     ///

@@ -30,7 +30,7 @@ struct DataSourcesView: View {
     @State private var activityFileFailed = false
     // Wearable export (Oura / Fitbit / Garmin own-data export) import state — same lightweight,
     // self-contained pattern: parse the file, upsert daily metrics + sleep sessions under the brand's
-    // own source, refresh. The brand's own scores are stored as reference only, never NOOP scores.
+    // own source, refresh. The brand's own scores are stored as reference only, never Pulse scores.
     @State private var wearableImporting = false
     @State private var wearableSummary: String?
     @State private var wearableFailed = false
@@ -50,8 +50,8 @@ struct DataSourcesView: View {
     @State private var confirmDeleteAppleHealth = false
     @State private var appleHealthDeletedSummary: String?
 
-    // "Broadcast heart rate" (opt-in, OFF by default): make NOOP a standard BLE Heart Rate peripheral
-    // (0x180D / 0x2A37) so a gym treadmill / Zwift / Peloton can read the live strap HR NOOP receives.
+    // "Broadcast heart rate" (opt-in, OFF by default): make Pulse a standard BLE Heart Rate peripheral
+    // (0x180D / 0x2A37) so a gym treadmill / Zwift / Peloton can read the live strap HR Pulse receives.
     // LOCAL Bluetooth only — nothing leaves the device. The toggle is persisted; the broadcaster is owned
     // here (a pure consumer of LiveState, isolated from the WHOOP/central path).
     @AppStorage(HrBroadcaster.defaultsKey) private var broadcastHrEnabled = false
@@ -90,7 +90,7 @@ struct DataSourcesView: View {
                        // lifecycle binding in onAppear/onDisappear, so a ~1 Hz tick still re-evaluates the
                        // built cards — that observation can't be removed here (see the lane-B2 note).
                        lazy: true) {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
                 whoopCard.staggeredAppear(index: 0)
                 appleHealthCard.staggeredAppear(index: 1)
                 xiaomiCard.staggeredAppear(index: 2)
@@ -141,14 +141,14 @@ struct DataSourcesView: View {
                                tone: hasWhoop ? .accent : .neutral),
              subtitle: String(localized: "Import your full WHOOP history (recovery, strain, sleep, workouts) from a data export (.zip). Works for WHOOP 4.0, 5.0 and MG. Get one at app.whoop.com → Data Management.")) {
             let importingWhoop = model.isImporting(.whoop)
-            HStack(spacing: NoopMetrics.space3) {
+            HStack(spacing: PulseMetrics.space3) {
                 Button {
                     presentImporter(.whoop)
                 } label: {
                     Label(importingWhoop ? "Importing…" : "Choose export…",
                           systemImage: "tray.and.arrow.down")
                 }
-                .buttonStyle(NoopButtonStyle(.primary))
+                .buttonStyle(PulseButtonStyle(.primary))
                 .disabled(model.hasActiveImport || nutritionImporting || liftingImporting || activityFileImporting)
                 if importingWhoop { ProgressView().controlSize(.small) }
             }
@@ -166,11 +166,11 @@ struct DataSourcesView: View {
              tint: StrandPalette.metricCyan,
              subtitle: String(localized: "Import an Apple Health export (Health app → profile → Export All Health Data → export.zip). 7 years of HR, HRV, sleep, SpO₂, steps and more, streamed locally. Large exports take a minute or two.")) {
             let importingAppleHealth = model.isImporting(.appleHealth)
-            HStack(spacing: NoopMetrics.space3) {
+            HStack(spacing: PulseMetrics.space3) {
                 Button { presentImporter(.appleHealth) } label: {
                     Label(importingAppleHealth ? "Working…" : "Choose export.zip…", systemImage: "tray.and.arrow.down")
                 }
-                .buttonStyle(NoopButtonStyle(.primary))
+                .buttonStyle(PulseButtonStyle(.primary))
                 .disabled(model.hasActiveImport || nutritionImporting || liftingImporting || activityFileImporting || appleHealthDeleting)
                 if importingAppleHealth { ProgressView().controlSize(.small) }
             }
@@ -182,13 +182,13 @@ struct DataSourcesView: View {
             // DeviceRegistryStore.deleteAllData(deviceId: "apple-health"). Always offered (the user may
             // have imported in a prior session, so we don't gate on this run's summary), with a
             // confirmation step since it permanently clears every Apple-Health-sourced row.
-            HStack(spacing: NoopMetrics.space3) {
+            HStack(spacing: PulseMetrics.space3) {
                 Button(role: .destructive) {
                     confirmDeleteAppleHealth = true
                 } label: {
                     Label(appleHealthDeleting ? "Removing…" : "Remove imported data", systemImage: "trash")
                 }
-                .buttonStyle(NoopButtonStyle(.destructive))
+                .buttonStyle(PulseButtonStyle(.destructive))
                 .disabled(model.hasActiveImport || appleHealthDeleting)
                 .accessibilityLabel("Remove Apple Health imported data")
                 if appleHealthDeleting { ProgressView().controlSize(.small) }
@@ -205,11 +205,11 @@ struct DataSourcesView: View {
              tint: StrandPalette.metricAmber,
              subtitle: String(localized: "Import your Mi Band history (steps, heart rate, resting HR, sleep stages, SpO₂, stress and sleep score) straight from the Mi Fitness app. On your iPhone: Files → On My iPhone → Mi Fitness, long-press the folder → Compress, then choose the .zip here. Fully offline; no Xiaomi account or Bluetooth needed. Smart Band 8/9/10.")) {
             let importingXiaomi = model.isImporting(.xiaomi)
-            HStack(spacing: NoopMetrics.space3) {
+            HStack(spacing: PulseMetrics.space3) {
                 Button { presentImporter(.xiaomi) } label: {
                     Label(importingXiaomi ? "Importing…" : "Choose Mi Fitness export…", systemImage: "tray.and.arrow.down")
                 }
-                .buttonStyle(NoopButtonStyle(.primary))
+                .buttonStyle(PulseButtonStyle(.primary))
                 .disabled(model.hasActiveImport || nutritionImporting || liftingImporting || activityFileImporting)
                 if importingXiaomi { ProgressView().controlSize(.small) }
             }
@@ -224,11 +224,11 @@ struct DataSourcesView: View {
         card(title: String(localized: "Nutrition (.csv)"), icon: "fork.knife",
              tint: StrandPalette.metricAmber,
              subtitle: String(localized: "Import daily nutrition totals from a Cronometer or MacroFactor CSV export: calories in, protein, carbs, fat (and weight if present). Other trackers work too if the file has a date column and daily totals.")) {
-            HStack(spacing: NoopMetrics.space3) {
+            HStack(spacing: PulseMetrics.space3) {
                 Button { presentImporter(.nutrition) } label: {
                     Label(nutritionImporting ? "Importing…" : "Choose .csv…", systemImage: "tray.and.arrow.down")
                 }
-                .buttonStyle(NoopButtonStyle(.primary))
+                .buttonStyle(PulseButtonStyle(.primary))
                 .disabled(model.hasActiveImport || nutritionImporting || liftingImporting || activityFileImporting)
                 if nutritionImporting { ProgressView().controlSize(.small) }
             }
@@ -243,11 +243,11 @@ struct DataSourcesView: View {
         card(title: String(localized: "Lifting log (Hevy / Liftosaur)"), icon: "dumbbell.fill",
              tint: DomainTheme.effort.color,
              subtitle: String(localized: "Import your strength-training history from a Hevy CSV export or a Liftosaur JSON export. Each workout becomes a Strength session with a training-volume estimate (weight × reps). It's a volume figure, not a measured strain. It never changes your Effort.")) {
-            HStack(spacing: NoopMetrics.space3) {
+            HStack(spacing: PulseMetrics.space3) {
                 Button { presentImporter(.lifting) } label: {
                     Label(liftingImporting ? "Importing…" : "Choose export…", systemImage: "tray.and.arrow.down")
                 }
-                .buttonStyle(NoopButtonStyle(.primary))
+                .buttonStyle(PulseButtonStyle(.primary))
                 .disabled(model.hasActiveImport || nutritionImporting || liftingImporting || activityFileImporting)
                 if liftingImporting { ProgressView().controlSize(.small) }
             }
@@ -262,11 +262,11 @@ struct DataSourcesView: View {
         card(title: String(localized: "Workout file (GPX / TCX / FIT)"), icon: "point.topleft.down.curvedto.point.bottomright.up",
              tint: StrandPalette.metricAmber,
              subtitle: String(localized: "Import a single exported workout file from any brand (Garmin, Coros, Suunto, Wahoo, Polar, Strava, Apple) straight off your device. GPS route, distance, heart rate and calories come in where the file has them. Fully offline; nothing leaves \(Platform.deviceNounPhrase).")) {
-            HStack(spacing: NoopMetrics.space3) {
+            HStack(spacing: PulseMetrics.space3) {
                 Button { presentImporter(.activityFile) } label: {
                     Label(activityFileImporting ? "Importing…" : "Choose .gpx / .tcx / .fit…", systemImage: "tray.and.arrow.down")
                 }
-                .buttonStyle(NoopButtonStyle(.primary))
+                .buttonStyle(PulseButtonStyle(.primary))
                 .disabled(model.hasActiveImport || nutritionImporting || liftingImporting || activityFileImporting)
                 if activityFileImporting { ProgressView().controlSize(.small) }
             }
@@ -281,11 +281,11 @@ struct DataSourcesView: View {
         card(title: String(localized: "Oura / Fitbit / Garmin export"), icon: "figure.mind.and.body",
              tint: StrandPalette.metricPurple,
              subtitle: String(localized: "Import your own data export from Oura, Fitbit or Garmin: sleep, resting heart rate, HRV, steps and more, where the export has them. Download it from the brand's app (Oura: Account → Export Data; Fitbit: Google Takeout; Garmin: Export Your Data), then choose the file here. Fully offline; nothing leaves \(Platform.deviceNounPhrase). Each brand's own readiness or sleep score is kept for reference only. Your scores stay yours.")) {
-            HStack(spacing: NoopMetrics.space3) {
+            HStack(spacing: PulseMetrics.space3) {
                 Button { presentImporter(.wearable) } label: {
                     Label(wearableImporting ? "Importing…" : "Choose export…", systemImage: "tray.and.arrow.down")
                 }
-                .buttonStyle(NoopButtonStyle(.primary))
+                .buttonStyle(PulseButtonStyle(.primary))
                 .disabled(model.hasActiveImport || nutritionImporting || liftingImporting || activityFileImporting || wearableImporting)
                 if wearableImporting { ProgressView().controlSize(.small) }
             }
@@ -309,15 +309,15 @@ struct DataSourcesView: View {
                 if oura.isConnected {
                     HStack {
                         Button { oura.connectAndImport(repo: repo) } label: { Label("Import again", systemImage: "arrow.clockwise") }
-                            .buttonStyle(NoopButtonStyle(.primary))
+                            .buttonStyle(PulseButtonStyle(.primary))
                         Button(role: .destructive) { oura.disconnect(repo: repo) } label: { Label("Forget Oura access", systemImage: "xmark.circle") }
-                            .buttonStyle(NoopButtonStyle(.destructive))
+                            .buttonStyle(PulseButtonStyle(.destructive))
                     }.disabled(oura.busy)
                 } else {
                     Button { oura.connectAndImport(repo: repo) } label: {
                         Label(oura.busy ? "Working…" : "Import your Oura history", systemImage: "square.and.arrow.down")
                     }
-                    .buttonStyle(NoopButtonStyle(.primary))
+                    .buttonStyle(PulseButtonStyle(.primary))
                     .disabled(oura.busy || !oura.isConfigured)
                     if !oura.isConfigured {
                         Text("Add your Oura app credentials to OuraSecrets.xcconfig to enable this.")
@@ -645,7 +645,7 @@ struct DataSourcesView: View {
 
     /// Parse a user's own Oura / Fitbit / Garmin data export and upsert it under the brand's own source
     /// (daily metrics + sleep sessions + reference-only metric series). The brand's own readiness/sleep
-    /// score is NEVER mapped to a NOOP Charge/Effort/Rest — NOOP recomputes its own from the raw inputs.
+    /// score is NEVER mapped to a Pulse Charge/Effort/Rest — Pulse recomputes its own from the raw inputs.
     private func importWearable(url: URL) {
         wearableImporting = true
         wearableSummary = nil
@@ -838,7 +838,7 @@ struct DataSourcesView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             // FI-2 (#490) — the 4.0-vs-5.0 explainer. Broadcast works for BOTH strap generations because it
-            // re-shares whatever LIVE heart rate NOOP already has off the strap; it doesn't depend on the
+            // re-shares whatever LIVE heart rate Pulse already has off the strap; it doesn't depend on the
             // 5/MG-only deep-data path. The honest distinction is WHERE that live HR comes from (4.0 = the
             // strap's standard HR characteristic; 5/MG = PPG-derived once connected), not whether broadcast
             // works at all. Stated plainly so a 4.0 owner knows this is for them too.
@@ -950,7 +950,7 @@ struct DataSourcesView: View {
         }
     }
 
-    /// One source as a frosted, domain-tinted NoopCard: a tinted source glyph + title, an optional
+    /// One source as a frosted, domain-tinted PulseCard: a tinted source glyph + title, an optional
     /// status pill on the trailing edge, the explainer line, then the connect/import action(s). The
     /// glyph + accents take the card's `tint` (its colour world); the status pill carries connection
     /// state. Replaces the old flat surfaceRaised rectangle with the shared Bevel card surface.
@@ -960,9 +960,9 @@ struct DataSourcesView: View {
                               status: S = EmptyView(),
                               subtitle: String,
                               @ViewBuilder content: @escaping () -> C) -> some View {
-        NoopCard(padding: 18, tint: tint) {
-            VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
-                HStack(spacing: NoopMetrics.space2 + 2) {
+        PulseCard(padding: 18, tint: tint) {
+            VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
+                HStack(spacing: PulseMetrics.space2 + 2) {
                     Image(systemName: icon)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(tint)

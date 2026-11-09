@@ -6,7 +6,7 @@ import Foundation
 // constant, gate, and formula here must stay byte-identical to that source.
 //
 // This is a PURE, deterministic, DB-free engine and it does NOT change the default Charge/ring in any way
-// — it is only surfaced (read-only) behind the PuffinExperiment `noopHrvReadiness` flag (off by default)
+// — it is only surfaced (read-only) behind the PuffinExperiment `pulseHrvReadiness` flag (off by default)
 // and feeds NO downstream gate. It reimplements the endurance-science "smallest worthwhile change" (SWC)
 // reading of nightly HRV popularised by Plews et al. and Marco Altini: work in the LOG domain (ln RMSSD is
 // closer to normal and stabilises variance), compare a short 7-night rolling baseline against a longer

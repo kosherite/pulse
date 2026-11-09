@@ -1,6 +1,6 @@
 # Cross-platform architecture — macOS, iOS & Android
 
-NOOP ships three clients. They look different and are written in two languages, but they implement the
+Pulse ships three clients. They look different and are written in two languages, but they implement the
 **same on-device pipeline**: read a WHOOP strap over BLE → decode the protocol → persist locally →
 score recovery/strain/sleep → render. This doc is the map of **what's shared, what's mirrored, and how
 to add a feature that should land on more than one of them** — so a new capability is built once
@@ -80,7 +80,7 @@ is in [`IOS.md` → "Lessons from the fold-in"](IOS.md).
 3. **Mirror to Kotlin.** Reimplement the pure helper in `android/.../analytics` (or the matching pkg),
    matching formulas/constants exactly, with the **same** unit-test cases.
 4. **UI per client.** SwiftUI screen (shared macOS+iOS, guarded where frameworks differ) + a Compose
-   screen on Android, each built from its design system (`StrandDesign` / `NoopType`+`Palette`).
+   screen on Android, each built from its design system (`StrandDesign` / `PulseType`+`Palette`).
 5. **Mirror the changelog** in all three surfaces; **bump all version surfaces** in lockstep (see
    [`BUILD.md`](BUILD.md) / the release process). Verify: `swift test` (packages) + the macOS/iOS
    `app-build` CI + `:app:testFullDebugUnitTest` (Android).
@@ -101,4 +101,4 @@ shared model + per-client edit UI. Each is "one idea, ported deliberately."
 ---
 
 *Everything stays on the device on every client. The platforms differ at the edges — the front door and
-the OS integrations — but the strap protocol, the math, and your data are the same NOOP underneath.*
+the OS integrations — but the strap protocol, the math, and your data are the same Pulse underneath.*

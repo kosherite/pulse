@@ -26,7 +26,7 @@ import Foundation
 /// permanently instead of leaving it to self-correct at the next real sync.
 ///
 /// Pure so the attribution is unit-tested without defaults, a strap, or a registry. Kotlin twin:
-/// `com.noop.ble.resolveLastSync`.
+/// `com.pulse.ble.resolveLastSync`.
 enum LastSyncAttribution {
 
     static func resolve(perDevice: Double?,
@@ -50,7 +50,7 @@ enum LastSyncAttribution {
     /// to no device.
     static func prefKey(peripheralId: String?) -> String? {
         guard let p = peripheralId?.trimmingCharacters(in: .whitespaces), !p.isEmpty else { return nil }
-        return "noop.lastSyncAt.\(p.lowercased())"
+        return "pulse.lastSyncAt.\(p.lowercased())"
     }
 
     /// The per-device defaults key for the #57 write-health stamps ("rows last landed", "offload stalled").
@@ -62,7 +62,7 @@ enum LastSyncAttribution {
     /// `kind` separates "ok" from "stalled" so both keep the per-device scoping rather than only the one
     /// that happened to be noticed — they are read as a PAIR ("stalled more recently than ok" is the
     /// alarm), and scoping one without the other would compare a strap's own stall against another
-    /// strap's success. Kotlin twin: `com.noop.ble.writeHealthPrefKey`.
+    /// strap's success. Kotlin twin: `com.pulse.ble.writeHealthPrefKey`.
     static func writeHealthPrefKey(peripheralId: String?, kind: String) -> String? {
         guard let p = peripheralId?.trimmingCharacters(in: .whitespaces), !p.isEmpty else { return nil }
         return "sync.\(kind).\(p.lowercased())"
@@ -80,7 +80,7 @@ enum LastSyncAttribution {
     ///
     /// Worse than a wrong number, because the verdict it feeds is a judgement. "Alarm unreliable" was
     /// asserted about one strap from another strap's clock, and the honest answer for a strap that has
-    /// banked nothing is that its clock is not known yet. Kotlin twin: `com.noop.ble.resolveStrapClockTs`.
+    /// banked nothing is that its clock is not known yet. Kotlin twin: `com.pulse.ble.resolveStrapClockTs`.
     static func resolveStrapClockTs(perDevice: Int?, legacyGlobal: Int?, pairedCount: Int) -> Int? {
         if let perDevice, perDevice > 0 { return perDevice }
         if let legacyGlobal, legacyGlobal > 0, pairedCount == 1 { return legacyGlobal }
@@ -88,7 +88,7 @@ enum LastSyncAttribution {
     }
 
     /// The per-device defaults key for the strap's newest banked-record timestamp. Keyed, lowercased and
-    /// blank-rejecting for the same reasons as `prefKey`. Kotlin twin: `com.noop.ble.strapClockPrefKey`.
+    /// blank-rejecting for the same reasons as `prefKey`. Kotlin twin: `com.pulse.ble.strapClockPrefKey`.
     static func strapClockPrefKey(peripheralId: String?) -> String? {
         guard let p = peripheralId?.trimmingCharacters(in: .whitespaces), !p.isEmpty else { return nil }
         return "strap.newestRecordTs.\(p.lowercased())"

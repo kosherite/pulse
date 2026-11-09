@@ -8,7 +8,7 @@ import Foundation
 // HRV surfaces already assemble) plus `today`, and gets back the current and longest runs.
 //
 // Civil-day arithmetic is TZ-free (`Baselines.isoEpochDay`, Howard Hinnant's algorithm), so Swift and
-// Kotlin agree bit-for-bit - the twin is `com.noop.analytics.StreakCalculator`, held aligned by mirrored
+// Kotlin agree bit-for-bit - the twin is `com.pulse.analytics.StreakCalculator`, held aligned by mirrored
 // fixtures. Pure and side-effect-free: no clock, no I/O, no PII. No em-dashes.
 
 public enum StreakCalculator {

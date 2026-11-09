@@ -4,7 +4,7 @@ import XCTest
 /// Pins the WHOOP 4.0 SET_ALARM_TIME (cmd 66) payload byte-for-byte.
 ///
 /// The earlier 7-byte form (`[0x01] + u32 LE epoch + [0x00, 0x00]`) made the strap ACK and log
-/// "armed" but never buzz (#428: no STRAP_DRIVEN_ALARM_EXECUTED event). @ujix's btsnoop capture of
+/// "armed" but never buzz (#428: no STRAP_DRIVEN_ALARM_EXECUTED event). @ujix's btspulse capture of
 /// the official WHOOP app on a real 4.0 (PR #535) showed the official app always sends 9 bytes — the
 /// missing trailing `[0x00, 0x00]` is a haptic-mode field. We now send the same 9 bytes; these tests
 /// pin that layout so the field can never silently regress to the silent 7-byte form again.
@@ -39,7 +39,7 @@ final class SetAlarmPayloadTests: XCTestCase {
         XCTAssertEqual(Array(p[7..<9]), [0x00, 0x00], "haptic-mode field (the missing 2 bytes, #535)")
     }
 
-    /// Whole-frame check against the captured epoch from @ujix's btsnoop log (PR #535).
+    /// Whole-frame check against the captured epoch from @ujix's btspulse log (PR #535).
     /// 1781912880 = 0x6A35D530 → LE: 0x30, 0xD5, 0x35, 0x6A.
     func testWireCapture_epoch1781912880_matchesOfficialApp() {
         XCTAssertEqual(

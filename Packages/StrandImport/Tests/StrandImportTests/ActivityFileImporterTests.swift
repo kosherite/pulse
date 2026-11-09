@@ -134,7 +134,7 @@ final class ActivityFileImporterTests: XCTestCase {
     }
 
     func testUntimedGpxRequiresTwoPointsForDerivedDistance() {
-        // bhelm/noop#100: without a summary distance, one coordinate has no measurable segment.
+        // bhelm/pulse#100: without a summary distance, one coordinate has no measurable segment.
         // The untimed parser must preserve that absence as nil, matching the timestamped branch.
         let onePoint = """
         <gpx><trk><trkseg>

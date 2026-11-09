@@ -11,18 +11,18 @@ final class FileExportNameTests: XCTestCase {
         let date = Calendar(identifier: .gregorian).date(from: c)!
         // The stamp uses the local zone, so assert structure not the exact time.
         let name = FileExport.bundleName(profile: "sleep", platform: "ios", version: "7.3.0", date: date)
-        XCTAssertTrue(name.hasPrefix("noop-sleep-ios-v7.3.0-"))
+        XCTAssertTrue(name.hasPrefix("pulse-sleep-ios-v7.3.0-"))
         XCTAssertTrue(name.hasSuffix(".zip"))
-        // noop-sleep-ios-v7.3.0-YYMMDD-HHMM.zip
-        let stampPart = name.dropFirst("noop-sleep-ios-v7.3.0-".count).dropLast(".zip".count)
+        // pulse-sleep-ios-v7.3.0-YYMMDD-HHMM.zip
+        let stampPart = name.dropFirst("pulse-sleep-ios-v7.3.0-".count).dropLast(".zip".count)
         XCTAssertEqual(stampPart.count, 11)  // "260626-0712"
         XCTAssertTrue(stampPart.contains("-"))
     }
 
     func testTimestampedNameStillTwoArg() {
         // The old 2-arg form must keep compiling for the existing strap-log/raw-capture callers.
-        let n = FileExport.timestampedName("noop-strap-log", ext: "txt")
-        XCTAssertTrue(n.hasPrefix("noop-strap-log-"))
+        let n = FileExport.timestampedName("pulse-strap-log", ext: "txt")
+        XCTAssertTrue(n.hasPrefix("pulse-strap-log-"))
         XCTAssertTrue(n.hasSuffix(".txt"))
     }
 }

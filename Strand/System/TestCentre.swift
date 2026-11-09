@@ -5,7 +5,7 @@ import StrandAnalytics
 /// and a one-time read-through migration that gathers the scattered legacy keys behind one accessor
 /// WITHOUT renaming them (spec section 10). `active(_:)` is the zero-cost gate engines check before
 /// emitting a tagged line, so an emitter on the GATT/analytics queue pays one Bool read when a mode is
-/// off. The Kotlin twin is TestCentre.kt, backed by a single "noop_testcentre" SharedPreferences file.
+/// off. The Kotlin twin is TestCentre.kt, backed by a single "pulse_testcentre" SharedPreferences file.
 public enum TestCentre {
 
     // SINGLE namespace for all NEW Test Centre flags. The migrated LEGACY keys keep their original

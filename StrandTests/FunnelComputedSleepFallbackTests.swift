@@ -4,13 +4,13 @@ import WhoopStore
 @testable import Strand
 
 /// #1150: a Bluetooth-only strap (no WHOOP/Apple-Health import) banks every night under the COMPUTED
-/// ("-noop") source, so the imported-only session read the analytics funnel used returned nothing and the
+/// ("-pulse") source, so the imported-only session read the analytics funnel used returned nothing and the
 /// funnel reported "no sleep session in the last 14 days to analyze" even though computed session rows
 /// existed. `Repository.computedSleepSessions` is the fallback the funnel now consults when the imported
 /// read is empty (see `DebugDataDiagnostics.funnelLines` / Android `AndroidDiagnostics.funnelLines`). These
 /// pin: (i) the imported read is empty while computed rows exist, (ii) the fallback returns them
-/// oldest→newest so `.last` is the newest night, and (iii) a re-added strap's "<uuid>-noop" sessions are
-/// reachable once the active id is adopted (the engine writes computed under `<activeStrapId>-noop`).
+/// oldest→newest so `.last` is the newest night, and (iii) a re-added strap's "<uuid>-pulse" sessions are
+/// reachable once the active id is adopted (the engine writes computed under `<activeStrapId>-pulse`).
 final class FunnelComputedSleepFallbackTests: XCTestCase {
 
     private let canonicalId = "my-whoop"
@@ -21,7 +21,7 @@ final class FunnelComputedSleepFallbackTests: XCTestCase {
                            avgHrv: 70, stagesJSON: nil, stagingSparse: true)
     }
 
-    /// The core regression: computed-only nights (all under "-noop") are invisible to the imported read, but
+    /// The core regression: computed-only nights (all under "-pulse") are invisible to the imported read, but
     /// the computed fallback surfaces them, sorted so `.last` is the newest — what the funnel's newest-night
     /// walk relies on.
     @MainActor
@@ -36,7 +36,7 @@ final class FunnelComputedSleepFallbackTests: XCTestCase {
         _ = try await store.upsertSleepSessions([
             session(startTs: newer, endTs: newer + 7 * 3_600),
             session(startTs: older, endTs: older + 7 * 3_600),
-        ], deviceId: canonicalId + "-noop")
+        ], deviceId: canonicalId + "-pulse")
 
         let repo = Repository(deviceId: canonicalId)
         repo.setStoreForTesting(store)
@@ -52,7 +52,7 @@ final class FunnelComputedSleepFallbackTests: XCTestCase {
     }
 
     /// The re-added-strap case (the Kotlin active-id parity concern, mirrored): the engine writes computed
-    /// sessions under "<activeStrapId>-noop", so a fallback pinned to the canonical sibling alone would miss
+    /// sessions under "<activeStrapId>-pulse", so a fallback pinned to the canonical sibling alone would miss
     /// a re-added strap's nights. After the active id is adopted the computed union reaches the strap's sibling.
     @MainActor
     func testFallbackReachesReAddedStrapComputedSibling() async throws {
@@ -63,7 +63,7 @@ final class FunnelComputedSleepFallbackTests: XCTestCase {
         let now = Int(Date().timeIntervalSince1970)
         let night = now - 2 * 86_400
         _ = try await store.upsertSleepSessions([session(startTs: night, endTs: night + 7 * 3_600)],
-                                                deviceId: newId + "-noop")
+                                                deviceId: newId + "-pulse")
 
         let repo = Repository(deviceId: canonicalId)
         repo.setStoreForTesting(store)
@@ -76,7 +76,7 @@ final class FunnelComputedSleepFallbackTests: XCTestCase {
         repo.adoptActiveDeviceId(newId)
         let after = await repo.computedSleepSessions(from: now - 14 * 86_400, to: now, limit: 200)
         XCTAssertEqual(after.count, 1,
-                       "after adopting the active id the fallback reaches the strap's '<uuid>-noop' sibling")
+                       "after adopting the active id the fallback reaches the strap's '<uuid>-pulse' sibling")
         XCTAssertEqual(after.first?.startTs, night)
     }
 }

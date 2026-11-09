@@ -7,7 +7,7 @@ import WhoopProtocol   // Whoop5Ecg.WristSelection — the MG ECG wrist-selectio
 
 // MARK: - Devices
 //
-// Pair and manage the bands NOOP reads from. WHOOP-FIRST: the WHOOP is the primary, fully-supported
+// Pair and manage the bands Pulse reads from. WHOOP-FIRST: the WHOOP is the primary, fully-supported
 // device; generic heart-rate straps (Polar / Wahoo / Coospo / Garmin HRM …) are an early, in-development
 // addition. The screen is a thin UI over `DeviceRegistry` (the Phase 1A/1B data layer): every mutation
 // goes through a registry op, and the `SourceCoordinator` (already wired in AppModel) reacts to the
@@ -129,8 +129,8 @@ private struct DevicesContent: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(NoopMetrics.space3)
-        .background(NoopPanelSurface(cornerRadius: 18))
+        .padding(PulseMetrics.space3)
+        .background(PulsePanelSurface(cornerRadius: 18))
         .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous)
             .strokeBorder(StrandPalette.statusWarning.opacity(0.5), lineWidth: 1))
         .accessibilityElement(children: .combine)
@@ -138,7 +138,7 @@ private struct DevicesContent: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+        VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
             // #802: the re-pair guide belongs HERE too, not only on Live. A strap that connects but never
             // finishes bonding leaves the user on this screen — it is where you go to fix a device — while
             // the four steps that resolve it were rendered one tab away. The reporter in #802 filed an issue
@@ -203,12 +203,12 @@ private struct DevicesContent: View {
                                      && DeviceFamily.isWhoop5Registry(model: device.model,
                                                                       brand: device.brand))
                         ? live.packSocPct : nil,
-                    // Firmware version for the ACTIVE strap. It's a STABLE property (NOOP can't change a
+                    // Firmware version for the ACTIVE strap. It's a STABLE property (Pulse can't change a
                     // strap's firmware), so prefer the live handshake value but fall back to the last-known
                     // persisted firmware (written on connect in FrameRouter) when the live value is momentarily
                     // nil — mid-handshake, or a connection that hasn't re-read GET_HELLO/REPORT_VERSION_INFO
                     // yet this session. Without this the "· FW x" blanks out while actively connected. The
-                    // persisted fallback is WHOOP-only: "noop.lastFirmware" is written solely from a WHOOP
+                    // persisted fallback is WHOOP-only: "pulse.lastFirmware" is written solely from a WHOOP
                     // handshake, so a non-WHOOP active device (Oura) must NOT inherit it. Single last-connected-
                     // strap key, so a not-yet-connected active strap can briefly show the other strap's build on
                     // a multi-WHOOP install until it republishes. Twin of Android.
@@ -222,7 +222,7 @@ private struct DevicesContent: View {
                             ? FirmwareAttribution.prefKey(peripheralId: device.peripheralId)
                                 .flatMap { UserDefaults.standard.string(forKey: $0) } : nil,
                         legacyGlobal: SourceCoordinator.isWhoop(device)
-                            ? UserDefaults.standard.string(forKey: "noop.lastFirmware") : nil,
+                            ? UserDefaults.standard.string(forKey: "pulse.lastFirmware") : nil,
                         pairedCount: registry.devices.count),
                     // Historical record layout (v24/v25 on WHOOP 4.0) observed from this connection's
                     // backfill. Distinct from the strap firmware build shown as FW.
@@ -426,14 +426,14 @@ private struct DevicesContent: View {
     // MARK: Pieces
 
     private var addButton: some View {
-        NoopButton("Add a device", systemImage: "plus", kind: .primary, fullWidth: true) {
+        PulseButton("Add a device", systemImage: "plus", kind: .primary, fullWidth: true) {
             showAddWizard = true
         }
         .accessibilityLabel("Add a device")
     }
 
     private var removedSection: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+        VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
             sectionHead("Removed", trailing: String(localized: "Data kept"))
             ForEach(removedDevices) { device in
                 DeviceCard(
@@ -619,7 +619,7 @@ private struct DevicesContent: View {
     /// so the dialog's choices come from the still-paired devices.
     private func confirmRemove(_ device: PairedDevice) {
         let wasActive = device.status == .active
-        // #78: actually RELEASE the BLE link, not just archive the registry row — otherwise NOOP keeps
+        // #78: actually RELEASE the BLE link, not just archive the registry row — otherwise Pulse keeps
         // re-grabbing the strap (reconnect timer + targeted-connect pin + iOS state restoration), holding
         // it connected so it can never enter pairing mode to be re-paired.
         model.ble.forgetDevice(device.peripheralId)
@@ -679,14 +679,14 @@ private struct DeviceSyncStatusCard: View {
         tint: Color,
         accessibility: String
     ) -> some View {
-        NoopCard(tint: tint) {
-            HStack(alignment: .center, spacing: NoopMetrics.space3) {
+        PulseCard(tint: tint) {
+            HStack(alignment: .center, spacing: PulseMetrics.space3) {
                 Image(systemName: systemImage)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(tint)
                     .frame(width: 24)
                     .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: NoopMetrics.space1) {
+                VStack(alignment: .leading, spacing: PulseMetrics.space1) {
                     Text("Strap history")
                         .font(StrandFont.headline)
                         .foregroundStyle(StrandPalette.textPrimary)
@@ -743,7 +743,7 @@ private struct DeviceCard: View {
     /// #221: the full #78 pairing-refusal guidance (bonded-elsewhere / pairing-mode / Forget This Device
     /// steps), shown on the card when `bondRefused` so the fix is self-service. nil otherwise.
     var pairingHint: String? = nil
-    /// The active strap's link dropped for a user-initiated reboot and NOOP is auto-reconnecting (#166).
+    /// The active strap's link dropped for a user-initiated reboot and Pulse is auto-reconnecting (#166).
     /// Drives the transient "Reconnecting…" pill; false for every non-reboot state.
     var isReconnecting: Bool = false
     /// The active+connected device's live battery percent (0–100), surfaced on the card the same way
@@ -800,8 +800,8 @@ private struct DeviceCard: View {
     /// the ⋮ menu overlay.
     private var cardContent: some View {
         StrandCard(padding: 18, tint: isActive ? StrandPalette.accent : nil) {
-            VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
-                HStack(alignment: .top, spacing: NoopMetrics.space3) {
+            VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
+                HStack(alignment: .top, spacing: PulseMetrics.space3) {
                     Image(systemName: icon)
                         .font(StrandFont.title2)
                         .foregroundStyle(isActive ? StrandPalette.accent : StrandPalette.textSecondary)
@@ -826,7 +826,7 @@ private struct DeviceCard: View {
 
                 // Honest local-takeover state row for an adopted Oura ring that is paired but not the
                 // active+connected source right now. States the single-owner reality plainly (if the ring
-                // was reset again or re-claimed in the Oura app, NOOP no longer owns it) without faking a
+                // was reset again or re-claimed in the Oura app, Pulse no longer owns it) without faking a
                 // live reading. Suppressed for the active+connected ring and for removed rings.
                 if device.sourceKind == .oura && !isLiveConnected && device.status == .paired {
                     ouraLocalStateNote
@@ -836,7 +836,7 @@ private struct DeviceCard: View {
                 // mislabel e.g. a "Blood oxygen" chip when no SpO₂ % ever comes off the strap).
                 capabilityRow(symbol: "waveform.path.ecg", text: profile.captures,
                               tint: StrandPalette.textSecondary)
-                // What NOOP USES it for — the scores/screens this device drives.
+                // What Pulse USES it for — the scores/screens this device drives.
                 capabilityRow(symbol: "bolt.fill", text: profile.powers,
                               tint: StrandPalette.textSecondary)
                 // Honest footnote: the "*" estimates + the SpO₂/steps caveats.
@@ -865,7 +865,7 @@ private struct DeviceCard: View {
 
                 // #987: strap clock state for the active+connected strap - "clock latched" + frame
                 // freshness, with the plain amber 1970/71 warning when the RTC was never set (the strap
-                // banks no history in that state, which otherwise looks like a NOOP sync bug).
+                // banks no history in that state, which otherwise looks like a Pulse sync bug).
                 if let clockLine = liveClockLine {
                     Text(clockLine)
                         .font(StrandFont.footnote)
@@ -1136,7 +1136,7 @@ private struct DeviceCard: View {
 
     /// Honest paired-but-not-connected note for a locally-adopted Oura ring. Amber heads-up, no fabricated
     /// reading: re-states the single-owner reality so the user understands why a re-reset / Oura re-claim
-    /// would break NOOP's ownership.
+    /// would break Pulse's ownership.
     private var ouraLocalStateNote: some View {
         HStack(alignment: .top, spacing: 6) {
             Image(systemName: "info.circle")
@@ -1165,19 +1165,19 @@ private struct DeviceCard: View {
 
 // MARK: - Capability profile
 
-/// Honest, per-model summary of what a device captures and what NOOP uses it for — shown on its card.
+/// Honest, per-model summary of what a device captures and what Pulse uses it for — shown on its card.
 ///
 /// Derived from brand/model/sourceKind, NOT from the stored capability `Set`. The stored set is generic
 /// across WHOOP models (it would render an identical "Heart rate · HRV · Blood oxygen · Skin temp · …"
 /// line for a 4.0 and a 5/MG alike) and it mislabels: no SpO₂ **percentage** ever comes off any WHOOP
 /// strap (raw red/IR only — a real % exists only from a WHOOP CSV / Apple Health import), skin temp is a
 /// nightly ±°C sleep deviation rather than a live reading, steps are 5/MG-only and a raw motion count,
-/// and Charge/Effort/Rest are NOOP-derived scores. Verdicts are source-verified against the decode +
+/// and Charge/Effort/Rest are Pulse-derived scores. Verdicts are source-verified against the decode +
 /// scoring paths (the device-capability audit). `*` in a label = an on-device estimate, not a raw sensor.
 struct DeviceCapabilityProfile {
     let displayModel: String   // clean card subtitle (replaces the redundant "WHOOP · WHOOP")
     let captures: String       // "·"-joined honest capture labels for THIS model
-    let powers: String         // the NOOP scores / screens this device drives
+    let powers: String         // the Pulse scores / screens this device drives
     let footnote: String       // one short honest caveat line ("*" estimates + the SpO₂/steps notes)
 
     static func make(for d: PairedDevice) -> DeviceCapabilityProfile {
@@ -1200,7 +1200,7 @@ struct DeviceCapabilityProfile {
                 footnote: String(localized: "Experimental: live heart rate where the band exposes it. Some bands need a pairing we can't do yet. Pulse will say so honestly and never show a made-up number. No sleep, recovery, skin temp, SpO₂ or steps."))
         }
         // EXPERIMENTAL locally-adopted Oura ring (gen 3/4/5). The gen is carried on `model` ("Oura Ring
-        // 3/4/5") and recovered with OuraRingGen.from(model:). NOOP reads the ring's OWN raw signals + open
+        // 3/4/5") and recovered with OuraRingGen.from(model:). Pulse reads the ring's OWN raw signals + open
         // HRV/sleep-phase tags and computes its own Charge/Effort/Rest; it NEVER reads Oura's encrypted
         // Readiness/Sleep scores, and claims NO absolute SpO₂ %. Estimates carry "*"; a signal it can't read
         // stays "-". Per-gen copy and the canonical Beta caveat (spec
@@ -1258,7 +1258,7 @@ struct DeviceCapabilityProfile {
                 powers: whoopPowers,
                 footnote: String(localized: "* on-device estimate: skin temp is a nightly ±°C deviation, steps are a raw motion count (#78). No SpO₂ % off the strap; import a WHOOP CSV for a real %."))
         }
-        // WHOOP 4.0 — NOOP's primary band; no steps over BLE.
+        // WHOOP 4.0 — Pulse's primary band; no steps over BLE.
         if model.contains("4") {
             return DeviceCapabilityProfile(
                 displayModel: "WHOOP 4.0",
@@ -1348,7 +1348,7 @@ private struct ExtendedBatteryProbeResultView: View {
         }
         .padding(20)
         .frame(minWidth: 340, minHeight: 260)
-        .background(NoopChromeSurface())
+        .background(PulseChromeSurface())
     }
 }
 
@@ -1453,7 +1453,7 @@ private struct BodyLocationProbeResultView: View {
         }
         .padding(20)
         .frame(minWidth: 340, minHeight: 260)
-        .background(NoopChromeSurface())
+        .background(PulseChromeSurface())
     }
 }
 
@@ -1494,7 +1494,7 @@ private struct FeatureFlagProbeSheets: ViewModifier {
 /// The wrist selection is deliberately a second, independent confirmation rather than a button inside
 /// the start flow: `SELECT_WRIST` writes strap state that survives a disconnect. The right/left mapping
 /// is no longer a guess (right=1/left=2, from the official parser and the firmware constructor), but a
-/// persistent write NOOP has not verified on its own hardware still costs a deliberate extra tap.
+/// persistent write Pulse has not verified on its own hardware still costs a deliberate extra tap.
 private struct EcgProbeSheets: ViewModifier {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var live: LiveState
@@ -1575,7 +1575,7 @@ private struct FeatureFlagProbeResultView: View {
         }
         .padding(20)
         .frame(minWidth: 340, minHeight: 260)
-        .background(NoopChromeSurface())
+        .background(PulseChromeSurface())
     }
 }
 
@@ -1600,7 +1600,7 @@ private struct EcgWristSheet: View {
                 .font(StrandFont.caption)
                 .foregroundStyle(StrandPalette.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
-            HStack(spacing: NoopMetrics.space3) {
+            HStack(spacing: PulseMetrics.space3) {
                 Button("Left wrist") { onPick(.left) }
                 Button("Right wrist") { onPick(.right) }
                 Spacer()
@@ -1609,7 +1609,7 @@ private struct EcgWristSheet: View {
         }
         .padding(20)
         .frame(minWidth: 340, minHeight: 220)
-        .background(NoopChromeSurface())
+        .background(PulseChromeSurface())
     }
 }
 
@@ -1656,7 +1656,7 @@ private struct EcgProbeResultView: View {
         }
         .padding(20)
         .frame(minWidth: 340, minHeight: 260)
-        .background(NoopChromeSurface())
+        .background(PulseChromeSurface())
     }
 }
 
@@ -1730,7 +1730,7 @@ private struct DeviceConfigProbeResultView: View {
         }
         .padding(20)
         .frame(minWidth: 340, minHeight: 260)
-        .background(NoopChromeSurface())
+        .background(PulseChromeSurface())
     }
 }
 
@@ -1769,7 +1769,7 @@ struct DeviceCardCatalog: View {
         ScreenScaffold(title: "Devices",
                        subtitle: "What each band captures (and what Pulse uses it for).",
                        topBackground: liquidScaffoldSky()) {
-            VStack(spacing: NoopMetrics.gap) {
+            VStack(spacing: PulseMetrics.gap) {
                 DeviceCard(device: Self.dev("whoop-4d", "WHOOP", "4.0", Self.whoopCaps),
                            isActive: true, isLiveConnected: true,
                            onMakeActive: {}, onRename: {}, onRemove: nil)
@@ -1813,7 +1813,7 @@ struct OuraDeviceDemoScreen: View {
         ScreenScaffold(title: "Devices",
                        subtitle: "A locally-adopted Oura ring, in beta.",
                        topBackground: liquidScaffoldSky()) {
-            VStack(spacing: NoopMetrics.gap) {
+            VStack(spacing: PulseMetrics.gap) {
                 // Active + connected so the card shows "Active · Live" + a live battery readout.
                 DeviceCard(device: DeviceCardCatalog.oura("Oura Ring 3"),
                            isActive: true, isLiveConnected: true, liveBatteryPct: 71,

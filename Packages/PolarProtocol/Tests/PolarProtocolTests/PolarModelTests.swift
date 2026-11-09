@@ -2,7 +2,7 @@ import XCTest
 @testable import PolarProtocol
 
 /// Polar model identification + PMD stream capabilities (`PolarModel`). Public-fact catalog; the
-/// cross-platform contract mirrored by `com.noop.polar.PolarModel`.
+/// cross-platform contract mirrored by `com.pulse.polar.PolarModel`.
 final class PolarModelTests: XCTestCase {
 
     func testIdentifyFromAdvertisedName() {

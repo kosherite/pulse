@@ -19,11 +19,11 @@ val requestedReleaseBuild = gradle.startParameter.taskNames.any {
 }
 
 android {
-    namespace = "com.noop"
+    namespace = "com.pulse"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.noop.whoop"
+        applicationId = "com.pulse.whoop"
         minSdk = 26
         targetSdk = 34
         versionCode = 558
@@ -63,7 +63,7 @@ android {
         }
         release {
             // Shipped UNMINIFIED for reliability. R8 minification crashes this app at runtime: full-mode
-            // over-strips reflective paths, and even with full-mode OFF + broad keeps (com.noop.** +
+            // over-strips reflective paths, and even with full-mode OFF + broad keeps (com.pulse.** +
             // Tink/Worker/ViewModel) a minified build STILL died right after the terms gate on a real
             // device — a library reflective path we couldn't pin without a device to trace. Offline app,
             // a ~18 MB APK is fine. Re-enabling minify needs the exact crash trace + device verification.
@@ -88,7 +88,7 @@ android {
             }
             // Fork staging release: built with -PstagingRelease (the fork testing-build CI only), the
             // release APK gets its own id/name so it installs BESIDE both the official app and the
-            // .debug staging build. A real release (no property) keeps the true com.noop.whoop id.
+            // .debug staging build. A real release (no property) keeps the true com.pulse.whoop id.
             if (isStagingRelease) {
                 applicationIdSuffix = ".staging"
                 versionNameSuffix = "-staging"
@@ -97,8 +97,8 @@ android {
     }
 
     // Two clearly-distinct apps that install side-by-side:
-    //   • full → "NOOP"      (com.noop.whoop)     — the real app, starts empty, pair a strap / import.
-    //   • demo → "NOOP Demo"  (com.noop.whoop.demo) — preloaded with 120 days of synthetic data and
+    //   • full → "Pulse"      (com.pulse.whoop)     — the real app, starts empty, pair a strap / import.
+    //   • demo → "Pulse Demo"  (com.pulse.whoop.demo) — preloaded with 120 days of synthetic data and
     //                          a visible DEMO badge, so anyone can explore every screen with no strap.
     // Build e.g. ./gradlew assembleFullRelease assembleDemoRelease.
     flavorDimensions += "tier"

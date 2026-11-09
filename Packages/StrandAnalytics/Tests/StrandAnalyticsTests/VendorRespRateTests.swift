@@ -4,7 +4,7 @@ import WhoopProtocol
 import WhoopStore
 
 /// A strap that MEASURES its own respiratory rate (the Oura ring's 0x6A `breath`) supplies the night's
-/// `respRateBpm` instead of NOOP's RSA-from-R-R estimate — and the personal baseline that value feeds is
+/// `respRateBpm` instead of Pulse's RSA-from-R-R estimate — and the personal baseline that value feeds is
 /// scoped to the current device era, so a strap switch is not read as physiology.
 final class VendorRespRateTests: XCTestCase {
     private let profile = UserProfile(weightKg: 75, heightCm: 178, age: 30, sex: "male")
@@ -177,7 +177,7 @@ final class VendorRespRateTests: XCTestCase {
     /// existing user's baseline folds exactly as it did before.
     func testASingleBrandHistoryIsUnscoped() {
         let days = (1...30).map { (day: String(format: "2026-07-%02d", $0),
-                                   sourceId: $0 % 2 == 0 ? "my-whoop" : "my-whoop-noop") }
+                                   sourceId: $0 % 2 == 0 ? "my-whoop" : "my-whoop-pulse") }
         XCTAssertEqual(Baselines.deviceEraEpoch(days), 0.0, accuracy: 0.0)
     }
 }

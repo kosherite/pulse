@@ -352,7 +352,7 @@ public enum LabMarkerCsvImport {
     /// first. The token is joined to a letter/digit neighbour by one "_" (a non-alphanumeric
     /// neighbour already maps to "_"), so "LYMPH %", "LYMPH%" and "Lymph (%)" all give
     /// `custom_lymph_pct`. Names without "%" keep the keys they always had. Twin: `customKey`
-    /// in android/app/src/main/java/com/noop/ingest/LabMarkerCsvImport.kt.
+    /// in android/app/src/main/java/com/pulse/ingest/LabMarkerCsvImport.kt.
     public static func customKey(_ name: String) -> String {
         let lowered = Array(name.precomposedStringWithCanonicalMapping
             .trimmingCharacters(in: .whitespaces).lowercased())

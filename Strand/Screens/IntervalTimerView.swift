@@ -93,7 +93,7 @@ struct IntervalTimerView: View {
     var body: some View {
         ScreenScaffold(title: "Interval Timer",
                        subtitle: "Silent haptic HIIT: the strap buzzes the transitions") {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
                 let cards: [AnyView] = [
                     AnyView(statusRow),
                     AnyView(stageCard),
@@ -256,15 +256,15 @@ struct IntervalTimerView: View {
     }
 
     private var controls: some View {
-        HStack(spacing: NoopMetrics.space3) {
-            NoopButton(running ? "Pause" : (isFinished ? "Restart" : "Start"),
+        HStack(spacing: PulseMetrics.space3) {
+            PulseButton(running ? "Pause" : (isFinished ? "Restart" : "Start"),
                        systemImage: running ? "pause.fill" : "play.fill",
                        kind: .primary, fullWidth: true) {
                 if isFinished { resetToStart() }
                 toggleRunning()
             }
 
-            NoopButton("Reset", systemImage: "arrow.counterclockwise",
+            PulseButton("Reset", systemImage: "arrow.counterclockwise",
                        kind: .secondary, fullWidth: true) {
                 stopAndReset()
             }
@@ -285,7 +285,7 @@ struct IntervalTimerView: View {
                         .foregroundStyle(StrandPalette.textPrimary)
                 }
 
-                // Slim total-session progress as the NOOP signature segmented bar — it cascades up as the
+                // Slim total-session progress as the Pulse signature segmented bar — it cascades up as the
                 // session advances, tinted to the Effort world. Flat, crisp, no glow.
                 PipBar(value: sessionProgress, range: 0...1, segments: 28,
                        tint: StrandPalette.effortColor, height: 10)

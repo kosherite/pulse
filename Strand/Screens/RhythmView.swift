@@ -34,9 +34,9 @@ public enum RhythmConsent {
     /// Bump on a material change to the experimental/non-diagnostic wording to re-prompt.
     public static let currentVersion = "1.0"
     /// `@AppStorage` key holding the accepted consent version ("" = never accepted).
-    public static let acceptedVersionKey = "noopRhythmConsentVersion"
-    /// `@AppStorage` key for the feature on/off flag (the `noopRhythmScreening` flag, default OFF).
-    public static let enabledKey = "noopRhythmScreening"
+    public static let acceptedVersionKey = "pulseRhythmConsentVersion"
+    /// `@AppStorage` key for the feature on/off flag (the `pulseRhythmScreening` flag, default OFF).
+    public static let enabledKey = "pulseRhythmScreening"
 
     /// True when the stored accepted version matches the current one.
     public static func isAccepted(_ storedVersion: String) -> Bool {
@@ -163,13 +163,13 @@ struct RhythmConsentGate: View {
                     Button(action: onAccept) {
                         Text("Turn on Rhythm")
                     }
-                    .buttonStyle(.noopPrimary)
+                    .buttonStyle(.pulsePrimary)
                     .disabled(!checked)
                     .keyboardShortcut(.defaultAction)
 
                     if let onCancel {
                         Button("Not now", action: onCancel)
-                            .buttonStyle(.noopGhost)
+                            .buttonStyle(.pulseGhost)
                     }
                 }
                 .padding(26)
@@ -232,7 +232,7 @@ private struct PoincarePlot: View {
             .frame(width: side, height: side)
             .frame(maxWidth: .infinity, alignment: .center)
         }
-        .frame(height: NoopMetrics.chartHeight)
+        .frame(height: PulseMetrics.chartHeight)
         .accessibilityHidden(true)
     }
 }
@@ -320,7 +320,7 @@ struct RhythmView: View {
     private func buildRhythmExportURL() -> URL? {
         guard let night, !windows.isEmpty else { return nil }
         let csv = RhythmExport.csv(summary: night, windows: windows)
-        let url = NoopScratch.file("rhythm.csv")
+        let url = PulseScratch.file("rhythm.csv")
         return (try? csv.write(to: url, atomically: true, encoding: .utf8)) != nil ? url : nil
     }
 
@@ -377,7 +377,7 @@ struct RhythmView: View {
 
     /// OpenStrap-style status chip: a compact pill with an icon + the neutral regularity label. Modelled
     /// on `SourceBadge`, but in the calm Rest-blue palette — NEVER a warn/alarm colour (§11 forbids alarm
-    /// styling; OpenStrap tints its chip amber, NOOP does not). States differ by icon + wording only, and
+    /// styling; OpenStrap tints its chip amber, Pulse does not). States differ by icon + wording only, and
     /// the short `chipLabel` sits in the pill, the sentence `headlineDetail` reads below. Non-diagnostic.
     private var statusChip: some View {
         let label = night?.overall ?? headlineWindow?.label ?? .unreadable
@@ -478,7 +478,7 @@ struct RhythmView: View {
                     PoincarePlot(points: allPoints)
                         .padding(8)
                 }
-                .frame(height: NoopMetrics.chartHeight + 24)
+                .frame(height: PulseMetrics.chartHeight + 24)
 
                 Text("Each dot pairs one heartbeat interval with the next. A tight line along the diagonal means a steady beat; a rounder, more spread-out cloud means the timing varied more.")
                     .font(StrandFont.footnote)
@@ -491,9 +491,9 @@ struct RhythmView: View {
     // MARK: Stats card — the descriptive numbers (equal-height tiles)
 
     private var statsCard: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("The numbers", overline: "DESCRIPTIVE STATS")
-            HStack(spacing: NoopMetrics.gap) {
+            HStack(spacing: PulseMetrics.gap) {
                 StatTile(label: "SHORT AXIS",
                          value: fmt(headlineWindow?.sd1, "%.0f"),
                          caption: String(localized: "SD1 · ms"),
@@ -503,7 +503,7 @@ struct RhythmView: View {
                          caption: String(localized: "SD2 · ms"),
                          accent: StrandPalette.restColor)
             }
-            HStack(spacing: NoopMetrics.gap) {
+            HStack(spacing: PulseMetrics.gap) {
                 StatTile(label: "CLOUD SHAPE",
                          value: fmt(headlineWindow?.sd1sd2, "%.2f"),
                          caption: String(localized: "SD1:SD2 ratio"),
@@ -513,7 +513,7 @@ struct RhythmView: View {
                          caption: String(localized: "variation index"),
                          accent: StrandPalette.metricPurple)
             }
-            HStack(spacing: NoopMetrics.gap) {
+            HStack(spacing: PulseMetrics.gap) {
                 StatTile(label: "EXTRA / SKIPPED",
                          value: percent(headlineWindow?.ectopicFraction),
                          caption: String(localized: "of beats"),

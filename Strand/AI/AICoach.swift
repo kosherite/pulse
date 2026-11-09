@@ -7,8 +7,8 @@ import StrandImport
 
 // MARK: - AI Coach (the one networked feature, strictly opt-in, bring-your-own-key)
 //
-// NOOP is offline by design. This file is the single exception: when the user pastes their OWN
-// API key for a provider they choose, NOOP can send a compact text summary of their metrics plus
+// Pulse is offline by design. This file is the single exception: when the user pastes their OWN
+// API key for a provider they choose, Pulse can send a compact text summary of their metrics plus
 // their question to that provider and surface coaching advice. Nothing leaves the device until a
 // key is set AND a question is asked. We never embed our own key, never auto-send, and only ever
 // transmit the small text context built in `buildContext()` + the running chat, no raw streams.
@@ -37,7 +37,7 @@ struct ChatMessage: Identifiable, Equatable {
 /// Keychain Services wrapper for the user's API key. Uses a generic-password item under a fixed
 /// service so the key never lands in UserDefaults, a plist, or on disk in the clear.
 enum AIKeyStore {
-    private static let service = "com.noop.aicoach"
+    private static let service = "com.pulse.aicoach"
     private static let account = "api-key"
 
     private static var baseQuery: [String: Any] {
@@ -524,7 +524,7 @@ final class AICoachEngine: ObservableObject {
     /// the existing list intact. Requires a saved key.
     /// When the live catalogue was last pulled for `provider`, keyed per provider so switching does
     /// not hide one provider's stale list behind another's refresh. Kotlin twin:
-    /// `NoopPrefs.coachModelsRefreshedAt`.
+    /// `PulsePrefs.coachModelsRefreshedAt`.
     static func modelsRefreshedKey(_ provider: AIProvider) -> String {
         "ai.modelsRefreshed.\(provider.rawValue)"
     }

@@ -10,7 +10,7 @@ import StrandAnalytics
 /// Settings → Experimental to help map the protocol; everyone else is unaffected.
 enum PuffinExperiment {
     /// Shared with the Settings toggle via `@AppStorage(PuffinExperiment.defaultsKey)`.
-    static let defaultsKey = "noopPuffinExperiments"
+    static let defaultsKey = "pulsePuffinExperiments"
 
     static var isEnabled: Bool { UserDefaults.standard.bool(forKey: defaultsKey) }
 
@@ -24,7 +24,7 @@ enum PuffinExperiment {
     /// consults `FeatureFlagWriteGate` so only the sixteen R22 keys — carrying either their enable value or
     /// the off value — can travel through opcode 120. Note the pref itself writes NOTHING in either
     /// direction; it only decides whether a send is permitted. (#174)
-    static let deepDataKey = "noopWhoop5DeepData"
+    static let deepDataKey = "pulseWhoop5DeepData"
 
     static var deepDataEnabled: Bool { UserDefaults.standard.bool(forKey: deepDataKey) }
 
@@ -32,7 +32,7 @@ enum PuffinExperiment {
     /// strap advertises the standard Heart Rate Service (0x180D), pairable by a Garmin/Zwift/gym HR
     /// client. Default off; driven by `BLEManager.setBroadcastHr(_:)`. Mirrors the Android
     /// `PuffinExperiment.KEY_BROADCAST_HR`. (#181)
-    static let broadcastHrKey = "noopBroadcastHr"
+    static let broadcastHrKey = "pulseBroadcastHr"
 
     static var broadcastHrEnabled: Bool { UserDefaults.standard.bool(forKey: broadcastHrKey) }
 
@@ -49,7 +49,7 @@ enum PuffinExperiment {
     /// — a plain 5.0 has no electrodes. Driven only by `BLEManager.setEcgRawDataGate(_:)`, which always
     /// follows the write with a `GET_DEVICE_CONFIG_VALUE(121)` read-back. Mirrors the Android
     /// `PuffinExperiment.KEY_ECG_RAW_DATA`.
-    static let ecgRawDataKey = "noopEcgRawDataGate"
+    static let ecgRawDataKey = "pulseEcgRawDataGate"
 
     static var ecgRawDataEnabled: Bool { UserDefaults.standard.bool(forKey: ecgRawDataKey) }
 
@@ -69,9 +69,9 @@ enum PuffinExperiment {
     /// gate.
     ///
     /// Display-only: writes nothing to the strap. The engine writes the resolved mean to metricSeries as
-    /// "spo2_candidate" under the "-noop" computed device ID; the UI reads it only while this toggle is
-    /// ON. Mirrors the Android `NoopPrefs.KEY_SPO2_CANDIDATE_DISPLAY`.
-    static let spo2CandidateDisplayKey = "noopSpo2CandidateDisplay"
+    /// "spo2_candidate" under the "-pulse" computed device ID; the UI reads it only while this toggle is
+    /// ON. Mirrors the Android `PulsePrefs.KEY_SPO2_CANDIDATE_DISPLAY`.
+    static let spo2CandidateDisplayKey = "pulseSpo2CandidateDisplay"
 
     static var spo2CandidateDisplayEnabled: Bool { UserDefaults.standard.bool(forKey: spo2CandidateDisplayKey) }
 
@@ -81,8 +81,8 @@ enum PuffinExperiment {
     /// SINGLE-SUBJECT (see `DaytimeStress.baselineRelativeHighMarginBPM`), so this stays a chooseable lens,
     /// not a silent default, until it is validated on more subjects. When OFF, `StressView` /
     /// `StressScreen` pass no mode and the read is byte-identical to before. Mirrors the Android
-    /// `NoopPrefs.KEY_STRESS_PERSONAL_BASELINE`.
-    static let stressPersonalBaselineKey = "noopStressPersonalBaseline"
+    /// `PulsePrefs.KEY_STRESS_PERSONAL_BASELINE`.
+    static let stressPersonalBaselineKey = "pulseStressPersonalBaseline"
 
     static var stressPersonalBaselineEnabled: Bool { UserDefaults.standard.bool(forKey: stressPersonalBaselineKey) }
 
@@ -99,8 +99,8 @@ enum PuffinExperiment {
     /// the window against a different recipe, so flipping it silently would move a headline metric's
     /// whole history. Each method maps a theoretical maximum day to exactly 100 via its own log
     /// denominator (`StrainScorer.logMapDenominator`), so the two are on the same axis and switching does
-    /// not rescale the axis under the user. Mirrors the Android `NoopPrefs.KEY_BANISTER_EFFORT`.
-    static let banisterEffortKey = "noopBanisterEffort"
+    /// not rescale the axis under the user. Mirrors the Android `PulsePrefs.KEY_BANISTER_EFFORT`.
+    static let banisterEffortKey = "pulseBanisterEffort"
 
     static var banisterEffortEnabled: Bool { UserDefaults.standard.bool(forKey: banisterEffortKey) }
 
@@ -111,8 +111,8 @@ enum PuffinExperiment {
     /// open, so the strap banks beat-to-beat R-R intervals 24/7 for far better overnight HRV/recovery/
     /// sleep (vs the sparse history offload). Uses more battery (continuous HR streaming). Default OFF;
     /// applied on launch + each (re)bond and driven by `BLEManager.setKeepRealtimeForData(_:)`. Mirrors
-    /// the Android `NoopPrefs.KEY_CONTINUOUS_HRV`. Works on WHOOP 4 and 5/MG (both emit 0x2A37 R-R).
-    static let keepRealtimeForDataKey = "noopContinuousHrv"
+    /// the Android `PulsePrefs.KEY_CONTINUOUS_HRV`. Works on WHOOP 4 and 5/MG (both emit 0x2A37 R-R).
+    static let keepRealtimeForDataKey = "pulseContinuousHrv"
 
     static var keepRealtimeForDataEnabled: Bool { UserDefaults.standard.bool(forKey: keepRealtimeForDataKey) }
 
@@ -123,8 +123,8 @@ enum PuffinExperiment {
     /// ALWAYS (the pre-#927 behaviour). Defaults ON for fresh installs, OFF once Continuous HRV has been
     /// used (#1008) — see below. Read by BLEManager at EVERY arm site (re-derived at
     /// arm time, never precomputed; see ContinuousHrvSchedule). Mirrors the Android
-    /// `NoopPrefs.KEY_CONTINUOUS_HRV_OVERNIGHT`.
-    static let continuousHrvOvernightOnlyKey = "noopContinuousHrvOvernightOnly"
+    /// `PulsePrefs.KEY_CONTINUOUS_HRV_OVERNIGHT`.
+    static let continuousHrvOvernightOnlyKey = "pulseContinuousHrvOvernightOnly"
 
     /// Defaults to ON for anyone who has never touched Continuous HRV, and to OFF for anyone who has
     /// (#1008). WHOOP publishes no daytime HRV figure at all — its reading is an overnight one — so a
@@ -136,7 +136,7 @@ enum PuffinExperiment {
     /// which is indistinguishable from an explicit off. The unset case is therefore resolved from whether
     /// `keepRealtimeForDataKey` exists, rather than by writing a migration — the only thing that must not
     /// happen is silently narrowing capture for someone already relying on it. Twin of the Android
-    /// `NoopPrefs.continuousHrvOvernight`.
+    /// `PulsePrefs.continuousHrvOvernight`.
     static var continuousHrvOvernightOnlyEnabled: Bool {
         UserDefaults.standard.object(forKey: continuousHrvOvernightOnlyKey) as? Bool ?? true
     }
@@ -158,7 +158,7 @@ enum PuffinExperiment {
     /// BEFORE the handler runs, so by then a first-ever toggle is indistinguishable from any other.
     ///
     /// Idempotent: writes only when the overnight key is absent and the base key is present.
-    /// Twin of the Android `NoopPrefs.migrateContinuousHrvOvernightDefault`.
+    /// Twin of the Android `PulsePrefs.migrateContinuousHrvOvernightDefault`.
     static func migrateContinuousHrvOvernightDefault() {
         let defaults = UserDefaults.standard
         guard shouldPinLegacyOvernightDefault(
@@ -168,7 +168,7 @@ enum PuffinExperiment {
     }
 
     /// The migration's decision, lifted out so it is testable without touching `UserDefaults`. Twin of
-    /// the Android `NoopPrefs.shouldPinLegacyOvernightDefault`.
+    /// the Android `PulsePrefs.shouldPinLegacyOvernightDefault`.
     ///
     /// Pin the OLD default only for an install that has used Continuous HRV and never chose an overnight
     /// setting. Everything else is left alone.
@@ -182,20 +182,20 @@ enum PuffinExperiment {
         !hasOvernightChoice && hasUsedContinuousHrv
     }
 
-    // MARK: - Power saving (#477), parity with Android NoopPrefs
+    // MARK: - Power saving (#477), parity with Android PulsePrefs
 
     /// "Power saving" master: battery-adaptive strap-sync cadence. Default off. */
-    static let powerSavingKey = "noopPowerSaving"
+    static let powerSavingKey = "pulsePowerSaving"
     static var powerSavingEnabled: Bool { UserDefaults.standard.bool(forKey: powerSavingKey) }
 
     /// "Low refresh": a sub-option of Power saving (only meaningful while that master is on). Stretches
     /// the periodic history offload to hourly at ANY strap charge, instead of only while the battery is
     /// low. Default off. Cadence only — no data is lost (the strap banks to flash and trims on our ack).
-    static let lowRefreshKey = "noopLowRefresh"
+    static let lowRefreshKey = "pulseLowRefresh"
     static var lowRefreshEnabled: Bool { UserDefaults.standard.bool(forKey: lowRefreshKey) }
 
     /// Battery-% threshold for power saving (10–30). Default 20 (0 in the store means "unset" → 20).
-    static let powerSavingBatteryPctKey = "noopPowerSavingBatteryPct"
+    static let powerSavingBatteryPctKey = "pulsePowerSavingBatteryPct"
     static var powerSavingBatteryPct: Int {
         let v = UserDefaults.standard.integer(forKey: powerSavingBatteryPctKey)
         return v == 0 ? 20 : v
@@ -203,7 +203,7 @@ enum PuffinExperiment {
 
     /// "Pause HRV capture under Low Power Mode" — a sub-option of power saving, default ON when the master
     /// is on. Stored inverted (`…Disabled`) so the default-true reads correctly from a zero-value store.
-    static let pauseHrvDisabledKey = "noopPowerSavingPauseHrvDisabled"
+    static let pauseHrvDisabledKey = "pulsePowerSavingPauseHrvDisabled"
     static var pauseHrvOnPowerSaveEnabled: Bool { !UserDefaults.standard.bool(forKey: pauseHrvDisabledKey) }
 
     /// "Experimental sleep staging (V2)": re-stage each detected night with `SleepStagerV2` — a transparent
@@ -214,7 +214,7 @@ enum PuffinExperiment {
     /// + Walch sleep-accel, leave-one-subject-out) showed V2 strictly dominates V1 (kappa 0.35 vs 0.03, deep
     /// recall 55 % vs 1 %) — the multi-subject validation this recipe originally lacked. V1 remains available.
     /// Read at the staging call site (Repository). Mirrors the Android `PuffinExperiment.KEY_EXPERIMENTAL_SLEEP_V2`.
-    static let experimentalSleepV2Key = "noopExperimentalSleepV2"
+    static let experimentalSleepV2Key = "pulseExperimentalSleepV2"
 
     /// Default ON when the key is unset (mirrors the Android `getBoolean(KEY, true)`): a `bool(forKey:)` alone
     /// reads a missing key as false, so an absent preference must resolve to the promoted V2 default explicitly.
@@ -231,7 +231,7 @@ enum PuffinExperiment {
     /// reported an HR for (it NEVER overrides a WHOOP-stored HR). The pure `PpgHr` package cannot read prefs,
     /// so the app-layer call site (the Backfiller / archive replay) reads this flag and threads it into the
     /// estimator. Mirrors the Android `PuffinExperiment.KEY_PPG_HR_SUBLAG_INTERP`.
-    static let ppgHrSubLagInterpKey = "noopPpgHrSubLagInterp"
+    static let ppgHrSubLagInterpKey = "pulsePpgHrSubLagInterp"
 
     static var ppgHrSubLagInterpEnabled: Bool { UserDefaults.standard.bool(forKey: ppgHrSubLagInterpKey) }
 
@@ -240,23 +240,23 @@ enum PuffinExperiment {
     /// byte-identical whether on or off; it only surfaces the tier + baseline band in the Experimental
     /// algorithms card. Rough / early (n=1, not yet validated against varying real data). Read directly by the
     /// Test Centre view via @AppStorage on this key. Mirrors the Android `PuffinExperiment.KEY_HRV_READINESS`.
-    static let hrvReadinessKey = "noopHrvReadiness"
+    static let hrvReadinessKey = "pulseHrvReadiness"
 
     /// Opt-in "Auto-detect workouts": after a sync / on Today appear, scan the last day or two of HR for a
     /// SUSTAINED-ELEVATED window (resting HR + 30 bpm held ≥ 12 min) that doesn't overlap a saved workout,
     /// and surface ONE dismissible Today card offering to save it as a manual-style workout. Pure read +
     /// suggestion: nothing is ever created without the user tapping Save, and turning this OFF stops all
-    /// detection and hides the card. Default OFF. Mirrors the Android `NoopPrefs.KEY_AUTO_DETECT_WORKOUTS`.
-    static let autoDetectWorkoutsKey = "noopAutoDetectWorkouts"
+    /// detection and hides the card. Default OFF. Mirrors the Android `PulsePrefs.KEY_AUTO_DETECT_WORKOUTS`.
+    static let autoDetectWorkoutsKey = "pulseAutoDetectWorkouts"
 
     static var autoDetectWorkoutsEnabled: Bool { UserDefaults.standard.bool(forKey: autoDetectWorkoutsKey) }
 
     /// "Journal reminder" (#627). When ON, Today shows a persistent journal widget (a last-7-days
     /// completion strip that taps through to the journal) and nudges when today isn't logged yet.
     /// Default ON — gates both the widget and (on Android) the morning sleep sheet. Mirrors the Android
-    /// `NoopPrefs.KEY_JOURNAL_REMINDER_ENABLED`. Default-true, so a bare `bool(forKey:)` can't be used to
+    /// `PulsePrefs.KEY_JOURNAL_REMINDER_ENABLED`. Default-true, so a bare `bool(forKey:)` can't be used to
     /// read it (that defaults false); read it through @AppStorage(...) = true or `object(forKey:)`.
-    static let journalReminderKey = "noopJournalReminder"
+    static let journalReminderKey = "pulseJournalReminder"
 
     static var journalReminderEnabled: Bool {
         UserDefaults.standard.object(forKey: journalReminderKey) as? Bool ?? true
@@ -275,7 +275,7 @@ enum PuffinExperiment {
     /// invents wake time; detection and the V1/V2 staging engines are untouched either way. Read at the
     /// staging call sites (`Repository.restageFromRaw`, `IntelligenceEngine`, threaded through
     /// `AnalyticsEngine.analyzeDay`). Mirrors the Android `PuffinExperiment.KEY_MOTION_AWARE_WAKE`.
-    static let motionAwareWakeKey = "noopMotionAwareWake"
+    static let motionAwareWakeKey = "pulseMotionAwareWake"
 
     static var motionAwareWakeEnabled: Bool { UserDefaults.standard.bool(forKey: motionAwareWakeKey) }
 
@@ -288,15 +288,15 @@ enum PuffinExperiment {
     ///
     /// NOT a medical feature. Whatever the strap returns is unvalidated instrumentation, never a
     /// diagnosis — see the probe's report text and DISCLAIMER.md.
-    static let ecgKey = "noopWhoop5Ecg"
+    static let ecgKey = "pulseWhoop5Ecg"
 
     static var ecgEnabled: Bool { UserDefaults.standard.bool(forKey: ecgKey) }
 
     /// Every 5/MG-only probe key, in ONE place — the twin of Kotlin's `FIVE_MG_GATED_KEYS`.
     ///
     /// The capture flag deliberately appears here even though it is declared on `PuffinFrameRecorder`
-    /// rather than on this type, and under a DIFFERENT string (`noopPuffinCapture` vs Kotlin's
-    /// `noopWhoop5Capture`). That split is exactly why it was missed when this reset first shipped:
+    /// rather than on this type, and under a DIFFERENT string (`pulsePuffinCapture` vs Kotlin's
+    /// `pulseWhoop5Capture`). That split is exactly why it was missed when this reset first shipped:
     /// grepping this file for a capture key found nothing, and grepping for the Kotlin key name found
     /// nothing either. Add new gated probes here, not inline in the reset.
     static let fiveMGGatedKeys: [String] = [

@@ -10,8 +10,8 @@ import MapKit
 
 // MARK: - Workout detail (#410)
 //
-// A READ-ONLY drill-down for one tapped session, built ONLY from the locked Noop component system
-// (NoopCard / ChartCard / SectionHeader / StatTile / SegmentBar idiom) so it sits in the same
+// A READ-ONLY drill-down for one tapped session, built ONLY from the locked Pulse component system
+// (PulseCard / ChartCard / SectionHeader / StatTile / SegmentBar idiom) so it sits in the same
 // instrument-grade, Effort-amber colour world as the Workouts list it opens from.
 //
 //   • a header (sport displayName · date · duration) with the source badge,
@@ -172,10 +172,10 @@ struct WorkoutDetailView: View {
 
     @ViewBuilder private var heartRateRecoveryCard: some View {
         if let recovery = heartRateRecovery {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 SectionHeader("Heart Rate Recovery", overline: "After high-intensity effort",
                               trailing: String(localized: "Peak \(recovery.endHR) bpm"))
-                NoopCard(tint: StrandPalette.metricRose) {
+                PulseCard(tint: StrandPalette.metricRose) {
                     VStack(alignment: .leading, spacing: 14) {
                         HStack(spacing: 0) {
                             recoveryStat(String(localized: "1 min"), value: recovery.after1Minute)
@@ -214,7 +214,7 @@ struct WorkoutDetailView: View {
     // MARK: - Header
 
     private var headerCard: some View {
-        NoopCard(tint: StrandPalette.effortColor) {
+        PulseCard(tint: StrandPalette.effortColor) {
             HStack(alignment: .center, spacing: 14) {
                 Image(systemName: sportSymbol(row.sport))
                     .font(.system(size: 22, weight: .semibold))
@@ -241,8 +241,8 @@ struct WorkoutDetailView: View {
     // MARK: - Stat strip
 
     @ViewBuilder private var statStrip: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: NoopMetrics.gap)],
-                  alignment: .leading, spacing: NoopMetrics.gap) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: PulseMetrics.gap)],
+                  alignment: .leading, spacing: PulseMetrics.gap) {
             StatTile(label: "Duration",
                      value: durationLabel(row.durationS),
                      caption: String(localized: "active"),
@@ -284,14 +284,14 @@ struct WorkoutDetailView: View {
     /// Mac with no GPS, denied permission, or a non-distance sport never produce a route).
     @ViewBuilder private var routeCard: some View {
         if route.count >= 2 {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 SectionHeader("Route", overline: routeOriginLabel,
                               trailing: distanceLabel(row.distanceM))
-                NoopCard(padding: 0, tint: StrandPalette.effortColor) {
+                PulseCard(padding: 0, tint: StrandPalette.effortColor) {
                     VStack(alignment: .leading, spacing: 0) {
                         WorkoutRouteMap(points: route)
                             .frame(height: 220)
-                            .clipShape(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius,
+                            .clipShape(RoundedRectangle(cornerRadius: PulseMetrics.cardRadius,
                                                         style: .continuous))
                             .accessibilityLabel(routeAccessibilityLabel)
                         HStack(spacing: 0) {
@@ -300,7 +300,7 @@ struct WorkoutDetailView: View {
                             routeStat(String(localized: "Avg pace"), paceLabel, tint: StrandPalette.effortBright)
                             routeStat(String(localized: "Points"), "\(route.count)", tint: StrandPalette.textSecondary)
                         }
-                        .padding(NoopMetrics.cardPadding)
+                        .padding(PulseMetrics.cardPadding)
                     }
                 }
                 Text(routeDescription)
@@ -313,7 +313,7 @@ struct WorkoutDetailView: View {
                 } label: {
                     Label("Export route", systemImage: "square.and.arrow.up")
                 }
-                .buttonStyle(NoopButtonStyle(.secondary, fullWidth: true))
+                .buttonStyle(PulseButtonStyle(.secondary, fullWidth: true))
                 .confirmationDialog("Export route", isPresented: $showRouteExport, titleVisibility: .visible) {
                     Button("GPX — Strava, Garmin, most apps") { exportRoute(.gpx) }
                     Button("FIT — Garmin Connect") { exportRoute(.fit) }
@@ -335,14 +335,14 @@ struct WorkoutDetailView: View {
         guard route.count >= 2 else { return }
         let points = route.map { RoutePoint(lat: $0.lat, lon: $0.lon) }
         // Name the file by the workout's start (not export time) so it's stable + matches the Android twin.
-        let name = "noop-route-\(row.startTs).\(format.ext)"
+        let name = "pulse-route-\(row.startTs).\(format.ext)"
         let startTs = row.startTs, endTs = row.endTs, sport = row.sport
         let distanceM = row.distanceM, energyKcal = row.energyKcal, avgHr = row.avgHr, maxHr = row.maxHr
         Task.detached(priority: .userInitiated) {
             let data = RouteExporter.render(
                 format, route: points, startTs: startTs, endTs: endTs, sport: sport,
                 distanceM: distanceM, energyKcal: energyKcal, avgHr: avgHr, maxHr: maxHr)
-            let url = NoopScratch.file(name)
+            let url = PulseScratch.file(name)
             do { try data.write(to: url) } catch { return }
             await MainActor.run { FileExport.exportFile(at: url, suggestedName: name) }
         }
@@ -409,7 +409,7 @@ struct WorkoutDetailView: View {
             let values = hrPoints.map(\.value)
             let lo = max(0, (values.min() ?? 60) - 8)
             let hi = (values.max() ?? 180) + 8
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 ChartCard(
                     title: "HEART RATE",
                     subtitle: String(localized: "Beats per minute across the session"),
@@ -445,7 +445,7 @@ struct WorkoutDetailView: View {
                 }
             }
         } else if loaded {
-            NoopCard {
+            PulseCard {
                 emptyNote("No heart-rate samples were recorded over this session's window.")
             }
         }
@@ -466,11 +466,11 @@ struct WorkoutDetailView: View {
         if let z = zoneMinutes, z.reduce(0, +) > 0 {
             let total = z.reduce(0, +)
             let busiest = z.indices.max(by: { z[$0] < z[$1] }) ?? 0
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 SectionHeader("HR Zones",
                               overline: zonesFromImport ? "Whoop import" : "From strap HR",
                               trailing: String(localized: "\(Int(total.rounded()))m in zone"))
-                NoopCard(tint: StrandPalette.effortColor) {
+                PulseCard(tint: StrandPalette.effortColor) {
                     VStack(alignment: .leading, spacing: 12) {
                         GeometryReader { geo in
                             HStack(spacing: 2) {
@@ -536,9 +536,9 @@ struct WorkoutDetailView: View {
         let displayValue = UnitFormatter.effortValue(strain, scale: effortScale)
         let scaleMax: Double = effortScale == .whoop ? 21 : 100
         let fraction = max(0, min(1, displayValue / scaleMax))
-        return VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        return VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Effort", overline: "This session")
-            NoopCard(tint: StrandPalette.effortColor) {
+            PulseCard(tint: StrandPalette.effortColor) {
                 HStack(alignment: .center, spacing: 18) {
                     ZStack {
                         // Static (posed) vessel — a compact liquid gauge inside a card, so it costs a single
@@ -546,7 +546,7 @@ struct WorkoutDetailView: View {
                         LiquidVessel(value: fraction, tint: StrandPalette.effortColor, animated: false)
                             .frame(width: 88, height: 88)
                         VStack(spacing: 0) {
-                            // The session's Effort contribution ticks up to its value — the NOOP signature.
+                            // The session's Effort contribution ticks up to its value — the Pulse signature.
                             CountUpText(value: displayValue,
                                         format: { String(format: "%.1f", $0) },
                                         font: StrandFont.rounded(28),
@@ -643,7 +643,7 @@ struct WorkoutDetailView: View {
 // analogue of Android's `RouteCanvas`, but on real map tiles. Built as a platform-bridged representable
 // around `MKMapView` so it runs on BOTH iOS 17 and macOS 13 (SwiftUI's newer `Map { MapPolyline }` needs
 // iOS 17 / macOS 14, and the macOS deployment target is 13). The map is offline-capable: MapKit caches
-// tiles locally and the route itself is on-device — NOOP never sends the route anywhere.
+// tiles locally and the route itself is on-device — Pulse never sends the route anywhere.
 
 #if canImport(MapKit) && canImport(UIKit)
 import UIKit

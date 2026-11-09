@@ -2,7 +2,7 @@ import XCTest
 @testable import Strand
 import WhoopProtocol
 
-/// bhelm/noop#4: the reboot-ack diagnostic must read the COMMAND_RESPONSE result byte at the FAMILY's
+/// bhelm/pulse#4: the reboot-ack diagnostic must read the COMMAND_RESPONSE result byte at the FAMILY's
 /// offset — WHOOP 4.0 @8, WHOOP 5/MG @12 (the "+4 shift"). Reading the fixed 4.0 offset on a 5/MG frame
 /// hit the inner *type* byte (non-zero) and logged REJECTED on a successful reboot.
 ///

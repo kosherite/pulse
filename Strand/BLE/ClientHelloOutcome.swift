@@ -20,7 +20,7 @@ import Foundation
 /// "the frame never reached the air". Naming the gap is what makes that answerable next.
 ///
 /// `status` is passed pre-rendered so each platform supplies its own, leaving the line shape identical.
-/// Pure. Kotlin twin: `com.noop.ble.clientHelloOutcomeLine`.
+/// Pure. Kotlin twin: `com.pulse.ble.clientHelloOutcomeLine`.
 enum ClientHelloOutcome {
     static func line(isHelloChar: Bool, charUuid: String?, elapsedMs: Int, status: String?) -> String {
         guard let charUuid else {

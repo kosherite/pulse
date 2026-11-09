@@ -5,10 +5,10 @@
 #
 #   release/forgejo-release.sh <version> <asset> [<asset> ...] [-- "release notes"]
 #   e.g. release/forgejo-release.sh 4.7.0 \
-#          dist/NOOP-v4.7.0-macos.zip dist/NOOP-v4.7.0-ios.ipa dist/NOOP-v4.7.0-android.apk
+#          dist/Pulse-v4.7.0-macos.zip dist/Pulse-v4.7.0-ios.ipa dist/Pulse-v4.7.0-android.apk
 #
 # Creates tag v<version> (server-side, from the current default branch) + the release,
-# then uploads every asset. Token from ~/.config/noop/forge_token. Idempotent on assets.
+# then uploads every asset. Token from ~/.config/pulse/forge_token. Idempotent on assets.
 # FORGE_DOMAIN/FORGE_ORG/FORGE_REPO come from deploy.env (or env). No secret on any cmdline.
 # ─────────────────────────────────────────────────────────────────────────────
 set -uo pipefail
@@ -16,18 +16,18 @@ set -uo pipefail
 # load config: prefer a sibling deploy.env, else expect FORGE_* in the environment
 HERE="$(cd "$(dirname "$0")" && pwd)"
 [ -f "$HERE/../deploy.env" ] && source "$HERE/../deploy.env"
-DOMAIN="${FORGE_DOMAIN:-${NOOP_DOMAIN:-noop.fans}}"
-ORG="${FORGE_ORG:-NoopApp}"; REPO="${FORGE_REPO:-noop}"
+DOMAIN="${FORGE_DOMAIN:-${PULSE_DOMAIN:-github.com/kosherite/pulse}}"
+ORG="${FORGE_ORG:-PulseApp}"; REPO="${FORGE_REPO:-pulse}"
 
 VER="${1:?usage: forgejo-release.sh <version> <asset...> [-- notes]}"; shift
-TAG="v$VER"; NOTES="NOOP $TAG — see CHANGELOG.md."
+TAG="v$VER"; NOTES="Pulse $TAG — see CHANGELOG.md."
 ASSETS=()
 while [ $# -gt 0 ]; do
   if [ "$1" = "--" ]; then shift; NOTES="${1:-$NOTES}"; break; fi
   ASSETS+=("$1"); shift
 done
 
-TOKEN_FILE="$HOME/.config/noop/forge_token"
+TOKEN_FILE="$HOME/.config/pulse/forge_token"
 [ -f "$TOKEN_FILE" ] || { echo "missing $TOKEN_FILE" >&2; exit 1; }
 TOKEN="$(cat "$TOKEN_FILE")"
 API="https://$DOMAIN/api/v1"
@@ -37,7 +37,7 @@ echo "→ release $TAG on $ORG/$REPO ($DOMAIN)"
 REL_ID="$(api "$API/repos/$ORG/$REPO/releases/tags/$TAG" 2>/dev/null | jq -r '.id // empty')"
 if [ -z "$REL_ID" ]; then
   REL_ID="$(api -X POST "$API/repos/$ORG/$REPO/releases" \
-    -d "$(jq -n --arg t "$TAG" --arg n "NOOP $TAG" --arg b "$NOTES" \
+    -d "$(jq -n --arg t "$TAG" --arg n "Pulse $TAG" --arg b "$NOTES" \
           '{tag_name:$t,name:$n,body:$b,draft:false,prerelease:false}')" | jq -r '.id')"
   echo "  created release id=$REL_ID"
 else

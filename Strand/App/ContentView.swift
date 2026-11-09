@@ -4,11 +4,11 @@ import StrandDesign
 /// Root — the sidebar shell, with the first-run onboarding/pairing wizard overlaid until complete,
 /// and a "What's New" changelog sheet shown automatically after an update.
 struct ContentView: View {
-    @AppStorage("noop.onboarded") private var onboarded = false
-    @AppStorage("noop.lastSeenChangelogVersion") private var lastSeenChangelog = ""
-    @AppStorage("noop.acceptedTermsVersion") private var acceptedTerms = ""
+    @AppStorage("pulse.onboarded") private var onboarded = false
+    @AppStorage("pulse.lastSeenChangelogVersion") private var lastSeenChangelog = ""
+    @AppStorage("pulse.acceptedTermsVersion") private var acceptedTerms = ""
     /// Local timestamp of the last terms acceptance — the on-device consent record (version + when).
-    @AppStorage("noop.acceptedTermsAt") private var acceptedTermsAt = ""
+    @AppStorage("pulse.acceptedTermsAt") private var acceptedTermsAt = ""
     @State private var showWhatsNew = false
 
     var body: some View {
@@ -53,7 +53,7 @@ struct ContentView: View {
             // Seed the current What's New into the Updates inbox (idempotent per version) so the bell
             // collects it even if the user dismisses the auto sheet.
             UpdateStore.shared.seedWhatsNewIfNeeded()
-            // #1659: NOOP is sideloaded on every platform, so nothing else will tell you a release
+            // #1659: Pulse is sideloaded on every platform, so nothing else will tell you a release
             // happened. On by default and switchable off - see UpdateAvailability.defaultEnabled.
             //
             // Gated on the SAME condition as showWhatsNewIfDue below, matching the iOS and Android hooks:

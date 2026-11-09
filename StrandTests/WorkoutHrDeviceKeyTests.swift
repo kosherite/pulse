@@ -7,15 +7,15 @@ import XCTest
 /// now resolves the read key per row from the workout's own `source`. Kotlin twin: `WorkoutHrDeviceKeyTest`.
 ///
 /// NB the Swift read-model `WorkoutRow` carries no `deviceId`, so only DETECTED rows (whose `source` IS their
-/// computed strap id "<base>-noop") can key on their own strap here; MANUAL/IMPORTED rows reconcile against the
+/// computed strap id "<base>-pulse") can key on their own strap here; MANUAL/IMPORTED rows reconcile against the
 /// active strap. This mirrors the Kotlin fix for the dominant (detected) multi-WHOOP case.
 final class WorkoutHrDeviceKeyTests: XCTestCase {
 
-    /// A bout detected on a 2nd WHOOP lives under "whoop-aabbcc-noop"; its HR is banked under "whoop-aabbcc".
+    /// A bout detected on a 2nd WHOOP lives under "whoop-aabbcc-pulse"; its HR is banked under "whoop-aabbcc".
     /// The active strap being something else must NOT redirect the read to an empty window.
     func testDetectedReadsItsOwnBaseStrap_notActive() {
         XCTAssertEqual(
-            Repository.workoutHrDeviceIds(source: "whoop-aabbcc-noop", activeStrapId: "my-whoop",
+            Repository.workoutHrDeviceIds(source: "whoop-aabbcc-pulse", activeStrapId: "my-whoop",
                                           importedIds: ["my-whoop"]),
             ["whoop-aabbcc"],
             "#856: exactly ONE id — unioning would mix in a strap that never recorded this bout")
@@ -25,7 +25,7 @@ final class WorkoutHrDeviceKeyTests: XCTestCase {
     /// old `self.deviceId` behaviour.
     func testDetectedCanonicalIsByteIdenticalToActive() {
         XCTAssertEqual(
-            Repository.workoutHrDeviceIds(source: "my-whoop-noop", activeStrapId: "my-whoop",
+            Repository.workoutHrDeviceIds(source: "my-whoop-pulse", activeStrapId: "my-whoop",
                                           importedIds: ["my-whoop"]),
             ["my-whoop"])
     }
@@ -41,7 +41,7 @@ final class WorkoutHrDeviceKeyTests: XCTestCase {
 
     /// Imported rows (Apple / activity file / lifting / WHOOP CSV) reconcile against the active strap — the
     /// worn-strap fill (#77) is unchanged. Includes the legacy `apple_health` spelling and the CSV `my-whoop`
-    /// source (contains "whoop" but not "-noop", so it classifies non-detected and is NOT stripped).
+    /// source (contains "whoop" but not "-pulse", so it classifies non-detected and is NOT stripped).
     func testImportedReadsActiveStrap() {
         for src in ["apple-health", "apple_health", "activity-file", "lifting", "my-whoop", "Health Connect"] {
             XCTAssertEqual(
@@ -66,7 +66,7 @@ final class WorkoutHrDeviceKeyTests: XCTestCase {
     /// into the branch where it would be wrong.
     func testDetectedIgnoresTheUnionEvenWhenOneIsAvailable() {
         XCTAssertEqual(
-            Repository.workoutHrDeviceIds(source: "whoop-aabbcc-noop", activeStrapId: "my-whoop",
+            Repository.workoutHrDeviceIds(source: "whoop-aabbcc-pulse", activeStrapId: "my-whoop",
                                           importedIds: ["my-whoop", "whoop-zzz"]),
             ["whoop-aabbcc"])
     }

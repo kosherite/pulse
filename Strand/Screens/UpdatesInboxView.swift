@@ -9,7 +9,7 @@ import StrandDesign
 // offers "Restore to Today". Everything is on-device and non-clinical — informational, never a verdict.
 //
 // Sheet idiom matches WhatsNewView: a FIXED macOS frame (a macOS sheet hosting a ScrollView collapses
-// without one) and iOS presentationDetents via `noopSheetPresentation`.
+// without one) and iOS presentationDetents via `pulseSheetPresentation`.
 struct UpdatesInboxView: View {
     @EnvironmentObject var updateStore: UpdateStore
     @EnvironmentObject var router: NavRouter
@@ -21,7 +21,7 @@ struct UpdatesInboxView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-                .background(NoopChromeSurface())
+                .background(PulseChromeSurface())
             Divider().overlay(StrandPalette.hairline)
             content
             if !updateStore.items.isEmpty {
@@ -35,7 +35,7 @@ struct UpdatesInboxView: View {
         .frame(width: 460, height: 640)
         #else
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .noopSheetPresentation(largeFirst: true)
+        .pulseSheetPresentation(largeFirst: true)
         #endif
         .background(StrandPalette.surfaceBase)
     }
@@ -79,7 +79,7 @@ struct UpdatesInboxView: View {
             emptyState
         } else {
             ScrollView {
-                VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+                VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                     if !unread.isEmpty {
                         section("NEW", items: unread)
                     }
@@ -97,7 +97,7 @@ struct UpdatesInboxView: View {
     }
 
     private func section(_ label: LocalizedStringKey, items: [UpdateItem]) -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             Text(label).font(StrandFont.overline)
                 .tracking(StrandFont.overlineTracking)
                 .foregroundStyle(StrandPalette.textTertiary)
@@ -192,7 +192,7 @@ private struct UpdateRow: View {
     let onRestore: () -> Void
 
     var body: some View {
-        NoopCard(tint: item.read ? nil : tint) {
+        PulseCard(tint: item.read ? nil : tint) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .top, spacing: 12) {
                     Image(systemName: symbol)
@@ -278,5 +278,5 @@ private struct UpdateRow: View {
 // inbox restores a card by clearing that same key, so the key shape lives in ONE place both sides use.
 enum TodayCardDismissal {
     /// The `@AppStorage` bool key for a Today info-card's dismissed flag, by stable card id.
-    static func flagKey(_ cardID: String) -> String { "noop.todayCard.\(cardID).dismissed" }
+    static func flagKey(_ cardID: String) -> String { "pulse.todayCard.\(cardID).dismissed" }
 }

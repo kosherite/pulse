@@ -4,7 +4,7 @@ import StrandDesign
 // MARK: - About Apple Watch data
 //
 // The honest "what your Apple Watch is good at, and where it's lighter" page (M2 of the
-// Watch-as-a-device project). NOOP can run off only an Apple Watch (the phone computes our
+// Watch-as-a-device project). Pulse can run off only an Apple Watch (the phone computes our
 // Charge / Rest / Effort / Fitness Age live from HealthKit) but the watch is not a chest
 // strap, and this page says so plainly. It renders the per-metric capability + confidence
 // table from the design spec, the HRV-sampling explanation (why recovery calibrates over
@@ -102,7 +102,7 @@ struct AppleWatchAboutView: View {
         ScreenScaffold(title: "About Apple Watch data",
                        subtitle: "What your watch is great at, where it's lighter than a chest strap, and how sure Pulse is.",
                        lazy: true) {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                 introCard
                 capabilityCard
                 hrvCard
@@ -118,7 +118,7 @@ struct AppleWatchAboutView: View {
     // MARK: - Intro
 
     private var introCard: some View {
-        NoopCard(tint: StrandPalette.accent) {
+        PulseCard(tint: StrandPalette.accent) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
                     Image(systemName: "applewatch")
@@ -149,7 +149,7 @@ struct AppleWatchAboutView: View {
     // MARK: - Capability + confidence table
 
     private var capabilityCard: some View {
-        NoopCard {
+        PulseCard {
             VStack(alignment: .leading, spacing: 14) {
                 Text("What the watch can do").font(StrandFont.overline)
                     .tracking(StrandFont.overlineTracking)
@@ -202,7 +202,7 @@ struct AppleWatchAboutView: View {
     // MARK: - HRV-sampling explanation
 
     private var hrvCard: some View {
-        NoopCard(tint: StrandPalette.chargeColor) {
+        PulseCard(tint: StrandPalette.chargeColor) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
                     Image(systemName: "waveform.path.ecg")
@@ -230,7 +230,7 @@ struct AppleWatchAboutView: View {
     // MARK: - SpO2 caveat
 
     private var spo2Card: some View {
-        NoopCard {
+        PulseCard {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
                     Image(systemName: "drop.degreesign")
@@ -258,7 +258,7 @@ struct AppleWatchAboutView: View {
     // MARK: - Start setup (iOS only; injected by the caller)
 
     private func startCard(_ start: @escaping () -> Void) -> some View {
-        NoopCard(tint: StrandPalette.accent) {
+        PulseCard(tint: StrandPalette.accent) {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Ready to connect your watch?")
                     .font(StrandFont.headline)
@@ -270,7 +270,7 @@ struct AppleWatchAboutView: View {
                 Button(action: start) {
                     Label("Set up Apple Watch", systemImage: "applewatch")
                 }
-                .buttonStyle(NoopButtonStyle(.primary, fullWidth: true))
+                .buttonStyle(PulseButtonStyle(.primary, fullWidth: true))
                 .accessibilityHint("Opens the Apple Watch setup and Health permission")
             }
             .frame(maxWidth: .infinity, alignment: .leading)

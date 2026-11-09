@@ -2,7 +2,7 @@ import XCTest
 @testable import PolarProtocol
 
 /// The PMD control-point command builder + response parse (`PolarPmdControl`). Pure byte work — the
-/// cross-platform contract mirrored by `com.noop.polar.PmdControl`. No CoreBluetooth, no hardware.
+/// cross-platform contract mirrored by `com.pulse.polar.PmdControl`. No CoreBluetooth, no hardware.
 final class PmdControlTests: XCTestCase {
 
     func testGetSettingsBytes() {

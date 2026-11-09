@@ -3,7 +3,7 @@ import StrandDesign
 
 // MARK: - Scoring guide
 //
-// "How your scores work" — the one honest explainer for NOOP's three daily scores
+// "How your scores work" — the one honest explainer for Pulse's three daily scores
 // (Charge, Effort, Rest) and the confidence labels. Presented as a sheet, mirroring
 // WhatsNewView's presentation + dismiss + layout idiom: a fixed header with a close
 // button, a scrollable column of cards, and a "Got it" footer. Reachable from
@@ -82,11 +82,11 @@ struct ScoringGuideView: View {
             header
                 // Design Reset: a FLAT opaque WHOOP-grey title surface — no scenic hero, no bloom, no
                 // domain tint. The header reads as a clean raised card edge, matching the Today look.
-                .background(NoopChromeSurface())
+                .background(PulseChromeSurface())
             Divider().overlay(StrandPalette.hairline)
             ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+                    VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                         introCard
                         scoreCard(.charge,
                                   headline: String(localized: "Charge: how recovered are you?"),
@@ -121,7 +121,7 @@ struct ScoringGuideView: View {
         #else
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         // A long explainer scroll → open full-height, with a grabber for swipe-to-dismiss.
-        .noopSheetPresentation(largeFirst: true)
+        .pulseSheetPresentation(largeFirst: true)
         #endif
         .background(StrandPalette.surfaceBase)
     }
@@ -167,7 +167,7 @@ struct ScoringGuideView: View {
     // MARK: - Cards
 
     private var introCard: some View {
-        NoopCard {
+        PulseCard {
             VStack(alignment: .leading, spacing: 14) {
                 Text("The three scores").font(StrandFont.overline)
                     .tracking(StrandFont.overlineTracking)
@@ -204,7 +204,7 @@ struct ScoringGuideView: View {
     /// Design Reset: a flat GlowRing (no bloom) replaces the old BevelGauge; the accent is a Reset score
     /// token, never gold / strain / sleep-purple.
     private func scoreCard(_ section: ScoreSection, headline: String, body: String, vsWhoop: String) -> some View {
-        NoopCard(tint: section.accent) {
+        PulseCard(tint: section.accent) {
             VStack(alignment: .leading, spacing: 14) {
                 // Header row — the flat sample ring sits beside the accent icon + headline.
                 HStack(alignment: .center, spacing: 14) {
@@ -248,7 +248,7 @@ struct ScoringGuideView: View {
         }
         // Deep-link highlight: a brief accent-tinted ring when arrived at via an ⓘ.
         .overlay(
-            RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: PulseMetrics.cardRadius, style: .continuous)
                 .strokeBorder(section.accent, lineWidth: 2)
                 .opacity(highlighted == section ? 1 : 0)
         )
@@ -278,7 +278,7 @@ struct ScoringGuideView: View {
     }
 
     private var confidenceCard: some View {
-        NoopCard {
+        PulseCard {
             VStack(alignment: .leading, spacing: 12) {
                 Text("How sure is Pulse?  ·  Solid · Building · Calibrating")
                     .font(StrandFont.headline)

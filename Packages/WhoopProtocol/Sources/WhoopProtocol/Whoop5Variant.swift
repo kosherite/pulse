@@ -9,7 +9,7 @@ import Foundation
 // means a capability gate (ECG, and later BP) can never accidentally change how a frame is parsed.
 //
 // Pure: no CoreBluetooth, no I/O. The app layer supplies the two strings (see below) and this
-// decides. The Kotlin twin is com.noop.protocol.Whoop5Variant — keep them byte-identical.
+// decides. The Kotlin twin is com.pulse.protocol.Whoop5Variant — keep them byte-identical.
 //
 // Provenance: the serial prefixes and the 5.0 hardware-revision string are protocol FACTS
 // (uncopyrightable), corroborated by community reverse-engineering discussed in #520. They are

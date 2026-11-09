@@ -47,7 +47,7 @@ struct SmartAlarmView: View {
         // evening wind-down reminder, so naming it "Wind-Down" undersold it. One surface, clearly labelled.
         ScreenScaffold(title: "Alarms",
                        subtitle: "Your strap wake-alarm and the evening wind-down reminder, in one place.") {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                 windowHero
                 strapAlarmCard
                 strapRejectedCard   // #34: only shows when the strap keeps refusing the alarm
@@ -83,7 +83,7 @@ struct SmartAlarmView: View {
     private var windowHero: some View {
         ZStack {
             ScenicHeroBackground(domain: .rest)
-                .clipShape(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: PulseMetrics.cardRadius, style: .continuous))
             VStack(alignment: .leading, spacing: 12) {
                 Text("Tonight").strandOverline()
                 HStack(alignment: .firstTextBaseline, spacing: 14) {
@@ -209,7 +209,7 @@ struct SmartAlarmView: View {
     // MARK: - Strap silent wake-alarm (#766, moved here from Automations)
 
     // The strap's own firmware alarm: a silent wrist buzz at the chosen time, armed over BLE so it fires
-    // even if the phone is asleep or NOOP is closed. Lifted verbatim (behaviour intact) out of
+    // even if the phone is asleep or Pulse is closed. Lifted verbatim (behaviour intact) out of
     // AutomationsView.alarmCard so users stop conflating it with the wind-down reminder below.
     private var strapAlarmCard: some View {
         StrandCard(padding: 20, tint: behavior.smartAlarmEnabled ? StrandPalette.accent : nil) {
@@ -312,7 +312,7 @@ struct SmartAlarmView: View {
                         } label: {
                             Text("Check what the strap has stored")
                         }
-                        .buttonStyle(NoopButtonStyle(.secondary, fullWidth: true))
+                        .buttonStyle(PulseButtonStyle(.secondary, fullWidth: true))
                         Text("The answer from the strap appears in your strap log and debug export, with the raw bytes it replied with.")
                             .font(StrandFont.footnote)
                             .foregroundStyle(StrandPalette.textTertiary)
@@ -478,7 +478,7 @@ struct SmartAlarmView: View {
         guard let next = nextStrapAlarm() else { return nil }
         let formatter = DateFormatter()
         // `AppLanguage.activeLocale`, not `.current`: the app language is an in-app setting, so a reader
-        // running NOOP in German on an English device must get German weekday words here, while keeping
+        // running Pulse in German on an English device must get German weekday words here, while keeping
         // their device's 24-hour convention. The same reason every other formatter in the app uses it.
         formatter.locale = AppLanguage.activeLocale
         formatter.setLocalizedDateFormatFromTemplate("EEEE jj:mm")

@@ -16,7 +16,7 @@ import Foundation
 // report text and returns values. No I/O, no clock, no PII (it only counts token occurrences). The token map
 // is the single declarative source of truth shared by the report renderer and the meta field. No em-dashes.
 // Android's `ReportCompleteness` in
-// `android/app/src/main/java/com/noop/testcentre/ReportCompleteness.kt` is the architectural counterpart;
+// `android/app/src/main/java/com/pulse/testcentre/ReportCompleteness.kt` is the architectural counterpart;
 // it has its own status vocabulary, token maps, and domain-selection rules.
 
 /// Whether a domain that was active during the capture produced its killer trace.

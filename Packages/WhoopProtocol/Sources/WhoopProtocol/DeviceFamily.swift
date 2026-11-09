@@ -22,9 +22,9 @@ public enum HeaderCRCKind: String, Sendable, CaseIterable {
 
 /// WHOOP custom GATT service families visible in advertisements.
 ///
-/// Only `.whoop4` and `.maverickGooseFD4B` are connectable in NOOP today. The other services are
+/// Only `.whoop4` and `.maverickGooseFD4B` are connectable in Pulse today. The other services are
 /// protocol facts from reverse engineering and are diagnostic-only until their connection framing is
-/// mapped and hardware-tested. `.puffin1150` is intentionally qualified because NOOP already uses
+/// mapped and hardware-tested. `.puffin1150` is intentionally qualified because Pulse already uses
 /// "puffin" for the fd4b/Maverick-Goose packet framing.
 public enum WhoopGattServiceFamily: String, Sendable, CaseIterable {
     case whoop4
@@ -80,7 +80,7 @@ public enum WhoopGattServiceFamily: String, Sendable, CaseIterable {
     public var isConnectable: Bool { connectableDeviceFamily != nil }
 
     public var diagnosticUnsupportedMessage: String {
-        "\(displayName) detected but unsupported; NOOP will not connect or send commands."
+        "\(displayName) detected but unsupported; Pulse will not connect or send commands."
     }
 
     public static var unsupportedFamilies: [WhoopGattServiceFamily] {

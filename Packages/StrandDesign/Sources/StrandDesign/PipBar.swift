@@ -1,10 +1,10 @@
 import SwiftUI
 
-// MARK: - PipBar (the NOOP segmented count-up bar)
+// MARK: - PipBar (the Pulse segmented count-up bar)
 //
 // A horizontal row of N equal rounded segments ("pips") separated by small uniform gaps. Segments
 // from the left up to the value's fraction are filled with the tint; the rest stay the track colour.
-// The last filled segment is a touch brighter (the lead edge). This is the NOOP signature for showing
+// The last filled segment is a touch brighter (the lead edge). This is the Pulse signature for showing
 // a 0…max value — a flat, crisp, WHOOP-grade alternative to a smooth progress bar.
 //
 // COUNT-UP: on first appear AND on every value change, the fill cascades segment-by-segment from 0 up
@@ -53,7 +53,7 @@ public struct PipBar: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // Keep the fill sweep on the same gate as count-up text: an in-app Reduce Motion choice
     // or Low Power Mode must suppress the decorative transition even when the OS flag is off.
-    @ObservedObject private var motion = NoopMotionState.shared
+    @ObservedObject private var motion = PulseMotionState.shared
     private var poseStill: Bool { motion.poseStill(reduceMotion) }
 
     /// The single animated driver: a 0…1 fraction that the whole bar derives from. One eased sweep moves

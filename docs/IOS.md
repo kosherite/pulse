@@ -1,13 +1,13 @@
 # iOS — Install & Build
 
-> **iOS is now a direct download (v1.96).** Grab **`NOOP-v<version>-ios.ipa`** from the
-> [Releases](https://github.com/ryanbr/noop/releases) page and install it with **AltStore** or **SideStore** — see
+> **iOS is now a direct download (v1.96).** Grab **`Pulse-v<version>-ios.ipa`** from the
+> [Releases](https://github.com/kosherite/pulse/releases) page and install it with **AltStore** or **SideStore** — see
 > **[Install (sideload)](#install-sideload)** below. No Mac, no Xcode, no App Store, and no Apple
-> Developer account needed — **and NOOP stays anonymous**, because the `.ipa` has no Apple developer
+> Developer account needed — **and Pulse stays anonymous**, because the `.ipa` has no Apple developer
 > signature and **you** sign it on your own iPhone with your own free Apple ID. It carries only a
 > replaceable ad-hoc capability template so the sideloader can provision HealthKit and the App Group
-> shared with the widget. The app target (`NOOPiOS` +
-> `NOOPiOSWidgets`) also still builds from source in Xcode if you'd rather (**[Build from source](#build-from-source)**).
+> shared with the widget. The app target (`PulseiOS` +
+> `PulseiOSWidgets`) also still builds from source in Xcode if you'd rather (**[Build from source](#build-from-source)**).
 > A CI job ([`app-build.yml`](../.github/workflows/app-build.yml)) compiles both the macOS and iOS
 > targets on every change so iOS can't silently break.
 
@@ -16,32 +16,32 @@
 The `.ipa` is **not signed by an Apple developer identity** — that's what keeps the project
 anonymous. Its replaceable ad-hoc signature only describes the capabilities AltStore/SideStore must
 provision; iOS won't run it until the sideloader signs it **on your device, with your own free Apple
-ID**. Nothing about this touches NOOP's identity or Apple's servers on our side.
+ID**. Nothing about this touches Pulse's identity or Apple's servers on our side.
 
 1. **Install a sideloader on your computer** — [AltStore](https://altstore.io) or
    [SideStore](https://sidestore.io) (both free). Follow their one-time setup (it installs a helper +
    AltStore/SideStore onto your iPhone using your own Apple ID).
-2. **Download `NOOP-v<version>-ios.ipa`** from [Releases](https://github.com/ryanbr/noop/releases) to your iPhone (or your
+2. **Download `Pulse-v<version>-ios.ipa`** from [Releases](https://github.com/kosherite/pulse/releases) to your iPhone (or your
    computer, then AirDrop/transfer it).
 3. **Open the `.ipa` with AltStore/SideStore** (Share → AltStore, or the app's "+" button). It signs
-   and installs NOOP. First launch may need **Settings → General → VPN & Device Management → trust
+   and installs Pulse. First launch may need **Settings → General → VPN & Device Management → trust
    your Apple ID**.
 
-### If AltStore's Error Log says "Install NOOP Failed"
+### If AltStore's Error Log says "Install Pulse Failed"
 
-The same failure also shows up **on the phone**, in AltStore's own Error Log, where it names NOOP and so
-looks like NOOP's fault:
+The same failure also shows up **on the phone**, in AltStore's own Error Log, where it names Pulse and so
+looks like Pulse's fault:
 
-> **Install NOOP Failed** — `NSCocoaErrorDomain 3840`
+> **Install Pulse Failed** — `NSCocoaErrorDomain 3840`
 > *The data couldn't be read because it isn't in the correct format.*
 
 **Read the whole log before concluding anything.** If it also contains:
 
 > **Refresh AltStore Failed** — `NSCocoaErrorDomain 3840`
 
-then AltStore could not refresh **its own app**, which nothing about NOOP's `.ipa` or NOOP's source can
+then AltStore could not refresh **its own app**, which nothing about Pulse's `.ipa` or Pulse's source can
 cause. Every "… Failed" line is the same decode failure hitting whatever AltStore happened to be doing at
-that minute — installing NOOP, refreshing NOOP, refreshing itself. The NOOP-named lines are the symptom,
+that minute — installing Pulse, refreshing Pulse, refreshing itself. The Pulse-named lines are the symptom,
 not the cause.
 
 `NSCocoaErrorDomain 3840` is a parse error: AltStore expected structured data and got something else back
@@ -50,7 +50,7 @@ failure, just reported from the phone instead of AltServer.
 
 ### If AltServer can't sign in with your Apple ID
 
-A failure at **step 1** — before NOOP is involved at all — looks like this:
+A failure at **step 1** — before Pulse is involved at all — looks like this:
 
 > **AltServer could not sign in with your Apple ID. The data is not in the correct format.**
 >
@@ -69,7 +69,7 @@ hex" line beneath it is the same failure reported by the older-style parser, not
 **What actually works today:**
 
 - **Use [SideStore](https://sidestore.io) instead.** It is a separate implementation that does not go
-  through AltServer's Apple ID sign-in, and NOOP's source works there identically — the same URL, the same
+  through AltServer's Apple ID sign-in, and Pulse's source works there identically — the same URL, the same
   auto-updates. This is the practical answer while the upstream bug is open.
 - **Install the `.ipa` directly** with any sideloader that signs on-device, if you prefer not to add a
   source at all.
@@ -79,22 +79,22 @@ Local network filtering — a DNS blocker, a VPN, a captive portal — can produ
 by returning a block page, so it is worth ruling out if you have any. But it is **not** the usual cause,
 and the two reports that prompted this note were both the upstream bug.
 
-This is AltStore's own setup rather than anything NOOP controls, but it is the first step of the install,
+This is AltStore's own setup rather than anything Pulse controls, but it is the first step of the install,
 so it is written down here rather than left as a dead end.
 
-### Add NOOP as a source (recommended — auto-updates)
+### Add Pulse as a source (recommended — auto-updates)
 
-So you never have to manually re-download, add NOOP's **source** to AltStore/SideStore once — new
+So you never have to manually re-download, add Pulse's **source** to AltStore/SideStore once — new
 releases then show up (and re-sign) automatically:
 
-**Source URL:** `https://raw.githubusercontent.com/ryanbr/noop/main/altstore-source.json`
+**Source URL:** `https://raw.githubusercontent.com/kosherite/pulse/main/altstore-source.json`
 
 > Make sure you copy the **raw** URL above exactly. If a sideloader says **"given data not valid
 > JSON"** when you add the source, you've pasted a normal web page URL (which returns HTML) instead of
 > the raw file — use the `raw.githubusercontent.com` URL above.
 
 - **AltStore:** open AltStore → **Browse** tab → tap **＋** (top-left) → paste the URL → **Add Source**.
-  NOOP appears under the source; tap **Free** / **Get** to install. From then on it updates itself on
+  Pulse appears under the source; tap **Free** / **Get** to install. From then on it updates itself on
   AltStore's background refresh (you can also pull-to-refresh **My Apps**).
 - **SideStore:** open SideStore → **Browse** / **Sources** → **＋ Add Source** → paste the same URL → add.
 
@@ -104,9 +104,9 @@ hunting for the `.ipa` each time.
 > ### Two honest limitations of free-Apple-ID sideloading
 > - **7-day expiry.** Apps signed with a *free* Apple ID stop launching after 7 days and need
 >   re-signing. **AltStore/SideStore refresh this automatically** in the background — keep the
->   sideloader installed and NOOP keeps working.
+>   sideloader installed and Pulse keeps working.
 > - **Apple-only features require their extensions and capabilities.** Keep the
->   `NOOPWidgets.appex` extension enabled when AltStore/SideStore asks: it renders the Home/Lock-Screen
+>   `PulseWidgets.appex` extension enabled when AltStore/SideStore asks: it renders the Home/Lock-Screen
 >   widgets and Live Activities and shares data through the provisioned App Group. Removing app
 >   extensions while signing disables those surfaces. Other signing tools must likewise preserve and
 >   provision the requested HealthKit and App Group entitlements. Building from source with your own
@@ -120,39 +120,39 @@ are very welcome.
 ## Build from source
 
 Prefer to build it yourself (which also grants HealthKit/widgets under your own Apple ID)? Run
-`xcodegen generate`, then build the **`NOOPiOS`** scheme in Xcode. The reconciliation that brought the
+`xcodegen generate`, then build the **`PulseiOS`** scheme in Xcode. The reconciliation that brought the
 [PR #42](../../../pull/42) port onto current `main` is summarised in **"Lessons from the fold-in"**
 below.
 
 > 🛠️ **Signing it under your own Apple ID** (thanks @gingerbeardman for the original recipe). Apple
 > requires a bundle id and app group unique to *your* developer account — otherwise the build collides
-> with any other NOOP install already on your device (an AltStore/SideStore sideload, or someone
+> with any other Pulse install already on your device (an AltStore/SideStore sideload, or someone
 > else's build). Two steps:
 > 1. `cp Config/BundleIdSecrets.example.xcconfig Config/BundleIdSecrets.xcconfig` and set
 >    `BUNDLE_ID_PREFIX` to your own reverse-domain prefix (e.g. `com.yourdomain`), then re-run
 >    `xcodegen generate`. This one gitignored file drives **every** target's bundle id *and* the shared
->    App Group together (`$(BUNDLE_ID_PREFIX).noop`, `group.$(BUNDLE_ID_PREFIX).noop.staging`) — nothing
+>    App Group together (`$(BUNDLE_ID_PREFIX).pulse`, `group.$(BUNDLE_ID_PREFIX).pulse.staging`) — nothing
 >    hard-coded in Swift, nothing else to edit, and it survives future regenerates.
-> 2. In Xcode, **select your Team** (Signing & Capabilities) for the `NOOPiOS` **and** `NOOPiOSWidgets`
+> 2. In Xcode, **select your Team** (Signing & Capabilities) for the `PulseiOS` **and** `PulseiOSWidgets`
 >    targets — the one step Apple still requires you to do by hand.
 >
-> Skip step 1 and the build still works under the default `com.noopapp` identifiers — fine if this is
-> the only NOOP install on your device.
+> Skip step 1 and the build still works under the default `com.pulseapp` identifiers — fine if this is
+> the only Pulse install on your device.
 
 > ℹ️ **Cross-platform engineering lives in [`CROSS_PLATFORM.md`](CROSS_PLATFORM.md)** — the shared-code
 > boundary across the macOS / iOS / Android clients, the `Platform.swift` shim convention, the
 > Swift↔Kotlin parity discipline, and the playbook for adding a feature across all three. Read that
 > first if you're building something that should land on more than one client.
 
-This document describes how NOOP — a standalone, fully offline companion app for
+This document describes how Pulse — a standalone, fully offline companion app for
 WHOOP straps — is positioned for iOS, what already works, and the concrete plan
 for a native iOS app target.
 
-> **Not affiliated with WHOOP.** NOOP is an independent, unofficial project. It is
+> **Not affiliated with WHOOP.** Pulse is an independent, unofficial project. It is
 > not affiliated with, endorsed by, or connected to WHOOP, Inc. "WHOOP" is used
 > nominatively only to identify the hardware the app interoperates with — your own
-> device and your own data. NOOP performs no DRM circumvention and ships no WHOOP
-> proprietary code, firmware, or assets. **NOOP is not a medical device;** all
+> device and your own data. Pulse performs no DRM circumvention and ships no WHOOP
+> proprietary code, firmware, or assets. **Pulse is not a medical device;** all
 > metrics (HR, HRV, recovery, strain, sleep, SpO₂, temperature) are approximations
 > and not clinically validated.
 
@@ -174,7 +174,7 @@ the WHOOP 5.0 / MG protocol from **`b-nnett/goose`**. See [`../ATTRIBUTION.md`](
 - **CoreBluetooth is fully available on iOS** and the BLE engine is already written
   with iOS background collection in mind (state restoration hooks exist).
 - **HealthKit is available on iOS** (it is not on macOS), so iOS can do *two-way*
-  Apple Health: read live, and write NOOP-computed metrics back. On macOS, Apple
+  Apple Health: read live, and write Pulse-computed metrics back. On macOS, Apple
   Health is import-only via the static `export.xml` / `export.zip` file.
 
 ---
@@ -419,16 +419,16 @@ static func runShortcut(_ name: String) {
   "double-tap runs an arbitrary Shortcut while my phone is in my pocket" pattern
   unreliable on iOS.
 - The robust iOS approach is to **publish App Intents** (the App Intents framework)
-  from NOOP — e.g. "Mark a moment", "Start live HR", "Buzz strap", "Log recovery". The
-  user then builds Shortcuts/Automations that call *NOOP's* intents, and NOOP also
+  from Pulse — e.g. "Mark a moment", "Start live HR", "Buzz strap", "Log recovery". The
+  user then builds Shortcuts/Automations that call *Pulse's* intents, and Pulse also
   appears in Spotlight, Siri, and the Shortcuts gallery.
-- For invoking *other* apps from NOOP, support **x-callback-url** style deep links
+- For invoking *other* apps from Pulse, support **x-callback-url** style deep links
   (`x-callback-url` is the de-facto inter-app callback convention) and the standard
   `shortcuts://x-callback-url/run-shortcut?name=…&x-success=…` form so control can
-  return to NOOP after the external shortcut completes.
+  return to Pulse after the external shortcut completes.
 
 > Net: replace the macOS `runShortcut(_:)` plumbing with (a) **App Intents exposed by
-> NOOP** for inbound automation and (b) **x-callback-url / `shortcuts://` deep links**
+> Pulse** for inbound automation and (b) **x-callback-url / `shortcuts://` deep links**
 > for outbound calls, and remove `lockScreen` from the iOS action set.
 
 ### 4. Pasteboard
@@ -469,7 +469,7 @@ This is the biggest *additive* opportunity on iOS.
 | Direction | iOS capability |
 |---|---|
 | **Read** | Query HealthKit live (`HKHealthStore`, `HKSampleQuery`, anchored/observer queries) for HR, RHR, HRV SDNN, SpO₂, wrist/body temperature, respiratory rate, sleep stages, workouts, body composition — the same types `relevantTypes` already enumerates in `AppleHealthImporter`. No manual export needed. |
-| **Write** | Write NOOP-computed values back into Apple Health: HR / HRV / SpO₂ / temperature samples decoded from the strap, sleep analysis from `StrandAnalytics.SleepStager`, and workouts from `WorkoutDetector` — so NOOP data shows up across the user's Health ecosystem. |
+| **Write** | Write Pulse-computed values back into Apple Health: HR / HRV / SpO₂ / temperature samples decoded from the strap, sleep analysis from `StrandAnalytics.SleepStager`, and workouts from `WorkoutDetector` — so Pulse data shows up across the user's Health ecosystem. |
 | **Background delivery** | `HKObserverQuery` + `enableBackgroundDelivery` keep the on-device store current, while a best-effort `BGAppRefreshTaskRequest` periodically writes already-banked strap data back to Health. Fresh WHOOP offloads write immediately from their completion hook. iOS chooses the actual refresh time. |
 
 Because `AppleHealthImporter` already defines the canonical type set, units, and
@@ -479,7 +479,7 @@ the static-export importer and the live HealthKit importer converge on one schem
 
 > **Entitlement/Info.plist on iOS:** add the **HealthKit** capability and supply
 > `NSHealthShareUsageDescription` (read) and `NSHealthUpdateUsageDescription` (write).
-> Keep both directions strictly opt-in and on-device — consistent with NOOP's
+> Keep both directions strictly opt-in and on-device — consistent with Pulse's
 > offline, no-cloud stance.
 
 ---
@@ -502,9 +502,9 @@ StrandiOS/                   # NEW iOS app target
 │   └── HealthKitBridge.swift       # two-way HealthKit (read + write)
 ├── System/
 │   ├── iOSActions.swift            # UIPasteboard, App Intents, x-callback-url
-│   └── NOOPAppIntents.swift        # App Intents exposed to Shortcuts/Siri
+│   └── PulseAppIntents.swift        # App Intents exposed to Shortcuts/Siri
 ├── Widgets/
-│   └── NOOPWidget.swift            # Home/Lock-Screen widget (menu-bar analogue)
+│   └── PulseWidget.swift            # Home/Lock-Screen widget (menu-bar analogue)
 └── Resources/
     └── Info.plist                  # UIBackgroundModes, Health + Bluetooth usage strings
 
@@ -528,7 +528,7 @@ in an Xcode project generated by XcodeGen / Tuist, or a `Package.swift` app targ
 import PackageDescription
 
 let package = Package(
-    name: "NOOPiOS",
+    name: "PulseiOS",
     platforms: [.iOS(.v16)],
     dependencies: [
         .package(path: "Packages/WhoopProtocol"),
@@ -539,7 +539,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "NOOPiOS",
+            name: "PulseiOS",
             dependencies: [
                 "WhoopProtocol",
                 "WhoopStore",
@@ -558,7 +558,7 @@ them under the target's `dependencies:`):
 
 ```yaml
 targets:
-  NOOPiOS:
+  PulseiOS:
     type: application
     platform: iOS
     deploymentTarget: "16.0"
@@ -568,30 +568,30 @@ targets:
     info:
       path: StrandiOS/Resources/Info.plist
       properties:
-        CFBundleName: NOOP
-        CFBundleDisplayName: NOOP
+        CFBundleName: Pulse
+        CFBundleDisplayName: Pulse
         LSApplicationCategoryType: public.app-category.healthcare-fitness
         UIBackgroundModes:
           - bluetooth-central
         NSBluetoothAlwaysUsageDescription: >-
-          NOOP connects directly to your WHOOP strap over Bluetooth to read heart rate,
+          Pulse connects directly to your WHOOP strap over Bluetooth to read heart rate,
           R-R intervals, battery, and sensor data locally on your iPhone. Nothing leaves
           your device.
         NSHealthShareUsageDescription: >-
-          NOOP reads your own Apple Health data on-device to compute recovery, strain,
+          Pulse reads your own Apple Health data on-device to compute recovery, strain,
           and sleep. Nothing leaves your device.
         NSHealthUpdateUsageDescription: >-
-          NOOP writes the metrics it computes from your strap back into Apple Health,
+          Pulse writes the metrics it computes from your strap back into Apple Health,
           on-device and only when you allow it.
     entitlements:
-      path: StrandiOS/Resources/NOOP.entitlements
+      path: StrandiOS/Resources/Pulse.entitlements
       properties:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.background-delivery: true
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.noopapp.noop
-        PRODUCT_NAME: NOOP
+        PRODUCT_BUNDLE_IDENTIFIER: com.pulseapp.pulse
+        PRODUCT_NAME: Pulse
     dependencies:
       - package: WhoopProtocol
       - package: WhoopStore
@@ -611,13 +611,13 @@ targets:
 
 ## Port checklist — done in the v1.94 fold-in
 
-- [x] `StrandiOS` + `NOOPiOSWidgets` app targets depending on the five existing packages (no package changes).
+- [x] `StrandiOS` + `PulseiOSWidgets` app targets depending on the five existing packages (no package changes).
 - [x] `CBCentralManager` built with `CBCentralManagerOptionRestoreIdentifierKey` (in `AppModel+iOS`).
 - [x] `UIBackgroundModes: [bluetooth-central]` + `NSBluetoothAlwaysUsageDescription` in the iOS Info.plist.
 - [x] `MenuBarExtra` replaced by a WidgetKit widget + Live Activity (`StrandiOSWidgets`), reusing `StrandDesign`.
-- [x] iOS action layer: `lockScreen` returns false on iOS, `buzzBack`/`markMoment` portable, **App Intents** exposed (`StrandiOS/System/NOOPAppIntents.swift`).
+- [x] iOS action layer: `lockScreen` returns false on iOS, `buzzBack`/`markMoment` portable, **App Intents** exposed (`StrandiOS/System/PulseAppIntents.swift`).
 - [x] Clipboard + URL-open routed through `Platform.swift` (`PlatformPasteboard`/`PlatformOpen`).
-- [x] `HealthKitBridge` two-way Apple Health (read live + immediate post-offload and periodic background write-back of NOOP metrics).
+- [x] `HealthKitBridge` two-way Apple Health (read live + immediate post-offload and periodic background write-back of Pulse metrics).
 - [ ] **Still TODO (needs hardware):** verify BLE on a **physical iPhone** with a real strap — CoreBluetooth has no Simulator. This is the one thing CI/compile can't cover.
 
 ---
@@ -630,10 +630,10 @@ How PR #42's port was brought onto current `main` — useful the next time a scr
 - **The macOS-only API surface is small + enumerable.** Folding in iOS only required touching these in shared code: file dialogs (`NSSavePanel`/`NSOpenPanel` → `DocumentPicker`/`FileExport`), `NSWorkspace.activateFileViewerSelecting` ("reveal in Finder", `#if os(macOS)`-guarded out), clipboard/`NSImage`/`NSWorkspace.open` (→ `Platform.*`), `MacActions.lockScreen` (returns false on iOS) / `runShortcut` (→ `PlatformOpen`), and two macOS-only SwiftUI modifiers (`.toggleStyle(.checkbox)`, `.onExitCommand`). The macOS-only *files* (`StrandApp`, `RootView`, `MenuBar`, notification settings) are **excluded from the iOS target** in `project.yml`.
 - **`ContentView` vs `RootTabView`.** macOS uses a `NavigationSplitView` sidebar (`ContentView` → `RootView`); iOS uses a `TabView` (`RootTabView`). The fold-in's one real drift was `ContentView` (not excluded) referencing the excluded `RootView`. Fix: exclude `ContentView.swift` from iOS and render `RootTabView` via `iOSRootView`, which reproduces the same onboarding / Terms / What's-New gates around the tab bar.
 - **CI is stricter than a bleeding-edge local Xcode — on purpose.** The first `app-build` run was red: `AppleHealthView` interpolated a `String?` into a `LocalizedStringKey` subtitle (`"\(optional)"`). A current local Xcode tolerates it as a deprecation (and renders `Optional(...)`); the runner's older Xcode rejects it. The maintainer can't device-test iOS, so the **CI compile gate on an older Xcode is the safety net** — treat its failures as real and fix the source (don't pin the runner to bleeding-edge).
-- **Anonymity when harvesting a community branch:** the fetched PR branch carried a real-name commit author. The pre-push hook scans `git log --all`, so **delete the fetched PR ref (and any worktree branches) before pushing**, and re-author harvested files as `NoopApp`. (`git checkout <ref> -- <paths>` brings the *content*; commit it yourself.)
+- **Anonymity when harvesting a community branch:** the fetched PR branch carried a real-name commit author. The pre-push hook scans `git log --all`, so **delete the fetched PR ref (and any worktree branches) before pushing**, and re-author harvested files as `PulseApp`. (`git checkout <ref> -- <paths>` brings the *content*; commit it yourself.)
 
 ---
 
-*NOOP keeps everything on-device. The iOS plan changes the front door (menu bar →
+*Pulse keeps everything on-device. The iOS plan changes the front door (menu bar →
 widgets, AppKit → UIKit, file import → HealthKit) but not the principle: your strap,
 your data, no cloud.*

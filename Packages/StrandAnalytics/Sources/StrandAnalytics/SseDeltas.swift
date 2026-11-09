@@ -4,7 +4,7 @@ import Foundation
 //
 // The verifiable core of K1 (streaming): given one SSE `data:` payload, extract the text delta
 // for the provider's wire shape. Pure + deterministic so it is unit-testable without a network,
-// and byte-identical to the Android twin `com.noop.analytics.SseDeltas`. The streaming HTTP glue
+// and byte-identical to the Android twin `com.pulse.analytics.SseDeltas`. The streaming HTTP glue
 // (URLSession.bytes / OkHttp source) is thin and calls into these pure functions per line.
 //
 // No network, no Foundation URL loading, no I/O — only JSONSerialization (Foundation core, available
@@ -12,7 +12,7 @@ import Foundation
 // streaming changes transport, not payload.
 
 /// Pure SSE delta extraction for the three provider wire shapes the coach speaks.
-/// Byte-twin of Android `com.noop.analytics.SseDeltas`.
+/// Byte-twin of Android `com.pulse.analytics.SseDeltas`.
 public enum SseDeltas {
 
     /// The SSE stream terminator sent by OpenAI-compatible servers.

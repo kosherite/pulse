@@ -76,7 +76,7 @@ public enum SleepStageTotals {
 
     /// The sleep-derived daily fields for a night made of these blocks' `stagesJSON`, or nil if none
     /// decode. `efficiency` is asleep / in-bed (TST / Σ stage minutes) in [0,1]. For the segment stages
-    /// noop stores (which TILE the window, last segment clamped to the wake), Σ stage minutes equals the
+    /// pulse stores (which TILE the window, last segment clamped to the wake), Σ stage minutes equals the
     /// clock span, so this coincides with `AnalyticsEngine.analyzeDay`'s TST/(end−start); it is not the
     /// literal same expression, and would diverge only for malformed non-tiling stages.
     public struct DailySleep: Equatable {

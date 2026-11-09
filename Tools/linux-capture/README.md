@@ -85,15 +85,15 @@ the Python capture side does not require Swift.
 | `whoop_setclock.py` | **Read/fix the strap clock.** Reads the RTC, and sets it to now if it has drifted past a threshold (`--if-drift`). See [Strap clock](#strap-clock-whoop_setclockpy). |
 | `whoop_probe.py` | **Read-only status probe.** Reports the strap RTC + whether a historical store is present (`GET_CLOCK` / `GET_DATA_RANGE`) without writing anything. |
 | `whoop_frame.py` | CRC8 / CRC16-Modbus / CRC32, frame builders (`build_command_frame`, `build_puffin_command`, `build_whoop5_buzz` / `build_whoop4_buzz`), the family-aware `Reassembler`, and the standard-HR parser. Stdlib only. |
-| `hci_extract.py` | **Turn a phone HCI capture into `capture.json`.** Parses a btsnoop (`btsnoop_hci.log`) or Apple PacketLogger (`.pklg`) log, reassembles L2CAP/ATT, and extracts the CRC-valid WHOOP frames — so a capture of the **official app** (issue [#103](https://github.com/ryanbr/noop/issues/103)) feeds the same decode pipeline. Only WHOOP streams reach the output. Stdlib only. See [From a phone HCI capture](#from-a-phone-hci-capture-hci_extractpy). |
+| `hci_extract.py` | **Turn a phone HCI capture into `capture.json`.** Parses a btspulse (`btspulse_hci.log`) or Apple PacketLogger (`.pklg`) log, reassembles L2CAP/ATT, and extracts the CRC-valid WHOOP frames — so a capture of the **official app** (issue [#103](https://github.com/kosherite/pulse/issues/103)) feeds the same decode pipeline. Only WHOOP streams reach the output. Stdlib only. See [From a phone HCI capture](#from-a-phone-hci-capture-hci_extractpy). |
 | `correlate_ground_truth.py` | **Locate un-decoded record fields using your WHOOP CSV export as known-plaintext.** Cross-references capture frames against the official per-night values (HRV, resting HR, skin temp, SpO₂, respiratory rate) to find each biometric's byte offset + encoding. Reuses the Swift importer's localized header aliases (English + DE/ES). Reports offsets only — your health values never leave the machine. Stdlib only. See [Ground-truth correlation](#ground-truth-correlation-correlate_ground_truthpy). |
-| `validate_spo2_candidate.py` | **Multi-device validation of the v18 SpO₂ candidate at frame @82** (`spo2_candidate_82`). Nightly aggregate of in-band (70–100) samples during `sleep_state=asleep` vs CSV `blood_oxygen_pct`; reports r / MAE / bias / offset-specificity and a promote checklist. **@82 is duty-cycled**, so the tool detects its window schedule per capture, aggregates per window, and reports window coverage; a strap that never emits @82 is classified `feature_absent` rather than failed. Batch mode for several straps. Postable summary has **no raw SpO₂ values** (safe for [#103](https://github.com/ryanbr/noop/issues/103)). Stdlib only. See [SpO₂ candidate validation](#spo₂-candidate-validation-validate_spo2_candidatepy). |
+| `validate_spo2_candidate.py` | **Multi-device validation of the v18 SpO₂ candidate at frame @82** (`spo2_candidate_82`). Nightly aggregate of in-band (70–100) samples during `sleep_state=asleep` vs CSV `blood_oxygen_pct`; reports r / MAE / bias / offset-specificity and a promote checklist. **@82 is duty-cycled**, so the tool detects its window schedule per capture, aggregates per window, and reports window coverage; a strap that never emits @82 is classified `feature_absent` rather than failed. Batch mode for several straps. Postable summary has **no raw SpO₂ values** (safe for [#103](https://github.com/kosherite/pulse/issues/103)). Stdlib only. See [SpO₂ candidate validation](#spo₂-candidate-validation-validate_spo2_candidatepy). |
 | `pair_probe.py` | One-shot WHOOP 5 bonding probe: scan → connect → `pair()` → test `fd4b` access. `python3 pair_probe.py <MAC>`. |
 | `analyze_v26_waveform.py` | Characterise the WHOOP 5 **v26** type-47 buffer as PPG @24 Hz using its own co-timestamped HR as ground truth. |
-| `analyze_v25_waveform.py` | **WHOOP 4.0 v25 PPG → HR span-pinning harness ([#194](https://github.com/ryanbr/noop/issues/194)).** Sweeps the unpinned PPG span (start + sample-count) across a corpus of captures at *known* HRs and reports the span where recovered HR **tracks** ground truth instead of the `1440/N` autocorrelation artifact — or, on resting-only data, exactly what capture is still needed. `--selftest` proves it on synthetic pulses; no args runs the bundled-frames demo. Stdlib only. |
+| `analyze_v25_waveform.py` | **WHOOP 4.0 v25 PPG → HR span-pinning harness ([#194](https://github.com/kosherite/pulse/issues/194)).** Sweeps the unpinned PPG span (start + sample-count) across a corpus of captures at *known* HRs and reports the span where recovered HR **tracks** ground truth instead of the `1440/N` autocorrelation artifact — or, on resting-only data, exactly what capture is still needed. `--selftest` proves it on synthetic pulses; no args runs the bundled-frames demo. Stdlib only. |
 | `whoop_spot_hrv.py` | **Spot HRV (RMSSD) from the sparse PPG bursts.** Reads the v26 `feat_ppg` channel-0 24 Hz waveform (read-only), detects beats, computes RMSSD per PPG-covered window with a GOOD/COARSE/POOR quality label. See [Spot HRV](#spot-hrv-from-sparse-ppg-whoop_spot_hrvpy). Stdlib only. |
 | `test_whoop_frame.py` | Unit tests for framing / reassembly / HR parsing / buzz frames (no `bleak` needed). |
-| `test_hci_extract.py` | Unit tests for the btsnoop/pklg parsers, L2CAP/ATT reassembly, and WHOOP-frame extraction (synthetic fixtures; stdlib only). |
+| `test_hci_extract.py` | Unit tests for the btspulse/pklg parsers, L2CAP/ATT reassembly, and WHOOP-frame extraction (synthetic fixtures; stdlib only). |
 | `test_correlate_ground_truth.py` | Unit tests for the CSV/alias loading and the known-plaintext field search (planted-value recovery + false-positive rejection; stdlib only). |
 | `test_validate_spo2_candidate.py` | Unit tests for multi-device SpO₂ @82 validation (planted perfect correlation, incomplete nights, awake gating, offset specificity, duty-cycle detection at planted period/phase, window coverage, the variance floor, flat-zero classification, privacy of postable output; stdlib only). |
 | `test_whoop_spot_hrv.py` | Unit tests for the spot-HRV DSP (synthetic-signal HR/RMSSD recovery, ectopic rejection, grid reconstruction; stdlib only). |
@@ -459,9 +459,9 @@ $BIN --json capture.json           # machine-readable, for piping into your own 
 $BIN --family whoop5 --hex aa0108000001e67123019101363e5c8d   # one frame ad hoc
 ```
 
-## Import into the noop Android app
+## Import into the pulse Android app
 
-The noop Android app's **Data Sources → "Raw capture (.json)"** reads the same `capture.json` this
+The pulse Android app's **Data Sources → "Raw capture (.json)"** reads the same `capture.json` this
 tool emits and decodes its frames on-device (HR / RR / gravity / …) through the *same* historical
 decoder a live BLE offload uses — so history captured here on Linux lands in the app exactly as if the
 phone had synced it. Produce one file per device:
@@ -482,8 +482,8 @@ If you want a smaller file, two optional flags narrow it down:
 - `--only-type 47` — just the main once-per-second records.
 - `--since <unix-time>` — only data newer than a given moment.
 
-Then transfer `capture.json` to your phone (any file transfer works), open NOOP, and pick it from
-**Data Sources → Raw capture**. Importing the same file twice is safe — NOOP skips anything it already
+Then transfer `capture.json` to your phone (any file transfer works), open Pulse, and pick it from
+**Data Sources → Raw capture**. Importing the same file twice is safe — Pulse skips anything it already
 has — so you can re-run it without making duplicates. Export one file per strap; a file is normally a
 single strap, but a mixed one still imports fine. The phone treats the file as untrusted input (size +
 frame-count bounded, malformed rows skipped), so a stray or corrupt file is rejected cleanly rather
@@ -520,8 +520,8 @@ than crashing the import.
 ## From a phone HCI capture (`hci_extract.py`)
 
 You don't need a Linux BLE adapter to contribute frames. A **Bluetooth HCI capture of the official
-WHOOP app** — the artifact issue [#103](https://github.com/ryanbr/noop/issues/103) asks for — records
-the real app unlocking and draining the deep streams, which is exactly the traffic NOOP can't yet
+WHOOP app** — the artifact issue [#103](https://github.com/kosherite/pulse/issues/103) asks for — records
+the real app unlocking and draining the deep streams, which is exactly the traffic Pulse can't yet
 elicit itself. `hci_extract.py` converts such a log into the same `capture.json` the rest of this
 pipeline consumes.
 
@@ -529,11 +529,11 @@ Grab the capture on the phone that already pairs with your strap:
 
 - **iOS** — install Apple's *Bluetooth* logging profile (the PacketLogger / Additional Logging
   profile), reproduce a **full history sync** in the WHOOP app, then export the `.pklg`.
-- **Android** — *Developer options → Enable Bluetooth HCI snoop log*, sync, then pull
-  `btsnoop_hci.log` (via a bug report or `adb`).
+- **Android** — *Developer options → Enable Bluetooth HCI spulse log*, sync, then pull
+  `btspulse_hci.log` (via a bug report or `adb`).
 
 ```bash
-python3 hci_extract.py btsnoop_hci.log --family whoop5 --out capture.json
+python3 hci_extract.py btspulse_hci.log --family whoop5 --out capture.json
 # → wrote 1843 frames → capture.json
 #     fd4b0005-… [rx]: 1620 frames, …    ← strap → app data
 #     fd4b0002-… [tx]: 41 frames, …      ← the app's commands (the enable sequence)
@@ -550,7 +550,7 @@ mapped offsets), not the raw log.
 
 A capture gives raw records; your **WHOOP data export** gives the official readings for the same
 nights. Put them together and the un-decoded layout (the type-`0x2F` deep records, the 5/MG history
-types NOOP still skips — see [`WHOOP5_DEEP_DATA.md`](../../docs/WHOOP5_DEEP_DATA.md)) becomes a
+types Pulse still skips — see [`WHOOP5_DEEP_DATA.md`](../../docs/WHOOP5_DEEP_DATA.md)) becomes a
 *known-plaintext* problem: search each record for the byte offset + encoding whose value reproduces a
 known biometric across every night.
 
@@ -599,7 +599,7 @@ usable records.
 
 > **This is the capture tooling's database, not the app's.** Neither shipped app has a `frames`
 > table — Android uses Room, iOS/macOS uses GRDB — so this cannot be pointed at a phone's store or a
-> `.noopbak`. Validating a strap still requires a capture.
+> `.pulsebak`. Validating a strap still requires a capture.
 
 ```bash
 # One strap from a capture (summary stays aggregate-only unless you pass --show-nights):
@@ -625,7 +625,7 @@ python3 validate_spo2_candidate.py --batch devices.json --postable
 
 `@82` is **not** sampled every second. On a corpus of 18,650 v18 records — 18,602 of them from
 [@digitalerdude](https://github.com/digitalerdude)'s public PacketLogger capture of an official-app
-overnight sync (see [#103](https://github.com/ryanbr/noop/issues/103)), plus 48 from a NOOP sync — it
+overnight sync (see [#103](https://github.com/kosherite/pulse/issues/103)), plus 48 from a Pulse sync — it
 is nonzero in only **450 records (2.4 %)**, in **15 runs, every one exactly 30 records long**, each
 starting at the same `unix % 1200`, with **zero phase variance**. Outside that window the byte is
 identically `0x00`.
@@ -670,7 +670,7 @@ multi-device gate, because a device with no data has not failed a correlation. T
 capture must also have **watched** the strap: at least an hour of *observed* sleep (samples × cadence,
 not `max − min`, which counts gaps) and a cadence of **≤ 30 s**, since a coarser one can alias with the
 duty period and read `0x00` off a working strap. Either bar missed and it stays a plain FAIL, with the
-duty line saying why. NOOP still will not
+duty line saying why. Pulse still will not
 promote `spo2_candidate_82` → `spo2Pct` from a single device: need **≥ 2 devices** that each PASS
 (postable summary prints `multi_device_eligible` / `all_pass` / `feature_absent`).
 

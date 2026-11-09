@@ -224,9 +224,9 @@ final class DeviceRegistryStoreTests: XCTestCase {
 
     /// The computed sibling must travel with the pairing.
     ///
-    /// Every strap owns a second id, `<deviceId>-noop`, holding the days/workouts/series the engine
+    /// Every strap owns a second id, `<deviceId>-pulse`, holding the days/workouts/series the engine
     /// DERIVES. It never equals `activeId`, so an exact-match re-key left it behind while the next scoring
-    /// pass wrote under `<serialId>-noop` — stranding the computed history under an id nothing reads
+    /// pass wrote under `<serialId>-pulse` — stranding the computed history under an id nothing reads
     /// again, which is the orphaned-history failure adoption exists to prevent. A ring has no computed
     /// sibling, so the shipped Oura path could never surface this.
     func testAdoptSerialCarriesTheComputedSibling() throws {
@@ -237,15 +237,15 @@ final class DeviceRegistryStoreTests: XCTestCase {
         try dbq.write { db in
             try db.execute(sql: "INSERT INTO hrSample (deviceId, ts, bpm) VALUES ('whoop-4DD70E24', 10, 55)")
             // the DERIVED half, under the computed sibling
-            try db.execute(sql: "INSERT INTO hrSample (deviceId, ts, bpm) VALUES ('whoop-4DD70E24-noop', 11, 56)")
+            try db.execute(sql: "INSERT INTO hrSample (deviceId, ts, bpm) VALUES ('whoop-4DD70E24-pulse', 11, 56)")
         }
 
         XCTAssertTrue(try store.adoptSerialIdentity(from: cbuuid, to: serial))
 
         XCTAssertEqual(try hrCount(dbq, serial), 1)
         XCTAssertEqual(try hrCount(dbq, cbuuid), 0)
-        XCTAssertEqual(try hrCount(dbq, serial + "-noop"), 1, "computed rows must follow the pairing")
-        XCTAssertEqual(try hrCount(dbq, cbuuid + "-noop"), 0, "and must not be left behind")
+        XCTAssertEqual(try hrCount(dbq, serial + "-pulse"), 1, "computed rows must follow the pairing")
+        XCTAssertEqual(try hrCount(dbq, cbuuid + "-pulse"), 0, "and must not be left behind")
     }
 
     /// A PK clash on the COMPUTED side resolves the same way as on the real id: canonical wins, source is
@@ -258,14 +258,14 @@ final class DeviceRegistryStoreTests: XCTestCase {
         try addOura(store, cbuuid, peripheralId: "0102A826", status: .paired, addedAt: 200)
         try store.setActive(cbuuid)
         try dbq.write { db in
-            try db.execute(sql: "INSERT INTO hrSample (deviceId, ts, bpm) VALUES ('whoop-MGB7654321-noop', 10, 50)")
-            try db.execute(sql: "INSERT INTO hrSample (deviceId, ts, bpm) VALUES ('whoop-0102A826-noop', 20, 60)")
+            try db.execute(sql: "INSERT INTO hrSample (deviceId, ts, bpm) VALUES ('whoop-MGB7654321-pulse', 10, 50)")
+            try db.execute(sql: "INSERT INTO hrSample (deviceId, ts, bpm) VALUES ('whoop-0102A826-pulse', 20, 60)")
         }
 
         try store.adoptSerialIdentity(from: cbuuid, to: serial)
 
-        XCTAssertEqual(try hrCount(dbq, serial + "-noop"), 2)
-        XCTAssertEqual(try hrCount(dbq, cbuuid + "-noop"), 0)
+        XCTAssertEqual(try hrCount(dbq, serial + "-pulse"), 2)
+        XCTAssertEqual(try hrCount(dbq, cbuuid + "-pulse"), 0)
     }
 
     func testAdoptSerialMergesWhenSerialAlreadyExists() throws {

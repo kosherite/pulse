@@ -3,7 +3,7 @@ import Foundation
 import StrandDesign
 import WhoopStore
 
-// MARK: - Menu-Bar Extra (NOOP)
+// MARK: - Menu-Bar Extra (Pulse)
 //
 // A glanceable presence in the macOS menu bar. The label shows a tiny heart-dot
 // tinted by the current HR zone plus the live HR (or "—" when not streaming).
@@ -144,7 +144,7 @@ public struct MenuBarContent: View {
         }
         .padding(16)
         .frame(width: 268)
-        .background(NoopChromeSurface())
+        .background(PulseChromeSurface())
         .preferredColorScheme(AppearanceMode.resolve(appearanceRaw).colorScheme)
     }
 

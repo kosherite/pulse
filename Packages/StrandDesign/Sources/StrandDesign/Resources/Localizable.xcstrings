@@ -2975,43 +2975,43 @@
       },
       "shouldTranslate": false
     },
-    "Adopted via NoopButtonStyle": {
+    "Adopted via PulseButtonStyle": {
       "comment": "Xcode #Preview specimen: this literal exists only inside an `#if DEBUG` preview block, so no release build can reach it and it is not user-facing copy. Translating it produced nonsense in the locales held to zero tolerance (fr rendered \"Bold\" as \"Or\", four languages read the animation \"lift\" as an elevator), which is what this flag prevents.",
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Über NoopButtonStyle übernommen"
+            "value": "Über PulseButtonStyle übernommen"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adoptado a través de NoopButtonStyle"
+            "value": "Adoptado a través de PulseButtonStyle"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adopté par NoopButtonStyle"
+            "value": "Adopté par PulseButtonStyle"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adoptado via NoopButtonStyle"
+            "value": "Adoptado via PulseButtonStyle"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Przyjęte przez NoopButtonStyle"
+            "value": "Przyjęte przez PulseButtonStyle"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Применяется через NoopButtonStyle"
+            "value": "Применяется через PulseButtonStyle"
           }
         }
       },

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Should NOOP try reading the Device Information Service on a 5/MG that has NOT bonded?
+/// Should Pulse try reading the Device Information Service on a 5/MG that has NOT bonded?
 ///
 /// `readDisIdentity` is issued only inside the post-bond handshake, so a strap that never bonds never
 /// reads DIS at all — and since #1635 the suppression makes that state PERMANENT rather than transient.
@@ -21,7 +21,7 @@ import Foundation
 ///
 /// A refusal is a RESULT, not a defeat: it settles #490, which no capture has ever done.
 ///
-/// Kotlin twin: `com.noop.ble.shouldReadDisUnbonded`.
+/// Kotlin twin: `com.pulse.ble.shouldReadDisUnbonded`.
 func shouldReadDisUnbonded(
     isWhoop5: Bool,
     bonded: Bool,
@@ -40,12 +40,12 @@ func shouldReadDisUnbonded(
 /// DIVERGENCE FROM ANDROID (deliberate, PII): the identifier here is the CoreBluetooth-local peripheral
 /// UUID, per-install rather than the hardware address. Same key SHAPE, different kind of identifier.
 ///
-/// Kotlin twin: `com.noop.ble.disRefusedPrefKey`.
+/// Kotlin twin: `com.pulse.ble.disRefusedPrefKey`.
 func disRefusedPrefKey(_ peripheralId: String?) -> String? {
     guard let raw = peripheralId?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
         return nil
     }
-    return "noop.disRefused.\(raw.lowercased())"
+    return "pulse.disRefused.\(raw.lowercased())"
 }
 
 /// The line for a DIS read that came back with a failure status.
@@ -66,7 +66,7 @@ func disReadFailureLine(uuid: String, status: String) -> String {
 /// Should the standard Device Information Service firmware string be published for this strap?
 ///
 /// A 5/MG that never completes the puffin handshake has no firmware to show, because the only source
-/// NOOP reads it from is a framed command that needs the bond. DIS `0x2A26` sits in the same service the
+/// Pulse reads it from is a framed command that needs the bond. DIS `0x2A26` sits in the same service the
 /// serial and hardware revision come from; it was simply never asked for on this platform.
 ///
 /// DIS is a FALLBACK, never an override. The puffin value is the strap's own report of the firmware it
@@ -75,7 +75,7 @@ func disReadFailureLine(uuid: String, status: String) -> String {
 /// rather than racing it — the decode lands later in the connect, and a value that appeared and then
 /// changed would be worse than one that arrived once.
 ///
-/// Kotlin twin: `com.noop.ble.shouldPublishDisFirmware`.
+/// Kotlin twin: `com.pulse.ble.shouldPublishDisFirmware`.
 func shouldPublishDisFirmware(disFirmware: String?, alreadyDecoded: String?) -> Bool {
     guard let dis = disFirmware, !dis.trimmingCharacters(in: .whitespaces).isEmpty else { return false }
     guard let decoded = alreadyDecoded else { return true }

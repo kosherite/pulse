@@ -24,7 +24,7 @@ struct StagesCard: View {
     let model: SleepModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             // Read-only header: the night's relative label + span pill — NO ◀/▶ nav controls.
             SectionHeader("Stages", overline: "Last night", trailing: model.night.spanLabel)
             // The shared stage chart + breakdown (verbatim of the Sleep tab's stageCard display). This is
@@ -69,15 +69,15 @@ struct StageDetailView: View {
         let s = night.stages
         let isPersisted = (night.realSegments?.count ?? 0) >= 2
         // An Oura night's stages are the ring's RAW on-device SleepNet classification (decoded off the 0x49
-        // phase stream), NOT a NOOP approximation — so it gets its own honest caption instead of the
-        // "stages approximate (on-device)" one that describes NOOP's own sparse-motion staging.
+        // phase stream), NOT a Pulse approximation — so it gets its own honest caption instead of the
+        // "stages approximate (on-device)" one that describes Pulse's own sparse-motion staging.
         let stageCaption = repo.activeDeviceIsOura
             ? String(localized: "raw on-device stages")
             : String(localized: "stages approximate (on-device)")
         let subtitle = isPersisted
             ? String(localized: "\(durationText(night.timeInBed)) in bed · \(efficiencyText(night)) efficiency · \(stageCaption)")
             : String(localized: "\(durationText(night.timeInBed)) in bed · \(efficiencyText(night)) efficiency")
-        VStack(alignment: .leading, spacing: NoopMetrics.space2) {
+        VStack(alignment: .leading, spacing: PulseMetrics.space2) {
             if intervals.count >= 2 {
                 // #sleep-chart-style: Classic keeps the per-stage timeline ROWS (ryanAtriumAi #988);
                 // Filled/Ribbon draw the WHOOP-style stepped hypnogram with the breakdown rows as the
@@ -94,7 +94,7 @@ struct StageDetailView: View {
                     title: "Stage breakdown",
                     subtitle: subtitle,
                     trailing: durationText(s.asleep),
-                    height: NoopMetrics.chartHeight,
+                    height: PulseMetrics.chartHeight,
                     tint: StrandPalette.restColor,
                     chart: { stageBar(s) },
                     footer: { stageBreakdownRows(s) }
@@ -150,9 +150,9 @@ struct StageDetailView: View {
     /// surface while allowing the timeline to size to the content it actually has.
     private func stageTimelineCard(_ stages: Stages, subtitle: String,
                                    intervals: [SleepInterval], night: Night) -> some View {
-        NoopCard(tint: StrandPalette.restColor) {
-            VStack(alignment: .leading, spacing: NoopMetrics.space3) {
-                VStack(alignment: .leading, spacing: NoopMetrics.spaceHalf) {
+        PulseCard(tint: StrandPalette.restColor) {
+            VStack(alignment: .leading, spacing: PulseMetrics.space3) {
+                VStack(alignment: .leading, spacing: PulseMetrics.spaceHalf) {
                     Text("Stage breakdown").strandOverline()
                     Text(subtitle)
                         .font(StrandFont.footnote)
@@ -174,12 +174,12 @@ struct StageDetailView: View {
             title: "Stage breakdown",
             subtitle: subtitle,
             trailing: durationText(s.asleep),
-            height: NoopMetrics.chartHeight,
+            height: PulseMetrics.chartHeight,
             tint: StrandPalette.restColor,
             chart: {
                 Hypnogram(
                     intervals: intervals,
-                    height: NoopMetrics.chartHeight,
+                    height: PulseMetrics.chartHeight,
                     showsStageAxis: false,
                     showsHover: true,
                     nightStart: nil,
@@ -388,8 +388,8 @@ struct StageDetailView: View {
     /// the prior footer, ordered by chart depth (awake / REM / light / deep) so Today and the Sleep detail
     /// agree; the values and colours stay attached to their own stage. No new numbers.
     @ViewBuilder
-    private func stageBreakdownRows(_ s: Stages, palette: SleepStagePalette = .noop) -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
+    private func stageBreakdownRows(_ s: Stages, palette: SleepStagePalette = .pulse) -> some View {
+        VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
             stageBreakdownRow(.awake, minutes: s.awake, total: s.total, percent: stageSharePercent(.awake, s), palette: palette)
             stageBreakdownRow(.rem,   minutes: s.rem,   total: s.total, percent: stageSharePercent(.rem, s), palette: palette)
             stageBreakdownRow(.light, minutes: s.light, total: s.total, percent: stageSharePercent(.light, s), palette: palette)
@@ -416,7 +416,7 @@ struct StageDetailView: View {
     /// row highlights that stage and recedes the rest; tapping the selected row again clears the highlight.
     @ViewBuilder
     private func stageBreakdownRow(_ stage: SleepStage, minutes: Double, total: Double, percent: Int,
-                                   palette: SleepStagePalette = .noop) -> some View {
+                                   palette: SleepStagePalette = .pulse) -> some View {
         let color = StrandPalette.sleepStageColor(stage, palette: palette)
         let fraction = total > 0 ? min(1, max(0, minutes / total)) : 0
         let isSelected = selectedStage == stage
@@ -435,7 +435,7 @@ struct StageDetailView: View {
                 .font(StrandFont.captionNumber)
                 .foregroundStyle(color)
                 .frame(width: 38, alignment: .leading)
-            // The NOOP signature: a segmented PipBar that counts up to the share-of-night fraction,
+            // The Pulse signature: a segmented PipBar that counts up to the share-of-night fraction,
             // tinted in the stage colour over the canonical inset track. Flat, crisp, no glow.
             PipBar(value: fraction * 100, segments: 20, tint: color, height: 8)
             Text(durationText(minutes))
@@ -478,7 +478,7 @@ struct StageDetailView: View {
         let smoothed = Hypnogram.displaySmoothed(intervals.sorted { $0.start < $1.start }, minDuration: 90)
         let origin = smoothed.first?.start ?? 0
         let span = max(1, (smoothed.map(\.end).max() ?? 1) - origin)
-        VStack(alignment: .leading, spacing: NoopMetrics.space2) {
+        VStack(alignment: .leading, spacing: PulseMetrics.space2) {
             // WHOOP's hero pair: HOURS OF SLEEP + RESTORATIVE SLEEP (deep + REM), each against
             // its 30-day typical.
             sleepHeadline(s)
@@ -509,7 +509,7 @@ struct StageDetailView: View {
             // range; otherwise a quiet hint that the rows are tappable. It grows only when a
             // selected-stage comparison needs a second line, avoiding a permanent empty footer.
             stageInsight(s)
-                .frame(minHeight: NoopMetrics.compactHintMinHeight, alignment: .topLeading)
+                .frame(minHeight: PulseMetrics.compactHintMinHeight, alignment: .topLeading)
                 .padding(.horizontal, 2)
         }
     }
@@ -520,7 +520,7 @@ struct StageDetailView: View {
     @ViewBuilder
     private func sleepHeadline(_ s: Stages) -> some View {
         let restorative = s.deep + s.rem
-        HStack(alignment: .top, spacing: NoopMetrics.space6) {
+        HStack(alignment: .top, spacing: PulseMetrics.space6) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(durationText(s.asleep))
                     .font(StrandFont.number(26))

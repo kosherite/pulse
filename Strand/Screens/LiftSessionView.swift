@@ -106,7 +106,7 @@ struct LiftSessionView: View {
     private func sheet(_ engine: LiftSessionEngine) -> some View {
         ScrollViewReader { proxy in
             ScrollView {
-                VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+                VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                     header(engine)
                     ForEach(Array(engine.plan.enumerated()), id: \.offset) { index, item in
                         exerciseCard(engine, index: index, item: item)
@@ -114,7 +114,7 @@ struct LiftSessionView: View {
                     addExerciseRow(engine)
                     Color.clear.frame(height: 8)
                 }
-                .padding(.horizontal, NoopMetrics.screenPadding)
+                .padding(.horizontal, PulseMetrics.screenPadding)
                 .padding(.top, 18)
             }
             .onChange(of: engine.currentSlot) { slot in
@@ -156,7 +156,7 @@ struct LiftSessionView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
             .background(
-                RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous)
+                RoundedRectangle(cornerRadius: PulseMetrics.cardRadius, style: .continuous)
                     .strokeBorder(StrandPalette.textTertiary.opacity(0.35),
                                   style: StrokeStyle(lineWidth: 1, dash: [5, 4])))
             .contentShape(Rectangle())
@@ -180,8 +180,8 @@ struct LiftSessionView: View {
     // MARK: - One exercise, with all its sets
 
     private func exerciseCard(_ engine: LiftSessionEngine, index: Int, item: LiftPlanItem) -> some View {
-        NoopCard {
-            VStack(alignment: .leading, spacing: NoopMetrics.rowSpacing) {
+        PulseCard {
+            VStack(alignment: .leading, spacing: PulseMetrics.rowSpacing) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.exercise)
                         .font(StrandFont.headline)
@@ -533,7 +533,7 @@ struct LiftSessionView: View {
     // MARK: - The control bar
 
     private func controlBar(_ engine: LiftSessionEngine) -> some View {
-        VStack(spacing: NoopMetrics.rowSpacing) {
+        VStack(spacing: PulseMetrics.rowSpacing) {
             HStack(spacing: 14) {
                 clock(String(localized: "Session"), tint: StrandPalette.textPrimary) { $0 - engine.startTs }
                 stageClock(engine)
@@ -549,11 +549,11 @@ struct LiftSessionView: View {
                 .accessibilityLabel("Undo")
             }
 
-            HStack(spacing: NoopMetrics.rowSpacing) {
+            HStack(spacing: PulseMetrics.rowSpacing) {
                 Button { session.advance() } label: {
                     Text(actionLabel(engine)).frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.noopPrimary)
+                .buttonStyle(.pulsePrimary)
 
                 Button {
                     unfinishedChoice = nil
@@ -563,10 +563,10 @@ struct LiftSessionView: View {
                 } label: {
                     Text("Finish")
                 }
-                .buttonStyle(NoopButtonStyle(.secondary))
+                .buttonStyle(PulseButtonStyle(.secondary))
             }
         }
-        .padding(.horizontal, NoopMetrics.screenPadding)
+        .padding(.horizontal, PulseMetrics.screenPadding)
         .padding(.top, 10)
         .padding(.bottom, 14)
         .background(.ultraThinMaterial)
@@ -610,7 +610,7 @@ struct LiftSessionView: View {
                 $0 - engine.stageStartedAt
             }
         case .resting:
-            // "Rest period", never "Rest": the catalog's "Rest" key is NOOP's SLEEP metric, so this
+            // "Rest period", never "Rest": the catalog's "Rest" key is Pulse's SLEEP metric, so this
             // label rendered as "Erholung" (recovery) in German — the exact collision CLAUDE.md and
             // the handover brief both warn about. Reintroduced by the workout-sheet rewrite.
             clock(String(localized: "Rest period"), tint: StrandPalette.metricAmber) {
@@ -641,9 +641,9 @@ struct LiftSessionView: View {
             && (!asksAboutProgram || programChoice != nil)
         return ScreenScaffold(title: "Finish session",
                               subtitle: "One number for the whole session, so a leg day can be compared with a run.") {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
-                NoopCard {
-                    VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
+                PulseCard {
+                    VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                         Text("How hard was the whole session? (1–10)").strandOverline()
                         TextField("7", text: $sessionRpeText)
                             .textFieldStyle(.plain)
@@ -663,9 +663,9 @@ struct LiftSessionView: View {
                 // One way to save. Session RPE above is optional, so an empty field is simply no rating;
                 // a separate "Skip" saved exactly the same way and read as a second choice.
                 Button("Save session") { Task { await save() } }
-                    .buttonStyle(.noopPrimary)
+                    .buttonStyle(.pulsePrimary)
                     .disabled(saving || !answered)
-                    .opacity(saving || !answered ? NoopButtonMetrics.disabledOpacity : 1)
+                    .opacity(saving || !answered ? PulseButtonMetrics.disabledOpacity : 1)
                 if !answered {
                     Text("Choose an option above to save.")
                         .font(StrandFont.footnote)
@@ -713,8 +713,8 @@ struct LiftSessionView: View {
     /// to zeros that every figure leaves out and Edit sets can still fill in. A set that was done is never
     /// asked about — it is complete (`LiftSessionController.setsToSave`).
     private func unfinishedCard(count: Int) -> some View {
-        NoopCard {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        PulseCard {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 Text("Unfinished sets").strandOverline()
                 Text("Sets not started: \(count)")
                     .font(StrandFont.body)
@@ -751,8 +751,8 @@ struct LiftSessionView: View {
     /// if asked to — one answer for all of them, listed so the lifter sees what "update" would write.
     private var programCard: some View {
         let added = addedExercises
-        return NoopCard {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        return PulseCard {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 Text("Program").strandOverline()
                 Text(programQuestion(countsChanged: !setCountChanges.isEmpty, exercisesAdded: !added.isEmpty))
                     .font(StrandFont.body)

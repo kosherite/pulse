@@ -56,7 +56,7 @@ else
 fi
 
 MAINTAINERS="${MAINTAINERS:-ryanbr,Fanboynz}"
-REPO="${GH_REPO:-ryanbr/noop}"
+REPO="${GH_REPO:-kosherite/pulse}"
 LIMIT=300
 
 # Field-exact, case-insensitive. The rows are "handle<TAB>#N<TAB>title", so a whole-line anchor never

@@ -17,7 +17,7 @@ import Foundation
 ///  - otherwise nil — "not known yet" is the honest answer, and better than another strap's number.
 ///
 /// Pure so the attribution is unit-tested without defaults, a strap, or a registry. Kotlin twin:
-/// `com.noop.ble.resolveFirmware`.
+/// `com.pulse.ble.resolveFirmware`.
 enum FirmwareAttribution {
 
     static func resolve(live: String?,
@@ -42,7 +42,7 @@ enum FirmwareAttribution {
     /// key that belongs to no device.
     static func prefKey(peripheralId: String?) -> String? {
         guard let p = peripheralId?.trimmingCharacters(in: .whitespaces), !p.isEmpty else { return nil }
-        return "noop.lastFirmware.\(p.lowercased())"
+        return "pulse.lastFirmware.\(p.lowercased())"
     }
 }
 

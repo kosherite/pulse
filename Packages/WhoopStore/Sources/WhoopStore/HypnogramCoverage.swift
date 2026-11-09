@@ -3,7 +3,7 @@ import Foundation
 /// How much of a sleep session's `[startTs, endTs)` span its stage segments actually account for.
 ///
 /// WHY THIS EXISTS. A session's stage timeline is supposed to TILE its span — `SleepStageTotals`
-/// says so explicitly ("the segment stages noop stores ... TILE the window ... Σ stage minutes equals
+/// says so explicitly ("the segment stages pulse stores ... TILE the window ... Σ stage minutes equals
 /// the clock span"), and every consumer is written as though it does. One producer breaks that
 /// invariant: a device-PROVIDED hypnogram assembled from records that arrived INCOMPLETE. The Oura
 /// path (`OuraSleepSessionMapping`) merges only CONTIGUOUS codes, so a sleep-phase page that never
@@ -27,7 +27,7 @@ import Foundation
 /// happened there, and asserting wake would be the same overreach in the opposite direction.
 ///
 /// PARITY: pure + deterministic, byte-identical to the Kotlin twin
-/// (`com.noop.analytics.HypnogramCoverage`). Keep the two in lockstep.
+/// (`com.pulse.analytics.HypnogramCoverage`). Keep the two in lockstep.
 public enum HypnogramCoverage {
 
     /// Coverage at or above which a stage timeline is treated as describing its whole span.
@@ -113,8 +113,8 @@ public enum HypnogramCoverage {
     /// mixing one with a timestamped fragment reads as holed). A group whose fragments are ALL
     /// timestamp-free totals 0 covered seconds and comes back nil — unknown, not holed.
     /// The accumulation itself, over `(payload, span)` fragments. This is the shape the Kotlin twin
-    /// implements — entity-free, because `HypnogramCoverage` sits in `com.noop.analytics` over there and
-    /// must not reach into `com.noop.data` for a row type. The session overload below is a thin adapter,
+    /// implements — entity-free, because `HypnogramCoverage` sits in `com.pulse.analytics` over there and
+    /// must not reach into `com.pulse.data` for a row type. The session overload below is a thin adapter,
     /// so both platforms run the identical arithmetic and only the packaging differs.
     public static func groupFraction(_ fragments: [(stagesJSON: String?, spanSeconds: Double)]) -> Double? {
         var covered = 0.0, span = 0.0

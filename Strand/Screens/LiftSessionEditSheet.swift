@@ -67,7 +67,7 @@ struct LiftSessionEditSheet: View {
     var body: some View {
         ScreenScaffold(title: "Edit sets",
                        subtitle: "Fix numbers, or add and remove sets. Sets left at 0 reps stay out of the figures, and only this session changes — not the program.") {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                 sessionRpeCard
                 ForEach(exercises.indices, id: \.self) { exerciseCard($0) }
                 footer
@@ -92,8 +92,8 @@ struct LiftSessionEditSheet: View {
     }
 
     private var sessionRpeCard: some View {
-        NoopCard {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        PulseCard {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 Text("How hard was the whole session? (1–10)").strandOverline()
                 field(.sessionRpe, text: Binding(
                     get: { sessionRpeText },
@@ -104,8 +104,8 @@ struct LiftSessionEditSheet: View {
 
     private func exerciseCard(_ index: Int) -> some View {
         let group = exercises[index]
-        return NoopCard {
-            VStack(alignment: .leading, spacing: NoopMetrics.rowSpacing) {
+        return PulseCard {
+            VStack(alignment: .leading, spacing: PulseMetrics.rowSpacing) {
                 Text(group.name)
                     .font(StrandFont.headline)
                     .foregroundStyle(StrandPalette.textPrimary)
@@ -260,10 +260,10 @@ struct LiftSessionEditSheet: View {
                 .foregroundStyle(StrandPalette.textSecondary)
             Spacer()
             Button("Save changes") { Task { await save() } }
-                .buttonStyle(.noopPrimary)
+                .buttonStyle(.pulsePrimary)
                 .frame(maxWidth: 180)
                 .disabled(saving || !hasChanges)
-                .opacity(saving || !hasChanges ? NoopButtonMetrics.disabledOpacity : 1)
+                .opacity(saving || !hasChanges ? PulseButtonMetrics.disabledOpacity : 1)
         }
     }
 

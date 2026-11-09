@@ -9,7 +9,7 @@ import UIKit
 
 // MARK: - SleepView
 //
-// Whoop-sleep clarity on the locked Noop component system. Scannable in two seconds:
+// Whoop-sleep clarity on the locked Pulse component system. Scannable in two seconds:
 //   1. HERO ChartCard "Last night" — the stage breakdown (Hypnogram if intervals
 //      reconstruct from stagesJSON, else a clean proportional stacked stage bar),
 //      trailing = total asleep, footer = REM/Deep/Light/Awake each "Xh Ym · NN%".
@@ -18,11 +18,11 @@ import UIKit
 //      Respiratory, Sleep Debt.
 //   2b. The sleep-debt LEDGER card — a rolling 14-night running balance of (slept −
 //      personal need) with a plain-English read and a diverging per-night delta bar.
-//   3. "Stages vs typical" NoopCard — Deep/REM/Light as horizontal bars, last-night
+//   3. "Stages vs typical" PulseCard — Deep/REM/Light as horizontal bars, last-night
 //      minutes with a marker at the personal typical (mean) so highs/lows pop.
 //   4. A 30-day asleep-hours ChartCard trend.
 //
-// Every surface is a NoopCard / StatTile / ChartCard — no hand-sized cards, one grid,
+// Every surface is a PulseCard / StatTile / ChartCard — no hand-sized cards, one grid,
 // equal margins. Data wiring is preserved from the previous screen (stagesJSON =
 // minutes for light/deep/rem/awake; typical = mean of repo.days).
 
@@ -167,7 +167,7 @@ struct SleepView: View {
             Group {
                 if let resolved {
                     // Each top-level section fades + rises in sequence on first appear (Reduce-Motion safe).
-                    VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+                    VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
                         if let sleepUndo { sleepUndoBanner(sleepUndo) }
                         SleepFreshnessNote(latestWakeTs: resolved.night.session.endTs)
                         if resultNoticeVisible {
@@ -316,10 +316,10 @@ struct SleepView: View {
     private var alarmsEntry: some View {
         // Button OUTSIDE the card, as `InsightsView.whatMovesYouLink` and `LabBookView` do: with it inside,
         // only the row content answers a tap and the card's own padding is dead, so the same edge tap works
-        // on Android (where the whole `NoopCard` is clickable) and does nothing here.
+        // on Android (where the whole `PulseCard` is clickable) and does nothing here.
         Button { router.openAlarms() } label: {
-            NoopCard(tint: StrandPalette.restColor) {
-                HStack(spacing: NoopMetrics.gap) {
+            PulseCard(tint: StrandPalette.restColor) {
+                HStack(spacing: PulseMetrics.gap) {
                     Image(systemName: "alarm.fill")
                         .foregroundStyle(StrandPalette.restColor)
                         .accessibilityHidden(true)
@@ -412,10 +412,10 @@ struct SleepView: View {
             .foregroundStyle(StrandPalette.restColor)
             .accessibilityLabel("Undo sleep deletion")
         }
-        .padding(NoopMetrics.space3)
+        .padding(PulseMetrics.space3)
         .background(StrandPalette.restColor.opacity(0.10),
-                    in: RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous)
+                    in: RoundedRectangle(cornerRadius: PulseMetrics.cardRadius, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: PulseMetrics.cardRadius, style: .continuous)
             .strokeBorder(StrandPalette.restColor.opacity(0.22), lineWidth: 1))
         .transition(.opacity)
         .accessibilityElement(children: .contain)
@@ -557,7 +557,7 @@ struct SleepView: View {
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "Sleep performance \(Int(score.rounded())) of 100, \(sleepScoreWord(score))"))
             } else {
-                VStack(spacing: NoopMetrics.space1) {
+                VStack(spacing: PulseMetrics.space1) {
                     CountUpText(
                         value: night.stages.asleep,
                         format: { durationText($0) },
@@ -609,7 +609,7 @@ struct SleepView: View {
     }
 
     /// Whether a SPECIFIC night's sleep-performance score is WHOOP's own imported figure, an Oura
-    /// ring-provided figure, or NOOP's on-device approximation — so the hero is honest about provenance,
+    /// ring-provided figure, or Pulse's on-device approximation — so the hero is honest about provenance,
     /// like Today's badges. Keyed by the night's wake-day (matching `performanceScore(for:)`) so a
     /// navigated night's badge tracks ITS OWN score's provenance, not last night's.
     private func heroSource(for night: Night) -> LocalizedStringKey {
@@ -623,7 +623,7 @@ struct SleepView: View {
     /// The REAL per-day merge winner for the DISPLAYED night's sleep numbers, as the same brand wording the
     /// By-Day badge / Today / Intelligence use ("On-device" / "Whoop"). A WHOOP export covering the night's
     /// wake-day wins the dashboard merge (imports win field-by-field, Repository.mergeDaily), so the badge
-    /// says "Whoop"; otherwise the night was scored on-device by NOOP. Keyed by the night's LOCAL wake-day
+    /// says "Whoop"; otherwise the night was scored on-device by Pulse. Keyed by the night's LOCAL wake-day
     /// (the `mergeSleep` / importer convention, sleep is filed under the day you woke), so a navigated past
     /// night reads its OWN provenance, not last night's. Honest: never a blanket "on-device". Apple Health
     /// carries no sleep into `importedSleep`, so the sleep merge winner is only ever Whoop vs on-device. (C4)
@@ -632,7 +632,7 @@ struct SleepView: View {
         if repo.importedSleep[wakeDay] != nil { return String(localized: "Whoop") }
         // An Oura ring PROVIDES the night's stages (its own SleepNet hypnogram, banked as the imported
         // session that wins the merge), so name it "Oura" — not the generic "On-device" that implies a
-        // NOOP computation. WHOOP import still wins above; only a night surfaced under a live Oura strap
+        // Pulse computation. WHOOP import still wins above; only a night surfaced under a live Oura strap
         // reaches here as "Oura".
         if repo.activeDeviceIsOura { return String(localized: "Oura") }
         return String(localized: "On-device")
@@ -654,7 +654,7 @@ struct SleepView: View {
         // navigated session decoded to no usable stages, the header stays on that REAL
         // session's date/times with an honest placeholder in the chart slot — never the
         // latest night silently rendered under a navigated label. (#160)
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             // #940: when the NEWEST day failed to merge (model.isStubNight), offset 0 falls through
             // to the same honest stage-less stub path the navigated browse uses, instead of drawing
             // a zeroed stage card. History stays browsable and the edit pencil stays reachable.
@@ -678,7 +678,7 @@ struct SleepView: View {
                 ChartCard(
                     title: "Stage breakdown",
                     subtitle: String(localized: "\(durationText(Double(session.endTs - session.startTs) / 60.0)) in bed"),
-                    height: NoopMetrics.chartHeight,
+                    height: PulseMetrics.chartHeight,
                     tint: StrandPalette.restColor,
                     chart: { noStagePlaceholder }
                 )
@@ -707,8 +707,8 @@ struct SleepView: View {
             .sorted { $0.effectiveStartTs < $1.effectiveStartTs }
         let mainMin = night.stages.total
         let napMin = naps.reduce(0.0) { $0 + Double($1.endTs - $1.effectiveStartTs) / 60.0 }
-        NoopCard(padding: NoopMetrics.cardInnerPadding, tint: StrandPalette.restColor) {
-            VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
+        PulseCard(padding: PulseMetrics.cardInnerPadding, tint: StrandPalette.restColor) {
+            VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
                 HStack {
                     SectionHeader("Naps", overline: "Daytime sleep", trailing: nil)
                     Spacer(minLength: 8)
@@ -834,15 +834,15 @@ struct SleepView: View {
         let s = night.stages
         let isPersisted = (night.realSegments?.count ?? 0) >= 2
         // An Oura night's stages are the ring's RAW on-device SleepNet classification (decoded off the 0x49
-        // phase stream), NOT a NOOP approximation — so it gets its own honest caption instead of the
-        // "stages approximate (on-device)" one that describes NOOP's own sparse-motion staging.
+        // phase stream), NOT a Pulse approximation — so it gets its own honest caption instead of the
+        // "stages approximate (on-device)" one that describes Pulse's own sparse-motion staging.
         let stageCaption = repo.activeDeviceIsOura
             ? String(localized: "raw on-device stages")
             : String(localized: "stages approximate (on-device)")
         let subtitle = isPersisted
             ? String(localized: "\(durationText(night.timeInBed)) in bed · \(efficiencyText(night)) efficiency · \(stageCaption)")
             : String(localized: "\(durationText(night.timeInBed)) in bed · \(efficiencyText(night)) efficiency")
-        VStack(alignment: .leading, spacing: NoopMetrics.space2) {
+        VStack(alignment: .leading, spacing: PulseMetrics.space2) {
             if intervals.count >= 2 {
                 // #sleep-chart-style (Settings → Appearance): Classic keeps the per-stage timeline ROWS
                 // (ryanAtriumAi #988) — hatched track = the whole night, solid segments = when that stage
@@ -861,7 +861,7 @@ struct SleepView: View {
                     title: "Stage breakdown",
                     subtitle: subtitle,
                     trailing: durationText(s.asleep),
-                    height: NoopMetrics.chartHeight,
+                    height: PulseMetrics.chartHeight,
                     tint: StrandPalette.restColor,
                     chart: { stageBar(s) },
                     footer: { stageBreakdownRows(s) }
@@ -921,9 +921,9 @@ struct SleepView: View {
     /// surface while allowing the timeline to size to the content it actually has.
     private func stageTimelineCard(_ stages: Stages, subtitle: String,
                                    intervals: [SleepInterval], night: Night) -> some View {
-        NoopCard(tint: StrandPalette.restColor) {
-            VStack(alignment: .leading, spacing: NoopMetrics.space3) {
-                VStack(alignment: .leading, spacing: NoopMetrics.spaceHalf) {
+        PulseCard(tint: StrandPalette.restColor) {
+            VStack(alignment: .leading, spacing: PulseMetrics.space3) {
+                VStack(alignment: .leading, spacing: PulseMetrics.spaceHalf) {
                     Text("Stage breakdown").strandOverline()
                     Text(subtitle)
                         .font(StrandFont.footnote)
@@ -945,12 +945,12 @@ struct SleepView: View {
             title: "Stage breakdown",
             subtitle: subtitle,
             trailing: durationText(s.asleep),
-            height: NoopMetrics.chartHeight,
+            height: PulseMetrics.chartHeight,
             tint: StrandPalette.restColor,
             chart: {
                 Hypnogram(
                     intervals: intervals,
-                    height: NoopMetrics.chartHeight,
+                    height: PulseMetrics.chartHeight,
                     showsStageAxis: false,
                     showsHover: true,
                     nightStart: night.onsetDate,
@@ -1141,9 +1141,9 @@ struct SleepView: View {
     /// HONEST-DATA: it reports only what was observed and changes no number. The percentage is floored,
     /// never rounded — 94.8% must not print as "95%" and appear to contradict the gate that flagged it.
     /// The copy names NO cause and offers NO remedy, deliberately: on the 08-29/30 and 08-30/31 captures the
-    /// missing codes DID reach NOOP — the ring reported them unwritten (0xFF), the persist log trimmed
+    /// missing codes DID reach Pulse — the ring reported them unwritten (0xFF), the persist log trimmed
     /// exactly as many as the hole is wide — and re-persisting the same night 5 and 8 times left the hole
-    /// intact. "The rest never reached NOOP" and "syncing again can fill in" were both wrong. Nor does the
+    /// intact. "The rest never reached Pulse" and "syncing again can fill in" were both wrong. Nor does the
     /// copy point at the totals by DIRECTION: both hosts render this note below the stage-breakdown card
     /// that carries them, so "the totals below" pointed the wrong way on every screen that shipped it.
     private func stagePartialNote(_ coverage: Double) -> some View {
@@ -1184,8 +1184,8 @@ struct SleepView: View {
     private func sleepWindowRow(_ night: Night) -> some View {
         // A frosted Rest-tinted card (was a flat surfaceRaised block) so the window row sits in the
         // same colour world as the rest of the screen. Bevel treatment — content unchanged.
-        NoopCard(padding: NoopMetrics.cardInnerPadding, tint: StrandPalette.restColor) {
-            VStack(alignment: .leading, spacing: NoopMetrics.rowSpacing) {
+        PulseCard(padding: PulseMetrics.cardInnerPadding, tint: StrandPalette.restColor) {
+            VStack(alignment: .leading, spacing: PulseMetrics.rowSpacing) {
                 HStack(spacing: 0) {
                     sleepTime(icon: "moon.zzz.fill", label: "Asleep", value: night.onsetText)
                     Spacer(minLength: 12)
@@ -1225,7 +1225,7 @@ struct SleepView: View {
                     // This is a compact metadata footer inside an already surfaced card. A forced
                     // 44-point label made the WHOOP / Why row look vertically padded despite having
                     // only one line of content.
-                    .frame(minHeight: NoopMetrics.compactMetadataMinHeight)
+                    .frame(minHeight: PulseMetrics.compactMetadataMinHeight)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(LiquidPressStyle())
@@ -1243,8 +1243,8 @@ struct SleepView: View {
     /// and the spec's nap-row suffix). Sized for both macOS and iOS. (spec 2026-06-20 C1)
     @ViewBuilder
     private func whyPopover(text: String, napSuffix: Bool) -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.space2) {
-            HStack(spacing: NoopMetrics.space2) {
+        VStack(alignment: .leading, spacing: PulseMetrics.space2) {
+            HStack(spacing: PulseMetrics.space2) {
                 Image(systemName: "moon.stars.fill")
                     .foregroundStyle(StrandPalette.restColor)
                     .accessibilityHidden(true)
@@ -1265,9 +1265,9 @@ struct SleepView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(NoopMetrics.cardInnerPadding)
+        .padding(PulseMetrics.cardInnerPadding)
         .frame(width: 260)
-        .background(NoopPanelSurface(cornerRadius: NoopVisualStyle.compactRadius, elevated: true))
+        .background(PulsePanelSurface(cornerRadius: PulseVisualStyle.compactRadius, elevated: true))
         .accessibilityElement(children: .combine)
     }
 
@@ -1370,8 +1370,8 @@ struct SleepView: View {
     /// proportional bar in the stage colour over a faint track, and the right-aligned duration. Same data
     /// as the prior footer (`s.rem` / `s.deep` / `s.light` / `s.awake` over `s.total`) — no new numbers.
     @ViewBuilder
-    private func stageBreakdownRows(_ s: Stages, palette: SleepStagePalette = .noop) -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
+    private func stageBreakdownRows(_ s: Stages, palette: SleepStagePalette = .pulse) -> some View {
+        VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
             stageBreakdownRow(.awake, minutes: s.awake, total: s.total, percent: stageSharePercent(.awake, s), palette: palette)
             stageBreakdownRow(.rem,   minutes: s.rem,   total: s.total, percent: stageSharePercent(.rem, s), palette: palette)
             stageBreakdownRow(.light, minutes: s.light, total: s.total, percent: stageSharePercent(.light, s), palette: palette)
@@ -1398,7 +1398,7 @@ struct SleepView: View {
     /// row highlights that stage and recedes the rest; tapping the selected row again clears the highlight.
     @ViewBuilder
     private func stageBreakdownRow(_ stage: SleepStage, minutes: Double, total: Double, percent: Int,
-                                   palette: SleepStagePalette = .noop) -> some View {
+                                   palette: SleepStagePalette = .pulse) -> some View {
         let color = StrandPalette.sleepStageColor(stage, palette: palette)
         let fraction = total > 0 ? min(1, max(0, minutes / total)) : 0
         let isSelected = selectedStage == stage
@@ -1417,7 +1417,7 @@ struct SleepView: View {
                 .font(StrandFont.captionNumber)
                 .foregroundStyle(color)
                 .frame(width: 38, alignment: .leading)
-            // The NOOP signature: a segmented PipBar that counts up to the share-of-night fraction,
+            // The Pulse signature: a segmented PipBar that counts up to the share-of-night fraction,
             // tinted in the stage colour over the canonical inset track. Flat, crisp, no glow.
             PipBar(value: fraction * 100, segments: 20, tint: color, height: 8)
             Text(durationText(minutes))
@@ -1462,7 +1462,7 @@ struct SleepView: View {
         let smoothed = Hypnogram.displaySmoothed(intervals.sorted { $0.start < $1.start }, minDuration: 90)
         let origin = smoothed.first?.start ?? 0
         let span = max(1, (smoothed.map(\.end).max() ?? 1) - origin)
-        VStack(alignment: .leading, spacing: NoopMetrics.space2) {
+        VStack(alignment: .leading, spacing: PulseMetrics.space2) {
             // WHOOP's hero pair: HOURS OF SLEEP + RESTORATIVE SLEEP (deep + REM), each against
             // its 30-day typical.
             sleepHeadline(s)
@@ -1493,7 +1493,7 @@ struct SleepView: View {
             // range; otherwise a quiet hint that the rows are tappable. It grows only when a
             // selected-stage comparison needs a second line, avoiding a permanent empty footer.
             stageInsight(s)
-                .frame(minHeight: NoopMetrics.compactHintMinHeight, alignment: .topLeading)
+                .frame(minHeight: PulseMetrics.compactHintMinHeight, alignment: .topLeading)
                 .padding(.horizontal, 2)
         }
     }
@@ -1504,7 +1504,7 @@ struct SleepView: View {
     @ViewBuilder
     private func sleepHeadline(_ s: Stages) -> some View {
         let restorative = s.deep + s.rem
-        HStack(alignment: .top, spacing: NoopMetrics.space6) {
+        HStack(alignment: .top, spacing: PulseMetrics.space6) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(durationText(s.asleep))
                     .font(StrandFont.number(26))
@@ -2001,8 +2001,8 @@ struct SleepView: View {
     private func nightNavHeader(trailing: String) -> some View {
         let lastIndex = max(navDays.count - 1, 0)
         let title = nightRelativeLabel
-        VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
-            HStack(spacing: NoopMetrics.cardInnerSpacing) {
+        VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
+            HStack(spacing: PulseMetrics.cardInnerSpacing) {
                 Button { if nightOffset < lastIndex { nightOffset += 1 } } label: {
                     Image(systemName: "chevron.left")
                         .font(StrandFont.headline)
@@ -2012,21 +2012,21 @@ struct SleepView: View {
                 .disabled(nightOffset >= lastIndex)
                 .accessibilityLabel("Previous night")
 
-                HStack(alignment: .bottom, spacing: NoopMetrics.space3) {
+                HStack(alignment: .bottom, spacing: PulseMetrics.space3) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Sleep").strandOverline()
                         Text(title)
                             .font(StrandFont.title2)
                             .foregroundStyle(StrandPalette.textPrimary)
                     }
-                    Spacer(minLength: NoopMetrics.space2)
+                    Spacer(minLength: PulseMetrics.space2)
                     Text(trailing)
                         .font(StrandFont.caption.weight(.semibold))
                         .foregroundStyle(StrandPalette.textSecondary)
                         .lineLimit(1)
                         .fixedSize(horizontal: true, vertical: false)
-                        .padding(.horizontal, NoopMetrics.space3)
-                        .padding(.vertical, NoopMetrics.space2)
+                        .padding(.horizontal, PulseMetrics.space3)
+                        .padding(.vertical, PulseMetrics.space2)
                         .background(
                             Capsule(style: .continuous)
                                 .fill(StrandPalette.surfaceInset)
@@ -2087,7 +2087,7 @@ struct SleepView: View {
             .font(StrandFont.footnote)
             .foregroundStyle(StrandPalette.textTertiary)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .background(NoopPanelSurface(tint: StrandPalette.restColor, cornerRadius: 12))
+            .background(PulsePanelSurface(tint: StrandPalette.restColor, cornerRadius: 12))
     }
 
     // MARK: - Formatting helpers
@@ -2514,22 +2514,22 @@ struct SleepMarkCard: View {
     @State private var lastMark: SleepMark?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Sleep marks", overline: "Tap to log")
-            NoopCard(tint: StrandPalette.restColor) {
-                VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
+            PulseCard(tint: StrandPalette.restColor) {
+                VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
                     Text("Tap when you're heading to bed or when you wake. Each tap is logged with the time. It doesn't change tonight's detected sleep.")
                         .font(StrandFont.footnote)
                         .foregroundStyle(StrandPalette.textTertiary)
                         .fixedSize(horizontal: false, vertical: true)
-                    HStack(spacing: NoopMetrics.gap) {
-                        // Routed through the unified NoopButton system so the two marks sit identically
+                    HStack(spacing: PulseMetrics.gap) {
+                        // Routed through the unified PulseButton system so the two marks sit identically
                         // (sentence-case label, leading icon at 8pt, controlHeight=48, no glow).
-                        NoopButton("Going to sleep", systemImage: "moon.zzz.fill",
+                        PulseButton("Going to sleep", systemImage: "moon.zzz.fill",
                                    kind: .secondary, fullWidth: true) { logMark(.bedtime) }
                             .accessibilityLabel("Log going to sleep")
 
-                        NoopButton("I'm awake", systemImage: "sun.max.fill",
+                        PulseButton("I'm awake", systemImage: "sun.max.fill",
                                    kind: .secondary, fullWidth: true) { logMark(.wake) }
                             .accessibilityLabel("Log waking up")
                     }
@@ -2791,13 +2791,13 @@ private struct SleepTimeEditor: View {
     var body: some View {
         let canSave = validatedWindow != nil
 
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             Text(title).font(StrandFont.title2).foregroundStyle(StrandPalette.textPrimary)
             Text(blurb)
                 .font(StrandFont.subhead).foregroundStyle(StrandPalette.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            NoopCard(padding: NoopMetrics.cardPadding, tint: StrandPalette.restColor) {
+            PulseCard(padding: PulseMetrics.cardPadding, tint: StrandPalette.restColor) {
                 VStack(alignment: .leading, spacing: 10) {
                     // Bed is bounded to the PAST (#940): a sleep can't start in the future, and an
                     // unbounded picker let a cross-midnight time roll land the bed on the coming
@@ -2832,9 +2832,9 @@ private struct SleepTimeEditor: View {
                 .accessibilityLabel(deleteLabel)
             }
 
-            HStack(spacing: NoopMetrics.gap) {
+            HStack(spacing: PulseMetrics.gap) {
                 Button("Cancel") { dismiss() }
-                    .buttonStyle(.noopGhost)
+                    .buttonStyle(.pulseGhost)
                     .disabled(saving)
                 Spacer()
                 Button(saving ? "Saving…" : "Save") {
@@ -2850,18 +2850,18 @@ private struct SleepTimeEditor: View {
                         commit(start: window.start, end: window.end)
                     }
                 }
-                .buttonStyle(.noopPrimary)
+                .buttonStyle(.pulsePrimary)
                 .disabled(saving || !canSave)
                 .opacity(canSave ? 1 : 0.55)
             }
         }
-        .padding(NoopMetrics.screenPadding)
+        .padding(PulseMetrics.screenPadding)
         .frame(minWidth: 360)
-        .background(NoopChromeSurface())
+        .background(PulseChromeSurface())
         // #940 guard 1: a time-only roll that lands the bed in the future, or at/after the night's
         // wake, almost always means the PREVIOUS evening (23:00 "yesterday", not tonight). Snap the
         // date back a day so the picker visibly shows the night the user meant. Pure rule + tests:
-        // SleepEditGuard.autoCorrectedBed (Android twin in com.noop.analytics).
+        // SleepEditGuard.autoCorrectedBed (Android twin in com.pulse.analytics).
         .onChangeCompat(of: bed) { newBed in
             let corrected = SleepEditGuard.autoCorrectedBed(
                 previousBed: previousBed, candidateBed: newBed,

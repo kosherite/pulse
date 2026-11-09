@@ -1,9 +1,9 @@
-# NOOP — Android Port Guide
+# Pulse — Android Port Guide
 
-NOOP is a standalone companion app for WHOOP straps (4.0 and 5.0), with **offline collection and analytics**.
+Pulse is a standalone companion app for WHOOP straps (4.0 and 5.0), with **offline collection and analytics**.
 It pairs directly with the strap over Bluetooth Low Energy, stores everything on-device in SQLite, imports
 WHOOP CSV exports and Apple Health exports, and computes recovery / strain / HRV / sleep locally.
-There is no NOOP cloud or account; collection and analytics need no network connection.
+There is no Pulse cloud or account; collection and analytics need no network connection.
 Optional network features and the default-on update check are documented in the
 [privacy inventory](PRIVACY_SECURITY.md#11-network-paths-canonical-inventory).
 
@@ -14,7 +14,7 @@ into the main project as a **build-from-source-only** client — see the macOS/i
 the same analytics so results match macOS.)
 
 > **Not affiliated with WHOOP, and not a medical device.** "WHOOP" is used nominatively only to
-> identify the hardware this software interoperates with. NOOP contains no WHOOP code, firmware, or
+> identify the hardware this software interoperates with. Pulse contains no WHOOP code, firmware, or
 > assets, and performs no DRM circumvention — it talks only to the user's own device and the data it
 > has already recorded. All outputs (HR, HRV, recovery, strain, sleep, SpO₂, temperature) are
 > approximations and are **not** clinically validated. See [`../DISCLAIMER.md`](../DISCLAIMER.md)
@@ -22,7 +22,7 @@ the same analytics so results match macOS.)
 
 > ### Status: shipping platform — builds, releases, and validated on WHOOP 4.0
 >
-> The Android client is a **fully shipping** part of NOOP. It builds and releases as two APK
+> The Android client is a **fully shipping** part of Pulse. It builds and releases as two APK
 > flavours — **full** (`./gradlew assembleFullRelease`) and **demo** (`./gradlew
 > assembleDemoRelease`) — and is sideloaded by users (with features such as a **Sync-now** button).
 > The BLE pipeline, Compose UI, Room database, and importers are all present and working. It is
@@ -60,12 +60,12 @@ re-implements the same observable behavior in idiomatic Kotlin:
 
 | Swift package (reference) | Android counterpart | Status |
 | --- | --- | --- |
-| `WhoopProtocol` — BLE framing, CRC, command/event/packet decode | `com.noop.protocol` (Kotlin) | shipped — framing/CRC, `parseFrame`, enums |
-| `WhoopStore` — GRDB/SQLite persistence | `com.noop.data` (Room) | shipped — entities, DAOs, database |
-| `StrandAnalytics` — HRV / recovery / strain / sleep math | `com.noop.analytics` | shipped — RMSSD / zones / illness-watch + scorers |
-| `StrandImport` — WHOOP CSV + Apple Health importers | `com.noop.data` / `com.noop.ingest` importers | shipped — WHOOP CSV, Apple Health, Health Connect, raw `capture.json` (see [Raw capture import](#raw-capture-import-capturejson)) |
-| `StrandDesign` — SwiftUI design system | Jetpack Compose theme | shipped — `Theme.NOOP` tokens + components |
-| `Strand/` macOS app (CoreBluetooth + UI) | `com.noop.ui` + `com.noop.ble` (Compose + `BluetoothGatt`) | shipped — Compose screens + BLE pipeline |
+| `WhoopProtocol` — BLE framing, CRC, command/event/packet decode | `com.pulse.protocol` (Kotlin) | shipped — framing/CRC, `parseFrame`, enums |
+| `WhoopStore` — GRDB/SQLite persistence | `com.pulse.data` (Room) | shipped — entities, DAOs, database |
+| `StrandAnalytics` — HRV / recovery / strain / sleep math | `com.pulse.analytics` | shipped — RMSSD / zones / illness-watch + scorers |
+| `StrandImport` — WHOOP CSV + Apple Health importers | `com.pulse.data` / `com.pulse.ingest` importers | shipped — WHOOP CSV, Apple Health, Health Connect, raw `capture.json` (see [Raw capture import](#raw-capture-import-capturejson)) |
+| `StrandDesign` — SwiftUI design system | Jetpack Compose theme | shipped — `Theme.Pulse` tokens + components |
+| `Strand/` macOS app (CoreBluetooth + UI) | `com.pulse.ui` + `com.pulse.ble` (Compose + `BluetoothGatt`) | shipped — Compose screens + BLE pipeline |
 
 The single source of truth that **both** platforms must agree on is the protocol schema resource
 `Packages/WhoopProtocol/Sources/WhoopProtocol/Resources/whoop_protocol.json` (top-level keys
@@ -82,26 +82,26 @@ memory.
 
 ```
 android/
-├── settings.gradle.kts          # rootProject.name = "NOOP"; include(":app")
+├── settings.gradle.kts          # rootProject.name = "Pulse"; include(":app")
 ├── build.gradle.kts             # root: declares AGP / Kotlin / KSP plugin versions (apply false)
 ├── gradle.properties            # JVM args, AndroidX on, R8 full mode, parallel/caching
 ├── gradlew / gradlew.bat        # committed wrapper scripts
 ├── gradle/wrapper/              # gradle-wrapper.{jar,properties} (committed)
 └── app/
-    ├── build.gradle.kts         # namespace com.noop, applicationId com.noop.whoop, Compose + Room
+    ├── build.gradle.kts         # namespace com.pulse, applicationId com.pulse.whoop, Compose + Room
     ├── proguard-rules.pro       # R8 release rules
     └── src/
         ├── main/
         │   ├── AndroidManifest.xml
-        │   ├── java/com/noop/
-        │   │   ├── NoopApplication.kt
+        │   ├── java/com/pulse/
+        │   │   ├── PulseApplication.kt
         │   │   ├── protocol/    # Crc.kt, Framing.kt, ParseFrame.kt, Schema.kt, DeviceFamily.kt, Commands.kt
-        │   │   ├── data/        # Entities.kt, *Dao.kt, NoopDatabase.kt, importers (CSV + Apple Health)
+        │   │   ├── data/        # Entities.kt, *Dao.kt, PulseDatabase.kt, importers (CSV + Apple Health)
         │   │   ├── analytics/   # Analytics.kt + StrandAnalytics scorers
         │   │   ├── ble/         # BluetoothGatt manager, frame router, collector, backfiller
         │   │   └── ui/          # MainActivity + Compose screens
         │   └── res/values/      # colors.xml, themes.xml, strings.xml
-        └── test/java/com/noop/
+        └── test/java/com/pulse/
             └── analytics/AnalyticsTest.kt
 ```
 
@@ -121,7 +121,7 @@ bump forces matching KSP and Compose-compiler bumps:
 | `compileSdk` / `targetSdk` | `34` | |
 | `minSdk` | `26` | Android 8.0 — the floor for the current BLE permission split |
 | `sourceCompatibility` / `jvmTarget` | `17` | JDK 17 |
-| `applicationId` | `com.noop.whoop` | `.debug` suffix on debug builds |
+| `applicationId` | `com.pulse.whoop` | `.debug` suffix on debug builds |
 
 The app declares `INTERNET` for its documented network features (see
 [Permissions](#permissions-and-offline-collection)) and sets `android:allowBackup="false"`.
@@ -133,7 +133,7 @@ The app declares `INTERNET` for its documented network features (see
 The Android client is built, released, and validated, so the layers below all **exist and work**.
 This section maps the surface so contributors know where each piece lives.
 
-**Present and working** (under `android/app/src/main/java/com/noop/`):
+**Present and working** (under `android/app/src/main/java/com/pulse/`):
 
 - `protocol/Crc.kt` — `Crc.crc8`, `Crc.crc32`, `Crc.crc16Modbus`. **Ported verbatim** from
   `Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift` (same CRC8 table, same zlib CRC-32
@@ -153,9 +153,9 @@ This section maps the surface so contributors know where each piece lives.
 - `analytics/Analytics.kt` — `Hrv.rmssd`, `Zones.zone` / `Zones.hrMaxTanaka`, `IllnessWatch.evaluate`
   (ported from `Strand/App/AppModel.swift`), alongside the heavier scorers ported from
   `StrandAnalytics`.
-- `ui/*` — `MainActivity` plus the Compose (Material 3) screens; `NoopApplication` as the
+- `ui/*` — `MainActivity` plus the Compose (Material 3) screens; `PulseApplication` as the
   `Application` subclass.
-- `test/java/com/noop/analytics/AnalyticsTest.kt` — JUnit unit tests for the analytics
+- `test/java/com/pulse/analytics/AnalyticsTest.kt` — JUnit unit tests for the analytics
   (RMSSD known-vector, zone ladder/boundaries, Tanaka rounding, illness-watch flag logic).
 - Manifest, `res/values/{colors,themes,strings}.xml`, launcher mipmaps,
   `res/xml/data_extraction_rules.xml`, `app/proguard-rules.pro` (R8 release), and the committed
@@ -204,15 +204,15 @@ cd android
 
 # Assemble a debug APK.
 ./gradlew assembleDebug
-# → app/build/outputs/apk/debug/app-debug.apk  (applicationId com.noop.whoop.debug)
+# → app/build/outputs/apk/debug/app-debug.apk  (applicationId com.pulse.whoop.debug)
 
 # Install onto a connected device and launch.
 ./gradlew installDebug
-adb shell am start -n com.noop.whoop.debug/com.noop.ui.MainActivity
+adb shell am start -n com.pulse.whoop.debug/com.pulse.ui.MainActivity
 
 # Release builds — the two shipped flavours (R8 full mode + resource shrink are enabled).
-./gradlew assembleFullRelease    # → NOOP-full.apk
-./gradlew assembleDemoRelease    # → NOOP-demo.apk
+./gradlew assembleFullRelease    # → Pulse-full.apk
+./gradlew assembleDemoRelease    # → Pulse-demo.apk
 ```
 
 Open `android/` directly in Android Studio (**File ▸ Open ▸ android/**) and let Gradle sync; run
@@ -222,9 +222,9 @@ the `app` configuration on a physical device.
 
 ## Installing the APK (sideload & Play Protect)
 
-The released `NOOP-full.apk` is an **unsigned, source-available APK** — there
+The released `Pulse-full.apk` is an **unsigned, source-available APK** — there
 is no Play Store listing, because the project is anonymous and has no paid Play identity to publish
-or sign under. That's deliberate, but it means Android treats NOOP as an "unknown app" and **Google
+or sign under. That's deliberate, but it means Android treats Pulse as an "unknown app" and **Google
 Play Protect** may warn or block on install — most stubbornly on stock Pixel / recent Android.
 Nothing is wrong with the file; it's just missing a Play signature. To get it on:
 
@@ -233,7 +233,7 @@ Nothing is wrong with the file; it's just missing a Play signature. To get it on
    directly: **Settings → Apps → Special app access → Install unknown apps → [the browser or file
    manager you're installing from] → Allow from this source**, then reopen the APK.
 3. **If Play Protect still refuses**, it's your call for an unsigned app you trust: **Play Store →
-   profile icon → Play Protect → ⚙ Settings → "Scan apps with Play Protect" off**, install NOOP,
+   profile icon → Play Protect → ⚙ Settings → "Scan apps with Play Protect" off**, install Pulse,
    then switch it **back on**.
 4. **Reinstalling is safe.** The app sets `android:allowBackup="false"` and keeps everything in
    private on-device storage, so uninstalling and reinstalling simply starts fresh — there's no cloud
@@ -304,10 +304,10 @@ total = declaredLength + 8
 | `WHOOP5` | `WHOOP5_MINIMUM_FRAME_BYTES` = **13** | `declaredLength + 8` |
 
 The minima have different evidence. Eleven bytes is structural for WHOOP 4.0 and deliberately admits
-real metadata records with no data after `type/seq/cmd`. Thirteen bytes is NOOP's empirical 5.0/MG
+real metadata records with no data after `type/seq/cmd`. Thirteen bytes is Pulse's empirical 5.0/MG
 policy: Goose's `v5Payload` accepts a self-consistent 12-byte empty-payload envelope, while the real
 fixtures in this tree include 20-byte command responses and 24-/32-byte frames but no 12-byte case.
-Those captures show valid traffic above the floor; they do not prove the boundary, so NOOP's extra
+Those captures show valid traffic above the floor; they do not prove the boundary, so Pulse's extra
 inner-type-byte requirement remains an explicit assumption. The exact size is compared for
 **equality**, rejecting truncation and trailing bytes even when the payload CRC32 over the declared
 range checks out. Keep both constants in step with Swift; changing 13 requires new protocol evidence.
@@ -491,7 +491,7 @@ log on:
    #   D WhoopBleClient: Backfill: session ended — reason=HISTORY_COMPLETE
    ```
 
-The toggle drives `WhoopBleClient.debugLogcat` (persisted as `NoopPrefs.KEY_DEBUG_LOGGING`); it
+The toggle drives `WhoopBleClient.debugLogcat` (persisted as `PulsePrefs.KEY_DEBUG_LOGGING`); it
 gates only the `Log.d` call. Whether or not it is on, **Settings → Strap → "Share strap log"**
 exports the same in-app buffer to a file (the path for users with no adb). What the log does and
 does not contain — and why logcat is opt-in — is covered in `PRIVACY_SECURITY.md` §2.4.
@@ -500,7 +500,7 @@ does not contain — and why logcat is opt-in — is covered in `PRIVACY_SECURIT
 
 ## Storage with Room
 
-`com.noop.data.Entities.kt` mirrors the GRDB schema from
+`com.pulse.data.Entities.kt` mirrors the GRDB schema from
 `Packages/WhoopStore/Sources/WhoopStore/Database.swift`, with DAOs and the `@Database` in place. The
 storage layer holds these invariants — preserve them when extending it:
 
@@ -549,7 +549,7 @@ optional exports are governed by the [network inventory](PRIVACY_SECURITY.md#11-
 **Settings → Data Sources → "Raw capture (.json)"** imports a strap offload that was captured on
 *another* device — most usefully the Linux `Tools/linux-capture/whoop_sync.py` tool, whose `export`
 subcommand writes exactly this format. It lets you pull a strap's history on a laptop (no phone, no
-WHOOP app) and then fold it into NOOP on the phone. Fully offline; nothing leaves the device.
+WHOOP app) and then fold it into Pulse on the phone. Fully offline; nothing leaves the device.
 
 **File format.** A JSON array of frame objects, one per stored BLE notify frame:
 
@@ -565,7 +565,7 @@ WHOOP app) and then fold it into NOOP on the phone. Fully offline; nothing leave
 The format is identical to the macOS app's frame-export hook, so captures are interchangeable across
 platforms and feed the one decoder of record.
 
-**Pipeline** (`com.noop.ingest.CaptureImporter`, a self-contained object with `CaptureImporterTest`
+**Pipeline** (`com.pulse.ingest.CaptureImporter`, a self-contained object with `CaptureImporterTest`
 covering the pure parts). The Data Sources screen wires it with a single call —
 `CaptureImporter.importCapture(context, uri, repo, RawHistoryArchive(context))`, then sizes the
 post-import rescore via `CaptureImporter.analyzeWindowDays(firstDay, today)`:
@@ -606,7 +606,7 @@ See `Tools/linux-capture/README.md` for the capture/export side that produces th
 
 ## Analytics
 
-`com.noop.analytics.Analytics.kt` ports the pure math from `Strand/App/AppModel.swift`:
+`com.pulse.analytics.Analytics.kt` ports the pure math from `Strand/App/AppModel.swift`:
 
 - **`Hrv.rmssd(rr)`** — root-mean-square of successive R-R differences (ms); returns `0.0` for
   fewer than two intervals (matches the Swift `rr.count >= 2` guard).
@@ -629,7 +629,7 @@ there's no hard 5.0/MG gate — but because 5.0/MG HR is currently sparse, those
 ## Compose UI
 
 The UI is Jetpack Compose (Material 3). The theme resources (`res/values/colors.xml`, `themes.xml`
-with `Theme.NOOP`, `strings.xml` with `app_name = "NOOP"`), `MainActivity`, and the screens are all
+with `Theme.Pulse`, `strings.xml` with `app_name = "Pulse"`), `MainActivity`, and the screens are all
 in place. The dependency set in `app/build.gradle.kts` is wired for Compose (BOM `2024.06.00`,
 Material 3, Material icons extended, `activity-compose`, `navigation-compose`,
 `lifecycle-viewmodel-compose`) and Coroutines.
@@ -637,7 +637,7 @@ Material 3, Material icons extended, `activity-compose`, `navigation-compose`,
 The screens follow the reference app's information architecture (`Strand/Screens/`): Today, Live,
 Sleep, Trends, Stress, Workouts, Compare, Insights, Metric Explorer, Data Sources, and Settings.
 `StrandDesign` (palette / components / charts) is the spec for tokens and chart styles,
-re-expressed as a Compose theme — colors come from `Theme.NOOP`, never hardcoded. When extending the
+re-expressed as a Compose theme — colors come from `Theme.Pulse`, never hardcoded. When extending the
 UI, keep that parity.
 
 ---
@@ -682,7 +682,7 @@ should be re-verified against a real build, a real device, and a real strap befo
 **Build & static**
 
 - [x] Gradle wrapper committed (`gradlew`, `gradlew.bat`, `gradle/wrapper/gradle-wrapper.{jar,properties}`).
-- [x] Entry points present: `com/noop/NoopApplication.kt`, `com/noop/ui/MainActivity.kt`,
+- [x] Entry points present: `com/pulse/PulseApplication.kt`, `com/pulse/ui/MainActivity.kt`,
       `app/proguard-rules.pro`.
 - [x] `./gradlew :app:testDebugUnitTest` is green (analytics vectors).
 - [x] `./gradlew assembleDebug` produces `app-debug.apk`.
@@ -750,6 +750,6 @@ reverse-engineering and interoperability work:
 - **`b-nnett/goose`** — WHOOP 5.0 / MG BLE protocol (service family `fd4b0001-…`, CRC16-Modbus
   header, CLIENT_HELLO, "puffin" packet types) that the WHOOP-5 path is ported from.
 
-See [`../ATTRIBUTION.md`](../ATTRIBUTION.md) for full detail. NOOP contains no WHOOP proprietary
+See [`../ATTRIBUTION.md`](../ATTRIBUTION.md) for full detail. Pulse contains no WHOOP proprietary
 code, firmware, logos, or assets, operates only with the user's own device and data, and is **not a
 medical device**.

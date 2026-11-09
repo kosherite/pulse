@@ -125,7 +125,7 @@ final class AnalyticsEngineProvidedSleepTests: XCTestCase {
             deepHrvWindow: false)
     }
 
-    /// bhelm/noop#74: a real in-bed session whose hypnogram is entirely wake has no TST,
+    /// bhelm/pulse#74: a real in-bed session whose hypnogram is entirely wake has no TST,
     /// so it must not manufacture a Rest score.
     func testWakeOnlyProvidedSessionHasNoRestScore() {
         let day = "2025-06-10"

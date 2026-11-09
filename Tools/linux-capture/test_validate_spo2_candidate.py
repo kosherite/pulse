@@ -322,7 +322,7 @@ class LoadFrameRecordsTest(unittest.TestCase):
     `whoop_sync.py export --only-type 47` to be analysed by a tool sitting in the same directory.
 
     This is the CAPTURE TOOLING's database, not the app's: neither shipped app has a `frames` table
-    (Android is Room, iOS/macOS is GRDB), so this path cannot reach a phone store or a .noopbak."""
+    (Android is Room, iOS/macOS is GRDB), so this path cannot reach a phone store or a .pulsebak."""
 
     def _store(self, rows, *, device_id=2, inner_type=47):
         path = tempfile.mktemp(suffix=".db")
@@ -335,7 +335,7 @@ class LoadFrameRecordsTest(unittest.TestCase):
         self.addCleanup(lambda: os.path.exists(path) and os.unlink(path))
         return path
 
-    def test_reads_frames_from_a_noop_sqlite_store(self):
+    def test_reads_frames_from_a_pulse_sqlite_store(self):
         frames = [make_v18(unix=1780000000 + i * 60, sleep_state=2, aux_byte_82=96).hex()
                   for i in range(5)]
         recs = vs.load_frame_records(self._store(frames), device_id=2)
@@ -855,7 +855,7 @@ class FeatureAbsentClassificationTests(unittest.TestCase):
         self.assertIn("duty_mode", blob)
 
 
-# --- NOOP app store (#845/#103) --------------------------------------------------------------------
+# --- Pulse app store (#845/#103) --------------------------------------------------------------------
 
 def _pack_v18_aux(values: dict) -> bytes:
     """Build a `v18AuxSample.fields` blob the way the Swift/Kotlin codecs do."""
@@ -870,8 +870,8 @@ def _pack_v18_aux(values: dict) -> bytes:
     return bytes([vs.V18_AUX_FORMAT_VERSION]) + bitmap.to_bytes(4, "little") + body
 
 
-def _write_app_db(folder: str, rows, *, device: str = "strap-a", name: str = "noop.sqlite") -> str:
-    """A minimal NOOP app store: just the two tables this reader touches, same columns as the
+def _write_app_db(folder: str, rows, *, device: str = "strap-a", name: str = "pulse.sqlite") -> str:
+    """A minimal Pulse app store: just the two tables this reader touches, same columns as the
     GRDB migration (`Database.swift` v23)."""
     path = os.path.join(folder, name)
     con = sqlite3.connect(path)
@@ -978,7 +978,7 @@ class AppDbReaderTests(unittest.TestCase):
             self.assertIsNone(vs.byte_at_offset(rec, off))
 
     def test_end_to_end_validate_device_against_an_app_store(self):
-        """The point of the whole path: a NOOP user with only their synced app DB can run the gate."""
+        """The point of the whole path: a Pulse user with only their synced app DB can run the gate."""
         nights, rows = [], []
         base = _utc(2026, 3, 1, 23, 0, 0)
         for night in range(6):
@@ -992,7 +992,7 @@ class AppDbReaderTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             app = _write_app_db(td, rows)
             res = vs.validate_device(app, _write_export(td, nights), device="app")
-        self.assertEqual(res["source"], "noop_app_db")
+        self.assertEqual(res["source"], "pulse_app_db")
         self.assertEqual(res["specificity_scan"], "unavailable_app_db")
         self.assertEqual(res["paired_nights"], 6)
         self.assertIsNotNone(res["r"])

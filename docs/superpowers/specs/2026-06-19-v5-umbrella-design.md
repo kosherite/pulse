@@ -1,4 +1,4 @@
-# NOOP v5 "Strand" — Umbrella Design Spec (IA · Design Language · Positioning)
+# Pulse v5 "Strand" — Umbrella Design Spec (IA · Design Language · Positioning)
 
 **Date:** 2026-06-19 · **Status:** Proposed — integration glue for the v5 pillar set
 **Scope:** This is the **umbrella** spec. It does *not* design a feature. It designs (1) the information
@@ -24,8 +24,8 @@ this doc only decides **where each lives** and **how they share chrome**.
 | # | Pillar | Spec file | Lives in |
 |---|--------|-----------|----------|
 | 1 | Fitness Age / readiness + multi-source bands | `docs/superpowers/specs/2026-06-15-multi-source-bands-and-age-engine-design.md` | **Health** hub + **Devices** |
-| 2 | Mind — mood check-in + correlations | `docs/superpowers/specs/2026-06-12-noop-mind-mental-health-design.md` | **Insights** hub |
-| 3 | Third-party file imports (nutrition / GPX / TCX / FIT) | `docs/superpowers/specs/2026-06-12-noop-third-party-imports-design.md` | **Devices & Sources** |
+| 2 | Mind — mood check-in + correlations | `docs/superpowers/specs/2026-06-12-pulse-mind-mental-health-design.md` | **Insights** hub |
+| 3 | Third-party file imports (nutrition / GPX / TCX / FIT) | `docs/superpowers/specs/2026-06-12-pulse-third-party-imports-design.md` | **Devices & Sources** |
 | 4 | GPS workout activities | `docs/superpowers/specs/2026-06-10-gps-workout-activities-design.md` | **Today** quick-action → Workouts |
 | 5 | Skin-temp trend / illness-watch cards | *sibling v5 spec (this batch): `2026-06-19-skin-temp-*-design.md`* | **Health** hub |
 | 6 | Breathe / HRV haptic biofeedback (the "act on the body" pillar) | *sibling v5 spec: `2026-06-19-breathe-biofeedback-*-design.md`* | **Today** quick-action + **Insights** outcome cards |
@@ -36,20 +36,20 @@ this doc only decides **where each lives** and **how they share chrome**.
 
 ---
 
-## 1. Goal & differentiation (why only NOOP)
+## 1. Goal & differentiation (why only Pulse)
 
-**Goal.** Make NOOP feel like *one product with five places to go*, not twenty-three features in a list.
+**Goal.** Make Pulse feel like *one product with five places to go*, not twenty-three features in a list.
 A new user should be able to name where everything is after thirty seconds. A returning power user should
 reach any feature in ≤ 2 taps.
 
-**Why only NOOP can frame it this way.** Every competitor's IA is organised around *scores their cloud
-computed and shipped you*. NOOP's IA can be organised around the **signal chain it owns end to end**:
+**Why only Pulse can frame it this way.** Every competitor's IA is organised around *scores their cloud
+computed and shipped you*. Pulse's IA can be organised around the **signal chain it owns end to end**:
 raw signals → on-device computation → an action it can take on your body (the haptic motor) → fusion of
 multiple devices, all offline. That is a structural story no cloud-scored app can tell, and the navigation
 should *read* that story: **Today** (what's true now) · **Insights** (what your own numbers mean,
 including the coach and the breathe-outcomes) · **Health** (your body's longer arc) · **Devices &
 Sources** (where signals come from + what you imported) · **Settings**. Five destinations. The "only one
-that can breathe you back down" pillar (HRV haptic biofeedback) is the literal proof that NOOP *acts*,
+that can breathe you back down" pillar (HRV haptic biofeedback) is the literal proof that Pulse *acts*,
 not just *reports* — it earns a permanent quick-action, not a buried screen.
 
 ---
@@ -143,7 +143,7 @@ one app. These are **enforced**, not suggestions.
 - **Type:** only `StrandFont.*` (`display/title1/title2/headline/body/subhead/caption/footnote/overline`
   + `number()/bodyNumber/captionNumber`). Helvetica + rounded numerics; no ad-hoc `.font(.system(size:))`
   except inside locked components.
-- **Spacing:** only `NoopMetrics.*` — `cardPadding 16 · gap 12 · sectionGap 28 · screenPadding 24 ·
+- **Spacing:** only `PulseMetrics.*` — `cardPadding 16 · gap 12 · sectionGap 28 · screenPadding 24 ·
   tileHeight 108 · chartHeight 220 · tabBarClearance 76`. No magic numbers between cards/sections.
 - **Motion:** only `StrandMotion.*` — `interactive` (taps), `gentle`, `hero`, `breathe`, the calm global
   easing `cubic-bezier(0.22,1,0.36,1)` for tab/section crossfades (~240 ms). Honour Reduce Motion (the
@@ -156,20 +156,20 @@ one app. These are **enforced**, not suggestions.
 Every pillar composes from the **locked component set** in `Packages/StrandDesign` and its Kotlin twin —
 do **not** invent a card:
 
-- `NoopCard` / `StrandCard` (the one surface, optional domain `tint`)
+- `PulseCard` / `StrandCard` (the one surface, optional domain `tint`)
 - `StatTile` (uniform `tileHeight` metric tile, optional sparkline + `TrendChip`)
 - `ChartCard` + `ChartFooter` (header + fixed chart body + footer)
 - `InsightCard` (coaching/synthesis card, hue wash + border)
 - `SectionHeader` (overline + title + optional trailing)
 - `SegmentedPillControl` (the one range control)
 - `SourceBadge`, `ScoreStatePill` (Solid/Building/Calibrating/Live), `StatePill`
-- Buttons: `.noopPrimary` (gold CTA) · `.noopSecondary` · `.noopGhost`
+- Buttons: `.pulsePrimary` (gold CTA) · `.pulseSecondary` · `.pulseGhost`
 - Gauges/charts: `RecoveryRing`, `StrainGauge`, `BevelGauge`, `Sparkline`, `TrendChart`, `Hypnogram`,
   `OverviewHRChart`, `YearHeatStrip`, `ScenicHeroBackground`
 
 ### 3.3 Honesty & accessibility (non-negotiable, design-level)
 
-- **Equal-height tiles.** All tiles in a grid are `NoopMetrics.tileHeight` (108) — never ragged. (This is
+- **Equal-height tiles.** All tiles in a grid are `PulseMetrics.tileHeight` (108) — never ragged. (This is
   the Strand analogue of the workspace "equal-height cards" rule.)
 - **Nil-honest.** A score that can't compute shows **Calibrating / Building** via `ScoreStatePill`, never a
   faked number. A 5/MG-thin day reads truthfully. No empty card where data exists — fall back to all-history.
@@ -182,7 +182,7 @@ do **not** invent a card:
   design-discipline rule.)
 - **Copy is plain and honest.** USD never GBP. Never claim to *diagnose/treat/screen*. Never name any AI/LLM
   anywhere in shipped copy **except** the opt-in bring-your-own-key Coach (and there, only "bring your own
-  key", never the model). NOOP is the WHOOP *companion* — never implies affiliation.
+  key", never the model). Pulse is the WHOOP *companion* — never implies affiliation.
 
 ### 3.4 The fully-resolved example screen — **Insights hub (iPhone)**
 
@@ -191,7 +191,7 @@ most pillars), so resolving it proves the IA holds.
 
 ```
 ┌─────────────────────────────────────────────┐
-│  ◉ NOOP   Insights                       ⚙︎  │  ← top bar: BrandMark + StrandFont.title2,
+│  ◉ Pulse   Insights                       ⚙︎  │  ← top bar: BrandMark + StrandFont.title2,
 │                                              │     trailing gear → Settings (no More tab)
 ├─────────────────────────────────────────────┤
 │  TODAY'S SYNTHESIS                  · Solid  │  ← SectionHeader overline + ScoreStatePill
@@ -203,7 +203,7 @@ most pillars), so resolving it proves the IA holds.
 │                                              │  ← sectionGap (28)
 │  MIND                          Log today's →  │  ← Mind pillar, section 2
 │  ┌─────────────────────────────────────────┐│
-│  │ NoopCard: 5-face mood row (tap to log)  ││  ← single card; history is a drill-in (push),
+│  │ PulseCard: 5-face mood row (tap to log)  ││  ← single card; history is a drill-in (push),
 │  │ last 7 days as faint dots underneath    ││     NOT a second section. Non-clinical framing
 │  └─────────────────────────────────────────┘│     line: "a personal journal, not an assessment"
 │                                              │
@@ -216,13 +216,13 @@ most pillars), so resolving it proves the IA holds.
 │                                              │
 │  COACH                              Optional  │  ← single entry, opt-in
 │  ┌─────────────────────────────────────────┐│
-│  │ NoopCard: "Ask the Coach about your week"││  ← bring-your-own-key; if no key, a ghost CTA
+│  │ PulseCard: "Ask the Coach about your week"││  ← bring-your-own-key; if no key, a ghost CTA
 │  │ [ Set up Coach ]  ·  brings your own key ││     "Set up Coach". No LLM named. No auto-run.
 │  └─────────────────────────────────────────┘│
 │                                              │
 │  BROWSE METRICS                           →   │  ← Explore demoted to a row, not a tab
 │  ┌─────────────────────────────────────────┐│
-│  │ NoopCard row → MetricExplorerView (push) ││
+│  │ PulseCard row → MetricExplorerView (push) ││
 │  └─────────────────────────────────────────┘│
 │         (last card clears tabBarClearance 76) │
 ├─────────────────────────────────────────────┤
@@ -232,10 +232,10 @@ most pillars), so resolving it proves the IA holds.
 
 **Resolved details (the bar every pillar meets):** five sections exactly (Rule of 5); each is
 `SectionHeader` + one card or one equal-height grid; ranges use `SegmentedPillControl`; coaching/patterns
-use `InsightCard` tinted by `DomainTheme`; the mood row and coach CTA use `NoopCard` + `.noopGhost`;
+use `InsightCard` tinted by `DomainTheme`; the mood row and coach CTA use `PulseCard` + `.pulseGhost`;
 synthesis carries a `ScoreStatePill`; copy is plain, USD, non-diagnostic, no LLM named; spacing is
 `sectionGap` between sections and `gap` within; the macOS twin renders the same five sections in the detail
-pane, the Android twin the same five as Compose `NoopCard`s.
+pane, the Android twin the same five as Compose `PulseCard`s.
 
 ---
 
@@ -243,7 +243,7 @@ pane, the Android twin the same five as Compose `NoopCard`s.
 
 ### 4.1 The cross-cutting posture (applies to every pillar)
 
-NOOP is a **wellness and self-tracking tool, not a medical device**. This is already the law of the repo
+Pulse is a **wellness and self-tracking tool, not a medical device**. This is already the law of the repo
 (`DISCLAIMER.md §5`). v5 makes it a **design rule** every pillar inherits:
 
 1. **No diagnostic verbs, anywhere.** Never *diagnose / treat / screen / detect a condition*. Skin-temp
@@ -256,8 +256,8 @@ NOOP is a **wellness and self-tracking tool, not a medical device**. This is alr
    both the honesty differentiator and the legal cover.
 3. **Crisis carve-out for Mind.** Anything mood/mental-health-adjacent carries the standing line *"If you
    are struggling or in crisis, contact a qualified professional or your local emergency service — do not
-   rely on NOOP."* (DISCLAIMER §5.1, verbatim.)
-4. **Your data, your device, your choice.** Imports/exports/Apple-Health surfaces restate that NOOP only
+   rely on Pulse."* (DISCLAIMER §5.1, verbatim.)
+4. **Your data, your device, your choice.** Imports/exports/Apple-Health surfaces restate that Pulse only
    moves data the user explicitly chooses, on-device, and can't see it afterward (DISCLAIMER §5.3).
 
 ### 4.2 One consolidated disclaimer surface (new in v5)
@@ -287,9 +287,9 @@ gives them a single home and a reusable surface so seven pillars can't drift.
 
 ### 5.1 Positioning
 
-**The category is "cloud-scored wearable apps." NOOP is the local-first, signal-first alternative.**
+**The category is "cloud-scored wearable apps." Pulse is the local-first, signal-first alternative.**
 Every competitor (WHOOP, Oura, Garmin, Apple, Ultrahuman) ships you a number their server computed, behind
-a subscription, and can't act on your body. NOOP's five-hub IA *is* the pitch:
+a subscription, and can't act on your body. Pulse's five-hub IA *is* the pitch:
 
 - **Reasons from raw signals** (red/IR PPG, beat-to-beat R-R, 3-axis accel, skin temp) — not a cloud verdict.
 - **Computes on-device** — no account, no cloud, no subscription, fully offline.
@@ -301,12 +301,12 @@ a subscription, and can't act on your body. NOOP's five-hub IA *is* the pitch:
 
 ### 5.2 The one-liner (and supporting copy)
 
-> **Everyone else shows you a score their cloud computed. NOOP computes from your raw signals, on your
+> **Everyone else shows you a score their cloud computed. Pulse computes from your raw signals, on your
 > device, for free — and it's the only one that can breathe you back down.**
 
 Tighter variants for different surfaces (all USD, no AI named, non-clinical):
 
-- **App Store / Reddit subhead:** *"Your strap, your data, your device. NOOP reads the raw signals and does
+- **App Store / Reddit subhead:** *"Your strap, your data, your device. Pulse reads the raw signals and does
   the math locally — recovery, strain, sleep, fitness age — no account, no cloud, no subscription."*
 - **Six-word badge:** *"Raw signals in. On-device. Offline."*
 - **The act-on-body hook (Breathe):** *"It doesn't just measure your nervous system — it can nudge it,
@@ -348,9 +348,9 @@ WHOOP affiliation; never name the Coach's model.
 
 **v5.x fast-follows (each pillar onto the v5 IA, lockstep, one per release):**
 - `5.1` Skin-temp section in Health (sibling spec).
-- `5.2` Mind mood check-in + correlations section in Insights (`2026-06-12-noop-mind-*`).
+- `5.2` Mind mood check-in + correlations section in Insights (`2026-06-12-pulse-mind-*`).
 - `5.3` Breathe/HRV haptic biofeedback as a first-class FAB action + Insights outcome cards (sibling spec).
-- `5.4` Third-party imports consolidated under Devices & Sources (`2026-06-12-noop-third-party-imports-*`).
+- `5.4` Third-party imports consolidated under Devices & Sources (`2026-06-12-pulse-third-party-imports-*`).
 - `5.5` Fitness-age / multi-source band surfaces finalised in Health + Devices (`2026-06-15-multi-source-*`).
 - `5.6` Coach single entry in Insights, opt-in BYO-key (sibling spec).
 - GPS workouts (`2026-06-10-gps-workout-activities-*`) lands whenever its Android engine is ready; it needs
@@ -364,8 +364,8 @@ Each fast-follow must satisfy **Rule of 5 / 5 / 2** and drop a `DisclaimerNote` 
 
 This umbrella is **mostly composition**, not new engine code — but it adds two shared primitives.
 
-**Reuse (no change):** `StrandPalette`/`Palette`, `StrandFont`, `StrandMotion`, `NoopMetrics`,
-`DomainTheme`, and the whole locked component set (`NoopCard`, `StatTile`, `ChartCard`, `InsightCard`,
+**Reuse (no change):** `StrandPalette`/`Palette`, `StrandFont`, `StrandMotion`, `PulseMetrics`,
+`DomainTheme`, and the whole locked component set (`PulseCard`, `StatTile`, `ChartCard`, `InsightCard`,
 `SectionHeader`, `SegmentedPillControl`, `SourceBadge`, `ScoreStatePill`, the three button styles, all
 gauges/charts). All seven pillars compose from these.
 

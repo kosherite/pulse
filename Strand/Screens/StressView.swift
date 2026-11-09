@@ -215,7 +215,7 @@ struct StressView: View {
 
     @ViewBuilder
     private func content(_ model: StressModel) -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+        VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
 
             // 1. HERO — the liquid stress-level vessel + band + one plain-English line, all in one card.
             heroCard(model)
@@ -230,7 +230,7 @@ struct StressView: View {
             }
 
             // 2. Today's numbers — uniform tiles in one grid.
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 SectionHeader("Today", overline: "Markers", trailing: String(localized: "vs 30-day baseline"))
                 tileGrid(model)
             }
@@ -285,9 +285,9 @@ struct StressView: View {
     /// `StressDaytimeLoading`.
     @ViewBuilder
     private func daytimeLoading() -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Today's Timeline", overline: "Intraday")
-            NoopCard(tint: StressRamp.calm) {
+            PulseCard(tint: StressRamp.calm) {
                 Text("Reading today's heart rate…")
                     .font(StrandFont.subhead)
                     .foregroundStyle(StrandPalette.textTertiary)
@@ -299,12 +299,12 @@ struct StressView: View {
 
     @ViewBuilder
     private func daytimeSection(_ day: DaytimeStress.Result) -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Today's Timeline", overline: "Intraday",
                           trailing: timelineTrailing(day))
 
-            NoopCard(tint: StressRamp.calm) {
-                VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
+            PulseCard(tint: StressRamp.calm) {
+                VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
                     HStack {
                         Text("Autonomic load through the day").strandOverline()
                         Spacer()
@@ -386,9 +386,9 @@ struct StressView: View {
     /// A passive, in-app nudge to run a Breathe session after a sustained high-stress run.
     /// No notification — just a card with a CTA that opens the existing trainer.
     private func sustainedBreatheCard(_ day: DaytimeStress.Result) -> some View {
-        NoopCard(tint: StressRamp.calm) {
-            VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
-                HStack(spacing: NoopMetrics.rowSpacing) {
+        PulseCard(tint: StressRamp.calm) {
+            VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
+                HStack(spacing: PulseMetrics.rowSpacing) {
                     Image(systemName: "lungs.fill")
                         .foregroundStyle(StressRamp.calm)
                     Text("Sustained high stress").strandOverline()
@@ -399,7 +399,7 @@ struct StressView: View {
                     .font(StrandFont.subhead)
                     .foregroundStyle(StrandPalette.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
-                NoopButton("Start a Breathe session", systemImage: "wind",
+                PulseButton("Start a Breathe session", systemImage: "wind",
                            kind: .primary, fullWidth: true) {
                     showBreathe = true
                 }
@@ -424,20 +424,20 @@ struct StressView: View {
     // one plain-English line explains the number below. Frosted card, liquid finish.
 
     private func heroCard(_ model: StressModel) -> some View {
-        NoopCard(tint: StressRamp.calm) {
-            VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
+        PulseCard(tint: StressRamp.calm) {
+            VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
                 HStack {
                     Text("Stress monitor").strandOverline()
                     Spacer()
                     StatePill("\(model.band.title)", tone: model.band.tone, showsDot: true)
                 }
 
-                HStack(alignment: .center, spacing: NoopMetrics.space5) {
+                HStack(alignment: .center, spacing: PulseMetrics.space5) {
                     // The stress-level vessel: fills to score/3, tinted to the live band, the value
                     // counting up over it. Taps splash the gauge (the numeral is hit-transparent).
                     StressHeroGauge(score: model.score, tint: StressRamp.color(model.score))
 
-                    VStack(alignment: .leading, spacing: NoopMetrics.space1) {
+                    VStack(alignment: .leading, spacing: PulseMetrics.space1) {
                         Text(model.band.title)
                             .font(StrandFont.overline)
                             .tracking(StrandFont.overlineTracking)
@@ -471,8 +471,8 @@ struct StressView: View {
 
     @ViewBuilder
     private func advancedReadoutsCard() -> some View {
-        NoopCard(tint: StressRamp.calm) {
-            VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
+        PulseCard(tint: StressRamp.calm) {
+            VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
                 HStack {
                     Text("Advanced HRV").strandOverline()
                     Spacer()
@@ -482,9 +482,9 @@ struct StressView: View {
                 }
 
                 LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 168), spacing: NoopMetrics.gap)],
+                    columns: [GridItem(.adaptive(minimum: 168), spacing: PulseMetrics.gap)],
                     alignment: .leading,
-                    spacing: NoopMetrics.gap
+                    spacing: PulseMetrics.gap
                 ) {
                     // Baevsky Stress Index, a whole number; higher means a more rigid, stressed rhythm.
                     if let si = stressIndex {
@@ -529,9 +529,9 @@ struct StressView: View {
 
     private func tileGrid(_ model: StressModel) -> some View {
         LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 168), spacing: NoopMetrics.gap)],
+            columns: [GridItem(.adaptive(minimum: 168), spacing: PulseMetrics.gap)],
             alignment: .leading,
-            spacing: NoopMetrics.gap
+            spacing: PulseMetrics.gap
         ) {
             // Today's stress value, with its band as the caption.
             StatTile(
@@ -605,7 +605,7 @@ struct StressView: View {
     @ViewBuilder
     private func trendSection(_ model: StressModel) -> some View {
         let points = windowedTrend(model)
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Stress Trend", overline: "History", trailing: range.name)
             if points.count >= 2 {
                 let avg = points.map(\.value).reduce(0, +) / Double(points.count)
@@ -626,7 +626,7 @@ struct StressView: View {
                         gradient: StressRamp.gradient,
                         valueRange: 0...3,
                         showsArea: true,
-                        height: NoopMetrics.chartHeight,
+                        height: PulseMetrics.chartHeight,
                         valueFormat: { StressTrace.formatLevel($0) },
                         accessibilityLabel: String(localized: "Stress trend"),
                         yDomain: 0...yTop
@@ -644,7 +644,7 @@ struct StressView: View {
                                      adaptsToAvailableWidth: true) { $0.label }
                     .frame(maxWidth: .infinity, alignment: .trailing)
             } else {
-                NoopCard(tint: StressRamp.calm) {
+                PulseCard(tint: StressRamp.calm) {
                     Text("Not enough recent days to chart a trend yet. Import a history or keep wearing your strap.")
                         .font(StrandFont.subhead)
                         .foregroundStyle(StrandPalette.textTertiary)
@@ -668,8 +668,8 @@ struct StressView: View {
     // MARK: 4 · Methodology (transparency)
 
     private func methodologyCard(_ model: StressModel) -> some View {
-        NoopCard(tint: StressRamp.calm) {
-            VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
+        PulseCard(tint: StressRamp.calm) {
+            VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
                 Text("How this is computed").strandOverline()
                 Text(model.usingStored
                      ? "Today's value is your recorded daily stress score (0-3)."
@@ -1240,9 +1240,9 @@ struct StressTotalsBar: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.space3) {
+        VStack(alignment: .leading, spacing: PulseMetrics.space3) {
             ForEach(bands) { b in
-                VStack(alignment: .leading, spacing: NoopMetrics.space1) {
+                VStack(alignment: .leading, spacing: PulseMetrics.space1) {
                     HStack(alignment: .firstTextBaseline) {
                         Text(b.label)
                             .font(StrandFont.captionNumber)
@@ -1303,20 +1303,20 @@ private struct StressPreviewHarness: View {
         let band = StressBand(score: score)
         let hours = sampleDaytimeHours()
         ScrollView {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                 Text("Stress").font(StrandFont.title1).foregroundStyle(StrandPalette.textPrimary)
 
                 // Liquid hero — the stress-level vessel + band + one plain-English line.
-                NoopCard(tint: StressRamp.calm) {
-                    VStack(alignment: .leading, spacing: NoopMetrics.cardInnerSpacing) {
+                PulseCard(tint: StressRamp.calm) {
+                    VStack(alignment: .leading, spacing: PulseMetrics.cardInnerSpacing) {
                         HStack {
                             Text("Stress monitor").strandOverline()
                             Spacer()
                             StatePill("\(band.title)", tone: band.tone)
                         }
-                        HStack(alignment: .center, spacing: NoopMetrics.space5) {
+                        HStack(alignment: .center, spacing: PulseMetrics.space5) {
                             StressHeroGauge(score: score, tint: StressRamp.color(score))
-                            VStack(alignment: .leading, spacing: NoopMetrics.space1) {
+                            VStack(alignment: .leading, spacing: PulseMetrics.space1) {
                                 Text(band.title).font(StrandFont.overline)
                                     .tracking(StrandFont.overlineTracking)
                                     .foregroundStyle(StressRamp.color(score))
@@ -1331,7 +1331,7 @@ private struct StressPreviewHarness: View {
                 }
 
                 // Screen-9 day autonomic-load line + Calm/Moderate/High totals bar.
-                NoopCard(tint: StressRamp.calm) {
+                PulseCard(tint: StressRamp.calm) {
                     VStack(alignment: .leading, spacing: 14) {
                         Text("Autonomic load through the day").strandOverline()
                         DaytimeLoadLine(hours: hours)
@@ -1340,8 +1340,8 @@ private struct StressPreviewHarness: View {
                     }
                 }
 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 168), spacing: NoopMetrics.gap)],
-                          alignment: .leading, spacing: NoopMetrics.gap) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 168), spacing: PulseMetrics.gap)],
+                          alignment: .leading, spacing: PulseMetrics.gap) {
                     StatTile(label: "Stress", value: StressTrace.formatLevel(score),
                              caption: "of 3 · \(band.title)", accent: StressRamp.color(score))
                     StatTile(label: "Resting HR", value: "54 bpm", accent: StrandPalette.metricRose,
@@ -1354,7 +1354,7 @@ private struct StressPreviewHarness: View {
 
                 ChartCard(title: "Stress · M", subtitle: "Daily 0-3 proxy", trailing: "avg 1.5") {
                     TrendChart(points: sampleStressTrend(30), gradient: StressRamp.gradient,
-                               valueRange: 0...3, showsArea: true, height: NoopMetrics.chartHeight,
+                               valueRange: 0...3, showsArea: true, height: PulseMetrics.chartHeight,
                                valueFormat: { StressTrace.formatLevel($0) })
                 } footer: {
                     ChartFooter([("Today", StressTrace.formatLevel(score)), ("Average", "1.5"), ("Days", "30")])
@@ -1363,7 +1363,7 @@ private struct StressPreviewHarness: View {
                                      adaptsToAvailableWidth: true) { $0.label }
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .padding(NoopMetrics.screenPadding)
+            .padding(PulseMetrics.screenPadding)
         }
         .background(StrandPalette.surfaceBase)
     }

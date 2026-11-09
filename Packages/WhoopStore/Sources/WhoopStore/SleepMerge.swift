@@ -14,7 +14,7 @@ public enum SleepMerge {
     /// clobber a computed day that HAS stage data — otherwise a stage-less WHOOP/Apple re-import blanks
     /// the stage breakdown for a night the strap fully staged. Days where the import carries stages, or
     /// where neither side does, keep the imported-over-computed rule unchanged. (Swift twin of the
-    /// Android HealthConnectImporter richness fix, ryanbr/noop#240.)
+    /// Android HealthConnectImporter richness fix, kosherite/pulse#240.)
     ///
     /// Richness is a RANK, not a yes/no. Presence alone was the original test, and it cannot see a
     /// device-provided hypnogram assembled from records that arrived incomplete: such a row carries many

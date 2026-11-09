@@ -1,12 +1,12 @@
 # Self-hosted push protocol
 
-This document specifies the wire contract for NOOP's **Experimental**, default-off export to a
+This document specifies the wire contract for Pulse's **Experimental**, default-off export to a
 user-owned HTTP(S) endpoint. Protocol version **1.0** covers the Android-first client. It is a
 one-way export protocol: the on-device database is authoritative, the receiver acknowledges writes
-and may advertise only which fixed v1 streams it accepts. NOOP never reads health data, commands,
+and may advertise only which fixed v1 streams it accepts. Pulse never reads health data, commands,
 URLs, field names, or other configuration back from the receiver.
 
-NOOP does not ship, operate, or endorse a receiver. A receiver is not part of this repository, and
+Pulse does not ship, operate, or endorse a receiver. A receiver is not part of this repository, and
 this contract must not be interpreted as an account, hosted-sync, restore, or two-way-sync API.
 
 ## Transport and authentication
@@ -19,7 +19,7 @@ does not open the health database or send a batch.
 GET /the/user-configured-path HTTP/1.1
 Accept: application/json
 Authorization: Bearer <user-supplied-token>
-NOOP-Push-Accept-Version: 1.0
+Pulse-Push-Accept-Version: 1.0
 ```
 
 A successful capability response has these required members:
@@ -28,7 +28,7 @@ A successful capability response has these required members:
 {"type":"capabilities","protocolVersion":"1.0","receiverStateId":"5fc7b9a0-8055-4e49-a308-3a290f98d81a","streams":["hrSample","rrInterval","dailyMetric"]}
 ```
 
-`NOOP-Push-Accept-Version` is a comma-separated, sender-preferred list of exact versions it can emit.
+`Pulse-Push-Accept-Version` is a comma-separated, sender-preferred list of exact versions it can emit.
 The receiver selects the first version in that order it supports and returns it as `protocolVersion`; no common version fails
 with `406` before health data is read. `receiverStateId` is a canonical UUID persisted with receiver
 state. It remains stable across upgrades, database backups and migrations, and changes whenever the
@@ -68,7 +68,7 @@ Content-Encoding: gzip
   RFC 1918 private IPv4, IPv4/IPv6 link-local, or IPv6 ULA address. Cleartext hostnames (including
   `.local`) and public cleartext destinations are rejected, eliminating a DNS-rebinding boundary. A
   bearer token sent over allowed local HTTP is still visible locally, so HTTPS remains preferable.
-- The token and endpoint are supplied by the user. Neither identifies a NOOP account; no such account
+- The token and endpoint are supplied by the user. Neither identifies a Pulse account; no such account
   exists.
 - One request contains exactly one device and one stream. A v1 request contains at most **5,000 record
   lines** and at most **4 MiB (4,194,304 bytes)** of decoded UTF-8 NDJSON, including newlines.
@@ -99,7 +99,7 @@ Content-Encoding: gzip
 ## Identity and storage scope
 
 `sourceId` is a random UUID generated locally and persisted for that app installation. `deviceId` is
-the identifier already used by NOOP's local `device` table. Neither is an account or a globally
+the identifier already used by Pulse's local `device` table. Neither is an account or a globally
 resolved user identity. The device name and MAC address are not part of this protocol.
 
 A receiver must scope every row and idempotency record by at least:
@@ -109,7 +109,7 @@ A receiver must scope every row and idempotency record by at least:
 ```
 
 Two installations that happen to use the same strap identifier must therefore not overwrite one
-another. Reinstalling NOOP may create a new `sourceId`; reconciliation between installations is
+another. Reinstalling Pulse may create a new `sourceId`; reconciliation between installations is
 deliberately outside v1.
 
 Local progress is scoped by `(sourceId, normalized endpoint, selected protocolVersion,
@@ -173,7 +173,7 @@ must reject duplicate keys within a batch or complete replacement window.
 Each append highwater is local state scoped by `(sourceId, deviceId, stream)` inside the destination
 namespace above. It is an opaque receiver value carrying the sender's persistent monotonic insertion
 position, not a measurement timestamp or natural primary key. The v1 member is named `rowId` because
-NOOP's Android and Apple SQLite stores both map it to SQLite insertion `rowid`; a conforming non-SQLite
+Pulse's Android and Apple SQLite stores both map it to SQLite insertion `rowid`; a conforming non-SQLite
 sender may supply an equivalent durable insertion sequence. Receivers validate and echo it but must not
 interpret it as receiver state.
 The sender selects rows for that device whose `rowid` is greater than `startCursor.rowId`, orders by
@@ -258,7 +258,7 @@ The receiver durably stages accepted parts. Only when every part is present does
 An acknowledgement for the part that completes the set must not be returned until that atomic apply
 succeeds. Retrying any part is harmless. Conflicting reuse of a `replacementId`, part number, or
 `batchId` must be rejected. Rows outside the declared window are untouched. This absence-means-delete
-rule makes edits and deletions within the rolling window converge to NOOP's local state; v1 carries no
+rule makes edits and deletions within the rolling window converge to Pulse's local state; v1 carries no
 tombstone for a row that has already aged out of that window.
 
 A sender must have at most one incomplete replacement generation per `(sourceId, deviceId, stream)`.
@@ -269,7 +269,7 @@ parts may arrive out of numerical order.
 
 ## Version 1 stream registry
 
-The v1 registry is deliberately finite. A table present in NOOP's database is **not** implicitly part
+The v1 registry is deliberately finite. A table present in Pulse's database is **not** implicitly part
 of the protocol.
 
 ### Append streams
@@ -302,7 +302,7 @@ Unless inherent above, mutable data members are nullable exactly as in the curre
 `sleepSession.endTs`, `workout.endTs`, `workout.source`, and `journal.answeredYes` are required;
 `sleepSession.userEdited` is a required boolean. `day` is `YYYY-MM-DD`; timestamp and count fields
 are integers; metric and measurement fields are finite numbers. See [DATA_MODEL.md](DATA_MODEL.md)
-and `android/app/src/main/java/com/noop/data/Entities.kt` for the local meanings and units. The wire
+and `android/app/src/main/java/com/pulse/data/Entities.kt` for the local meanings and units. The wire
 registry, not automatic reflection over either database, determines what is sent.
 
 Newer tables such as `ppgHrSample`, `stepSample`, `sleepStateSample`, `metricSeries`, raw waveform /
@@ -330,7 +330,7 @@ Acceptance is valid only if all of these exactly match the request:
 
 Any missing or mismatched member is a failed delivery even when the HTTP status is 2xx. There is no
 partial success. The acknowledgement contains metadata only; it must not contain source records,
-remote changes, commands, cursors chosen by the server, or configuration for NOOP to apply.
+remote changes, commands, cursors chosen by the server, or configuration for Pulse to apply.
 Capability metadata is confined to the separate authenticated `GET` defined above.
 
 A receiver must remember the hash and acceptance result of each batch under
@@ -341,7 +341,7 @@ batch. Reusing a `batchId` with different decoded entity bytes is a conflict and
 data. Recommended failures are `400` for malformed NDJSON, `401`/`403` for auth,
 `409` for conflicting identifiers or replace-window parts, `413` for a decoded body over 4 MiB (or
 an encoded body over the receiver's documented wire limit), `422` for an
-unsupported protocol/stream or invalid record, and `5xx` for a transient receiver failure. NOOP
+unsupported protocol/stream or invalid record, and `5xx` for a transient receiver failure. Pulse
 automatically retries transport errors, `408`, `429`, and `5xx`. Other `4xx` responses and malformed
 or mismatched acknowledgements retain progress and surface a visible configuration/protocol error;
 they are retried only after a later trigger or configuration change. Responses are never consumed as
@@ -382,11 +382,11 @@ opened; senders never optimistically emit a version the receiver did not select.
 
 Capability discovery only selects an offered version and narrows the sender's compiled registry for it.
 It is not general negotiation: the receiver cannot add schemas, change delivery modes, select an
-endpoint, request diagnostics, set cadence, or otherwise control NOOP.
+endpoint, request diagnostics, set cadence, or otherwise control Pulse.
 
 ## Apple compatibility
 
-The contract is platform-neutral. NOOP on iOS/macOS uses GRDB/SQLite with the same natural keys and
+The contract is platform-neutral. Pulse on iOS/macOS uses GRDB/SQLite with the same natural keys and
 logical v1 streams, but every implementation uses explicit registry projections rather than reflection
 or `SELECT *`. A platform lacking a nullable exported column emits `null`; platform-only columns stay
 absent until a later negotiated registry version. Scheduling and credential storage are platform

@@ -52,7 +52,7 @@ final class ImportInboxCleanupTests: XCTestCase {
     func testCleanupDeletesInboxOriginalAndTemp() throws {
         let inboxOriginal = try makeFile(at: inbox.appendingPathComponent("export-\(UUID()).zip"))
         let temp = try makeFile(at: FileManager.default.temporaryDirectory
-            .appendingPathComponent("noop-import-\(UUID()).zip"))
+            .appendingPathComponent("pulse-import-\(UUID()).zip"))
 
         let file = AppModel.ImportFile(url: temp, temp: temp, inboxOriginal: inboxOriginal)
         file.cleanup()

@@ -23,8 +23,8 @@ final class QuietMotionCoverageTests: XCTestCase {
         "StrandiOSShared",
         "StrandiOSWidgets",
         "Packages/StrandDesign/Sources",
-        "NOOPWatch",
-        "NOOPWatchComplications",
+        "PulseWatch",
+        "PulseWatchComplications",
     ]
 
     /// A loop that never settles: an indefinitely repeating implicit animation, or a per-frame
@@ -137,7 +137,7 @@ final class QuietMotionCoverageTests: XCTestCase {
             guard !hits.isEmpty else { continue }
             censused += 1
             if Self.exemptions[rel] != nil { continue }
-            guard !text.contains("NoopMotionState") else { continue }
+            guard !text.contains("PulseMotionState") else { continue }
             for line in hits {
                 let source = code.indices.contains(line - 1)
                     ? code[line - 1].trimmingCharacters(in: .whitespaces)
@@ -149,7 +149,7 @@ final class QuietMotionCoverageTests: XCTestCase {
         // The census must actually find the known loops; a zero-hit run means the markers drifted.
         XCTAssertGreaterThanOrEqual(censused, 6, "expected to census the known frame loops, found \(censused)")
         XCTAssertTrue(offenders.isEmpty, """
-            \(offenders.count) never-settling animation(s) do not consult NoopMotionState. Gate them \
+            \(offenders.count) never-settling animation(s) do not consult PulseMotionState. Gate them \
             with `motion.poseStill(reduceMotion)`, or add the file to `exemptions` WITH a reason:
             \(offenders.joined(separator: "\n"))
             """)
@@ -217,7 +217,7 @@ final class QuietMotionCoverageTests: XCTestCase {
             // The call site must name the composed condition AND the file must reach the shared
             // monitor — checking only for the token would pass a `poseStill` that is a local alias
             // for `reduceMotion`, which is exactly the state this change is fixing.
-            let reachesMonitor = text.contains("NoopMotionState")
+            let reachesMonitor = text.contains("PulseMotionState")
             for (i, line) in codeLines(text).enumerated() where line.contains("StrandMotion.breathe") {
                 sites += 1
                 if !line.contains("poseStill") || !reachesMonitor {
@@ -240,7 +240,7 @@ final class QuietMotionCoverageTests: XCTestCase {
     func testGateReadsAllFourSignalsAndStaysLive() throws {
         let root = try repoRoot()
         let src = try String(contentsOf: root.appendingPathComponent(
-            "Packages/StrandDesign/Sources/StrandDesign/NoopMotion.swift"), encoding: .utf8)
+            "Packages/StrandDesign/Sources/StrandDesign/PulseMotion.swift"), encoding: .utf8)
         XCTAssertTrue(src.contains("reduceMotion || isLowPower || quietMotion || windowObscured"),
                       "poseStill must OR all four signals")
         // #2393: the window-visibility term is worthless if nothing ever sets it, and the three
@@ -254,7 +254,7 @@ final class QuietMotionCoverageTests: XCTestCase {
             XCTAssertTrue(src.contains(name),
                           "windowObscured must stay live on \(name)")
         }
-        // The window list MUST be filtered to real app windows. NOOP ships a MenuBarExtra whose
+        // The window list MUST be filtered to real app windows. Pulse ships a MenuBarExtra whose
         // status-item window lives in `NSApplication.shared.windows` forever, so dropping this filter
         // leaves the gate permanently open and the fix silently inert.
         //
@@ -281,16 +281,16 @@ final class QuietMotionCoverageTests: XCTestCase {
                       "Low Power Mode must stay live without a relaunch")
         XCTAssertTrue(src.contains("UserDefaults.didChangeNotification"),
                       "the in-app toggle must stay live — @AppStorage writes straight to UserDefaults")
-        // The key string is the cross-platform contract — it travels in .noopbak by key, not by symbol
+        // The key string is the cross-platform contract — it travels in .pulsebak by key, not by symbol
         // name — so it is pinned here even though Android has not adopted it yet (#941). Pinning it now is
         // the point: whoever writes the Kotlin side must match this string exactly, and a later edit here
         // would silently break a round-trip that by then has real users.
-        XCTAssertEqual(QuietMotionPrefs.enabledKey, "noop.quietMotion",
+        XCTAssertEqual(QuietMotionPrefs.enabledKey, "pulse.quietMotion",
                        "the key Android must adopt verbatim when the third signal lands (#941)")
     }
 
     /// Posing the picture still while the sensor keeps running saves nothing. `onDisappear` is not
-    /// called when the app is backgrounded, and NOOP declares background modes, so without an
+    /// called when the app is backgrounded, and Pulse declares background modes, so without an
     /// explicit app-boundary stop a decorative 60 Hz device-motion feed ran all day behind the lock
     /// screen.
     func testDecorativeMotionSensorStopsAtTheAppBoundary() throws {

@@ -19,7 +19,7 @@ import StrandAnalytics
 //   • HeadsUpCard          — IllnessSignalEngine.Result. The confounder-suppressed illness
 //                            "heads-up". On-device estimate — not a diagnosis.
 //
-// DESIGN-SYSTEM ONLY: NoopCard + DomainTheme/StrandPalette tokens, StrandFont, NoopMetrics,
+// DESIGN-SYSTEM ONLY: PulseCard + DomainTheme/StrandPalette tokens, StrandFont, PulseMetrics,
 // ScoreStatePill, the house buttons. No raw hex, no ad-hoc cards. Privacy-forward copy:
 // there is no upload or sync path, and every sensitive surface names the user-exported
 // backup exception.
@@ -78,8 +78,8 @@ struct CycleAwarenessCard: View {
     private var hue: Color { StrandPalette.restColor }
 
     var body: some View {
-        NoopCard(tint: hue) {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        PulseCard(tint: hue) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 header
 
                 // The headline phase line + cycle-day range.
@@ -119,7 +119,7 @@ struct CycleAwarenessCard: View {
                 // sits below the awareness/privacy lines without competing with the primary actions.
                 if let onTurnOff {
                     Button("Turn off cycle awareness", action: onTurnOff)
-                        .buttonStyle(.noopGhost)
+                        .buttonStyle(.pulseGhost)
                         .accessibilityHint("Stops reading a cycle phase from your nightly temperature. You can turn it back on here any time.")
                 }
             }
@@ -175,15 +175,15 @@ struct CycleAwarenessCard: View {
     }
 
     @ViewBuilder private var actions: some View {
-        HStack(spacing: NoopMetrics.gap) {
+        HStack(spacing: PulseMetrics.gap) {
             if let onLogPeriod {
                 Button("Log period start", action: onLogPeriod)
-                    .buttonStyle(.noopSecondary)
+                    .buttonStyle(.pulseSecondary)
                     .accessibilityHint("Optional. Stored only on this device.")
             }
             if let onOpenDetail {
                 Button("View detail", action: onOpenDetail)
-                    .buttonStyle(.noopGhost)
+                    .buttonStyle(.pulseGhost)
             }
         }
     }
@@ -245,8 +245,8 @@ struct CycleAwarenessOptInCard: View {
     var onEnable: () -> Void
 
     var body: some View {
-        NoopCard(tint: StrandPalette.restColor) {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        PulseCard(tint: StrandPalette.restColor) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 HStack(spacing: 8) {
                     Image(systemName: "drop.degreesign")
                         .font(.system(size: 16, weight: .semibold))
@@ -263,7 +263,7 @@ struct CycleAwarenessOptInCard: View {
                     .fixedSize(horizontal: false, vertical: true)
                 PrivacyNote()
                 Button("Turn on cycle awareness", action: onEnable)
-                    .buttonStyle(.noopSecondary)
+                    .buttonStyle(.pulseSecondary)
                     .padding(.top, 2)
             }
         }
@@ -296,9 +296,9 @@ struct MenstrualCycleHomeCard: View {
     var body: some View {
         Group {
             if shouldShow {
-                NoopCard(tint: StrandPalette.restColor) {
-                    VStack(alignment: .leading, spacing: NoopMetrics.gap) {
-                        HStack(spacing: NoopMetrics.space2) {
+                PulseCard(tint: StrandPalette.restColor) {
+                    VStack(alignment: .leading, spacing: PulseMetrics.gap) {
+                        HStack(spacing: PulseMetrics.space2) {
                             Image(systemName: "drop.degreesign")
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundStyle(StrandPalette.restColor)
@@ -350,13 +350,13 @@ struct MenstrualCycleHomeCard: View {
                                 .multilineTextAlignment(.trailing)
                         }
 
-                        HStack(spacing: NoopMetrics.space2) {
+                        HStack(spacing: PulseMetrics.space2) {
                     Button(cycleEnabled
                            ? String(localized: "Open tracker")
                            : String(localized: "Set up cycle tracking")) {
                                 openTracker()
                             }
-                            .buttonStyle(.noopSecondary)
+                            .buttonStyle(.pulseSecondary)
 
                             if cycleEnabled {
                                 Button(starts.contains(Repository.localDayKey(Date()))
@@ -364,7 +364,7 @@ struct MenstrualCycleHomeCard: View {
                                        : String(localized: "Log today")) {
                                     logToday()
                                 }
-                                .buttonStyle(.noopGhost)
+                                .buttonStyle(.pulseGhost)
                                 .disabled(starts.contains(Repository.localDayKey(Date())))
                             }
                         }
@@ -386,7 +386,7 @@ struct MenstrualCycleHomeCard: View {
                 } else {
                     ProgressView("Preparing cycle tracker…")
                         .task { await model.refreshV5Signals() }
-                        .padding(NoopMetrics.screenPadding)
+                        .padding(PulseMetrics.screenPadding)
                 }
             }
         }
@@ -453,19 +453,19 @@ struct CycleTrackerView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+                VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                     SectionHeader("Cycle tracker", overline: "Period-start history")
                     statusCard
                     logCard
                     historyCard
-                    VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+                    VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                         Text(String(localized: "For awareness only. Not a medical device, not contraception, not a substitute for professional care."))
                             .font(StrandFont.footnote)
                             .foregroundStyle(StrandPalette.textTertiary)
                         PrivacyNote()
                     }
                 }
-                .padding(NoopMetrics.screenPadding)
+                .padding(PulseMetrics.screenPadding)
             }
             #if os(iOS)
             // #697/#horizontal-swipe parity, see ScreenScaffold.
@@ -494,14 +494,14 @@ struct CycleTrackerView: View {
             }
         }
         #if os(macOS)
-        .frame(minWidth: NoopMetrics.detailSheetMinWidth,
-               minHeight: NoopMetrics.detailSheetMinHeight)
+        .frame(minWidth: PulseMetrics.detailSheetMinWidth,
+               minHeight: PulseMetrics.detailSheetMinHeight)
         #endif
     }
 
     private var statusCard: some View {
-        NoopCard(tint: StrandPalette.restColor) {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        PulseCard(tint: StrandPalette.restColor) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 Text("Current estimate").strandOverline()
                 HStack(alignment: .firstTextBaseline) {
                     Text(phaseTitle)
@@ -521,7 +521,7 @@ struct CycleTrackerView: View {
                               gradient: Gradient(colors: [StrandPalette.restColor.opacity(0.4),
                                                           StrandPalette.restBright]),
                               showsHover: false)
-                        .frame(height: NoopMetrics.space10)
+                        .frame(height: PulseMetrics.space10)
                         .accessibilityHidden(true)
                 }
                 Text(localizedCycleStatus(result))
@@ -537,8 +537,8 @@ struct CycleTrackerView: View {
     }
 
     private var logCard: some View {
-        NoopCard(tint: StrandPalette.restColor) {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        PulseCard(tint: StrandPalette.restColor) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 Text("Log a period start").strandOverline()
                 DatePicker("Period started on", selection: $selectedDate, in: ...Date(),
                            displayedComponents: .date)
@@ -551,7 +551,7 @@ struct CycleTrackerView: View {
                         await model.refreshV5Signals()
                     }
                 }
-                .buttonStyle(.noopSecondary)
+                .buttonStyle(.pulseSecondary)
                 .disabled(alreadyLogged)
                 Text("This optional date anchors cycle day 1 and is checked against your nightly temperature pattern.")
                     .font(StrandFont.footnote)
@@ -561,14 +561,14 @@ struct CycleTrackerView: View {
     }
 
     private var historyCard: some View {
-        NoopCard {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        PulseCard {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 HStack {
                     Text("Logged starts").strandOverline()
                     Spacer()
                     if !starts.isEmpty {
                         Button("Delete all") { confirmDeleteAll = true }
-                            .buttonStyle(.noopGhost)
+                            .buttonStyle(.pulseGhost)
                             .foregroundStyle(StrandPalette.statusCritical)
                     }
                 }
@@ -595,7 +595,7 @@ struct CycleTrackerView: View {
                                 Label("Delete \(prettyDay(day))", systemImage: "trash")
                                     .labelStyle(.iconOnly)
                             }
-                            .buttonStyle(.noopGhost)
+                            .buttonStyle(.pulseGhost)
                             .foregroundStyle(StrandPalette.statusCritical)
                         }
                         if day != starts.first { Divider().overlay(StrandPalette.hairline) }
@@ -632,8 +632,8 @@ struct BodyClockCard: View {
     private var hue: Color { StrandPalette.restColor }
 
     var body: some View {
-        NoopCard(tint: hue) {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        PulseCard(tint: hue) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 header
 
                 offsetHeadline
@@ -664,7 +664,7 @@ struct BodyClockCard: View {
                     Button(plan == nil
                            ? String(localized: "Plan a trip or shift")
                            : String(localized: "View the full plan"), action: onOpenPlanner)
-                        .buttonStyle(.noopGhost)
+                        .buttonStyle(.pulseGhost)
                         .padding(.top, 2)
                 }
             }
@@ -777,8 +777,8 @@ struct HeadsUpCard: View {
     var distance: IllnessDistance.Result? = nil
 
     var body: some View {
-        NoopCard(padding: 14, tint: hue) {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        PulseCard(padding: 14, tint: hue) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 HStack(alignment: .top, spacing: 12) {
                     Image(systemName: glyph)
                         .font(.system(size: 15, weight: .semibold))
@@ -1041,7 +1041,7 @@ private func localizedList(_ values: [String]) -> String {
 #if DEBUG
 #Preview("Skin-temp cards") {
     ScrollView {
-        VStack(spacing: NoopMetrics.sectionGap) {
+        VStack(spacing: PulseMetrics.sectionGap) {
             CycleAwarenessCard(
                 result: CyclePhaseEngine.Result(
                     phase: .luteal, confidence: .solid,
@@ -1077,7 +1077,7 @@ private func localizedList(_ values: [String]) -> String {
                 suppressedBy: ["alcohol"], signalCount: 2,
                 copy: "Some signals are up (RHR +5, skin temp +0.6 °C), but you logged alcohol — likely that, not illness. On-device estimate — not a diagnosis."))
         }
-        .padding(NoopMetrics.screenPadding)
+        .padding(PulseMetrics.screenPadding)
     }
     .background(StrandPalette.surfaceBase)
     .preferredColorScheme(.dark)

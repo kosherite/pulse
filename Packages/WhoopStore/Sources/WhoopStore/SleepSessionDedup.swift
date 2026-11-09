@@ -11,7 +11,7 @@ import Foundation
 /// This is the shared collapse rule, applied wherever banked sessions are assembled before day
 /// assignment / scoring (habitual-midsleep learning, band sleep-state consumption, and the
 /// post-upsert store heal in IntelligenceEngine). Pure + deterministic so it is unit-tested
-/// directly and the Kotlin twin (`com.noop.analytics.SleepSessionDedup`) mirrors it byte-for-byte.
+/// directly and the Kotlin twin (`com.pulse.analytics.SleepSessionDedup`) mirrors it byte-for-byte.
 public enum SleepSessionDedup {
 
     /// Absolute overlap (seconds) at or above which two sessions are copies of the same night.

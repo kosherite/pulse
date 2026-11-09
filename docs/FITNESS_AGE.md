@@ -10,7 +10,7 @@ Fitness Age is below your real age, your estimated fitness is better than averag
 if it's above, it's worse. That's the whole claim — it is **not** a measure of how old your body, cells,
 or organs are, and it carries no medical meaning.
 
-It is computed **on-device**, weekly, from data NOOP already has. Nothing is sent anywhere.
+It is computed **on-device**, weekly, from data Pulse already has. Nothing is sent anywhere.
 
 ## Where the number comes from
 
@@ -36,7 +36,7 @@ corroborated by the **CERG/NTNU** group that authored the original work.
 
 The Nes model takes a **physical-activity index** that, in HUNT, came from the **HUNT1 PA-Q**
 questionnaire (Kurtze 2008) — a short self-report of weekly exercise frequency, duration and intensity
-mapped onto a 0–7.5 scale. NOOP doesn't ask the user to fill that in. Instead it **reconstructs the
+mapped onto a 0–7.5 scale. Pulse doesn't ask the user to fill that in. Instead it **reconstructs the
 PA-index on-device** from the measured training signal it already records (workout frequency, duration
 and strain/intensity over the rolling window), mapping it onto the same scale the questionnaire produced.
 This keeps the input honest — it's derived from what you actually did, not what you'd claim on a survey.
@@ -65,7 +65,7 @@ groups them under *"Unlocks your VO₂max"*, never under the age itself.
 - **±5-year presentation band.** The number is shown inside a **±5-year band** (`bandYears = 5.0`), not as
   a false-precision point value — honest about the model's error.
 
-The weekly results are stored in `metricSeries` under two keys, written to the computed `-noop` source:
+The weekly results are stored in `metricSeries` under two keys, written to the computed `-pulse` source:
 
 | Key            | Unit       | Meaning                                              |
 |----------------|------------|-----------------------------------------------------|

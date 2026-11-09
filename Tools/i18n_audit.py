@@ -53,7 +53,7 @@ Reader = Callable[[Path], str | None]
 # false positives here just mean noise in the report, not a wrong fix.
 UNIVERSAL = {
     "", "-", "–", "—", "·", "•", "✓", "→", "↔",
-    "NOOP", "bpm", "BPM", "HRV", "SpO2", "SpO₂", "OK", "ID",
+    "Pulse", "bpm", "BPM", "HRV", "SpO2", "SpO₂", "OK", "ID",
     # Training-load acronyms — universal training-science terms, identical in every language (like HRV).
     "CTL", "ATL", "TSB",
 }
@@ -262,10 +262,10 @@ def _extract_literals(text: str, start: int, end: int) -> list[tuple[int, str]]:
 # ---------------------------------------------------------------------------
 
 ANDROID_DIRS = [
-    ROOT / "android/app/src/main/java/com/noop/ui",
-    ROOT / "android/app/src/main/java/com/noop/widget",
-    ROOT / "android/app/src/main/java/com/noop/ble",
-    ROOT / "android/app/src/main/java/com/noop/notif",
+    ROOT / "android/app/src/main/java/com/pulse/ui",
+    ROOT / "android/app/src/main/java/com/pulse/widget",
+    ROOT / "android/app/src/main/java/com/pulse/ble",
+    ROOT / "android/app/src/main/java/com/pulse/notif",
 ]
 
 # `AlertDialog` is deliberately NOT in this list: confirmed (all 22 call sites
@@ -663,12 +663,12 @@ CATALOGS = [
         ROOT / "Packages/StrandDesign/Sources/StrandDesign/Resources/Localizable.xcstrings",
     ),
     (
-        [ROOT / "NOOPWatch"],
-        ROOT / "NOOPWatch/Localizable.xcstrings",
+        [ROOT / "PulseWatch"],
+        ROOT / "PulseWatch/Localizable.xcstrings",
     ),
     (
-        [ROOT / "NOOPWatchComplications"],
-        ROOT / "NOOPWatchComplications/Localizable.xcstrings",
+        [ROOT / "PulseWatchComplications"],
+        ROOT / "PulseWatchComplications/Localizable.xcstrings",
     ),
     (
         [ROOT / "Strand", ROOT / "StrandiOS", ROOT / "StrandiOSShared", ROOT / "StrandiOSWidgets"],

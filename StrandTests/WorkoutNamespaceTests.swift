@@ -13,14 +13,14 @@ final class WorkoutNamespaceTests: XCTestCase {
         let ids = Repository.workoutNamespaces(rawIds: ["strap-a", "my-whoop"])
         XCTAssertTrue(ids.contains("strap-a"))
         XCTAssertTrue(ids.contains("my-whoop"))
-        XCTAssertTrue(ids.contains("strap-a-noop"), "the computed sibling holds detected bouts")
-        XCTAssertTrue(ids.contains("my-whoop-noop"))
+        XCTAssertTrue(ids.contains("strap-a-pulse"), "the computed sibling holds detected bouts")
+        XCTAssertTrue(ids.contains("my-whoop-pulse"))
     }
 
     func testAnIdThatIsAlreadyComputedIsNotDoubleSuffixed() {
-        let ids = Repository.workoutNamespaces(rawIds: ["my-whoop-noop"])
-        XCTAssertTrue(ids.contains("my-whoop-noop"))
-        XCTAssertFalse(ids.contains("my-whoop-noop-noop"), "suffixing must be idempotent")
+        let ids = Repository.workoutNamespaces(rawIds: ["my-whoop-pulse"])
+        XCTAssertTrue(ids.contains("my-whoop-pulse"))
+        XCTAssertFalse(ids.contains("my-whoop-pulse-pulse"), "suffixing must be idempotent")
     }
 
     func testTheReadIncludesImportNamespaces() {
@@ -45,13 +45,13 @@ final class WorkoutNamespaceTests: XCTestCase {
     func testDeleteStillCoversEveryStrapNamespace() {
         // The actual bug: a manual row under a retained strap or a computed sibling was undeletable.
         let ids = Repository.deletableWorkoutNamespaces(rawIds: ["active", "retained"])
-        XCTAssertEqual(ids, ["active", "retained", "active-noop", "retained-noop"])
+        XCTAssertEqual(ids, ["active", "retained", "active-pulse", "retained-pulse"])
     }
 
     func testTheDeletableSetIsASubsetOfWhatTheListReads() {
         // If a delete could target a namespace the list never reads, it would be deleting something the
         // wearer cannot see. Pin the containment rather than the two lists separately.
-        let raw = ["active", "retained", "my-whoop-noop"]
+        let raw = ["active", "retained", "my-whoop-pulse"]
         let readable = Set(Repository.workoutNamespaces(rawIds: raw))
         for id in Repository.deletableWorkoutNamespaces(rawIds: raw) {
             XCTAssertTrue(readable.contains(id), "\(id) is deletable but never read")

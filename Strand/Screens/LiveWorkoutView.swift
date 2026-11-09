@@ -44,7 +44,7 @@ struct LiveWorkoutView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
                 let cards: [AnyView] = [
                     AnyView(header),
                     AnyView(timeBlock),
@@ -66,8 +66,8 @@ struct LiveWorkoutView: View {
                 SensorRowIfPresent()
             }
             .screenPadding()
-            .padding(.vertical, NoopMetrics.space6)
-            .padding(.bottom, NoopMetrics.space8)
+            .padding(.vertical, PulseMetrics.space6)
+            .padding(.bottom, PulseMetrics.space8)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         #if os(iOS)
@@ -130,7 +130,7 @@ struct LiveWorkoutView: View {
 
     private var header: some View {
         HStack(alignment: .center) {
-            HStack(spacing: NoopMetrics.space1) {
+            HStack(spacing: PulseMetrics.space1) {
                 Circle()
                     .fill(StrandPalette.metricRose)
                     .frame(width: 7, height: 7)
@@ -141,9 +141,9 @@ struct LiveWorkoutView: View {
                 .font(StrandFont.overline).tracking(StrandFont.overlineTracking)
                 .foregroundStyle(StrandPalette.metricRose)
             }
-            .padding(.horizontal, NoopMetrics.space2)
-            .padding(.vertical, NoopMetrics.space1)
-            .background(NoopPanelSurface(tint: StrandPalette.metricRose, cornerRadius: 14))
+            .padding(.horizontal, PulseMetrics.space2)
+            .padding(.vertical, PulseMetrics.space1)
+            .background(PulsePanelSurface(tint: StrandPalette.metricRose, cornerRadius: 14))
             .clipShape(Capsule())
             Spacer(minLength: 0)
         }
@@ -156,7 +156,7 @@ struct LiveWorkoutView: View {
     private var timeBlock: some View {
         Group {
             if let workout = model.activeWorkout {
-                VStack(spacing: NoopMetrics.space1) {
+                VStack(spacing: PulseMetrics.space1) {
                     Text("Time")
                         .font(StrandFont.overline).tracking(StrandFont.overlineTracking)
                         .foregroundStyle(StrandPalette.textSecondary)
@@ -175,7 +175,7 @@ struct LiveWorkoutView: View {
     /// Centered live HR stack — bpm unit sits under the value; the zone capsule moved to `zoneSection`.
     private var heartRateBlock: some View {
         let tint = zone >= 1 ? StrandPalette.hrZoneColor(zone) : StrandPalette.effortColor
-        return VStack(spacing: NoopMetrics.space1) {
+        return VStack(spacing: PulseMetrics.space1) {
             Text("Heart rate")
                 .font(StrandFont.overline).tracking(StrandFont.overlineTracking)
                 .foregroundStyle(StrandPalette.textSecondary)
@@ -212,7 +212,7 @@ struct LiveWorkoutView: View {
             : "\(Int(displayEffort.rounded()))"
         let scaleCaption = String(localized: "of \(UnitFormatter.effortScaleMax(effortScale))")
         let effortAccessibilityLabel = "\(String(localized: "Effort")) \(valueText) \(scaleCaption)"
-        return VStack(spacing: NoopMetrics.space1) {
+        return VStack(spacing: PulseMetrics.space1) {
             CountUpText(value: displayEffort,
                         format: { value in
                             effortScale == .whoop
@@ -248,8 +248,8 @@ struct LiveWorkoutView: View {
                     .font(StrandFont.captionNumber)
                     .foregroundStyle(tint)
                     .multilineTextAlignment(.trailing)
-                    .padding(.horizontal, NoopMetrics.space2)
-                    .padding(.vertical, NoopMetrics.space1)
+                    .padding(.horizontal, PulseMetrics.space2)
+                    .padding(.vertical, PulseMetrics.space1)
                     .background(tint.opacity(0.12), in: Capsule())
             }
             HStack(spacing: 6) {
@@ -282,7 +282,7 @@ struct LiveWorkoutView: View {
 
     private var statsGrid: some View {
         let w = model.activeWorkout
-        return NoopCard(padding: NoopMetrics.cardInnerPadding) {
+        return PulseCard(padding: PulseMetrics.cardInnerPadding) {
             HStack(spacing: 0) {
                 stat(String(localized: "AVG"), (w?.avgHr ?? 0) > 0 ? "\(w!.avgHr)" : "—",
                      tint: (w?.avgHr ?? 0) > 0 ? StrandPalette.metricRose : StrandPalette.textPrimary)
@@ -297,7 +297,7 @@ struct LiveWorkoutView: View {
     }
 
     private func stat(_ title: String, _ value: String, tint: Color = StrandPalette.textPrimary) -> some View {
-        VStack(spacing: NoopMetrics.space1) {
+        VStack(spacing: PulseMetrics.space1) {
             Text(title)
                 .font(StrandFont.overline).tracking(StrandFont.overlineTracking)
                 .foregroundStyle(StrandPalette.textSecondary)
@@ -352,10 +352,10 @@ struct LiveWorkoutView: View {
     /// the timer clear of the widest group to keep true centring — left it barely 105pt and would have
     /// truncated the same clock outright.
     private var bottomControlRow: some View {
-        HStack(spacing: NoopMetrics.space2) {
+        HStack(spacing: PulseMetrics.space2) {
             deleteWorkoutGlassButton
             pauseWorkoutGlassButton
-            Spacer(minLength: NoopMetrics.space2)
+            Spacer(minLength: PulseMetrics.space2)
             bottomElapsedTimer
                 .allowsHitTesting(false)
                 // Scaling down is the honest failure when the room runs out: truncating a clock to
@@ -368,16 +368,16 @@ struct LiveWorkoutView: View {
                 // half-drawn pause button is worse than a smaller clock, and a clipped control is the
                 // failure this whole change exists to remove. At equal priority the inflexible frames
                 // are satisfied first and the Text scales into what is left, which is the order wanted.
-            Spacer(minLength: NoopMetrics.space2)
+            Spacer(minLength: PulseMetrics.space2)
             endWorkoutGlassButton
         }
         .padding(Self.bottomBarInset)
         .background {
-            NoopPanelSurface(cornerRadius: NoopVisualStyle.pillRadius, elevated: true)
+            PulsePanelSurface(cornerRadius: PulseVisualStyle.pillRadius, elevated: true)
         }
-        .padding(.horizontal, NoopMetrics.space4)
-        .padding(.top, NoopMetrics.space2)
-        .padding(.bottom, NoopMetrics.space3)
+        .padding(.horizontal, PulseMetrics.space4)
+        .padding(.top, PulseMetrics.space2)
+        .padding(.bottom, PulseMetrics.space3)
     }
 
     /// Same `activeWorkout.start` + `TimelineView` source as the hero TIME block — plain primary text,
@@ -507,12 +507,12 @@ private struct SensorRowIfPresent: View {
                 live.sensorSpeedKmh, system: distanceUnitSystem)
             let cadence = LiveState.formatCadence(live.sensorCadence)
             let power = LiveState.formatPowerWatts(live.sensorPowerWatts)
-            NoopCard(padding: NoopMetrics.cardInnerPadding, tint: StrandPalette.effortColor) {
-                VStack(alignment: .leading, spacing: NoopMetrics.space3) {
+            PulseCard(padding: PulseMetrics.cardInnerPadding, tint: StrandPalette.effortColor) {
+                VStack(alignment: .leading, spacing: PulseMetrics.space3) {
                     Text("Sensor")
                         .font(StrandFont.overline).tracking(StrandFont.overlineTracking)
                         .foregroundStyle(StrandPalette.textSecondary)
-                    HStack(spacing: NoopMetrics.gap) {
+                    HStack(spacing: PulseMetrics.gap) {
                         if let speed { stat(String(localized: "SPEED"), speed, tint: StrandPalette.effortColor) }
                         if let cadence { stat(String(localized: "CADENCE"), "\(cadence)/min", tint: StrandPalette.effortColor) }
                         if let power { stat(String(localized: "POWER"), "\(power) W", tint: StrandPalette.effortColor) }
@@ -526,7 +526,7 @@ private struct SensorRowIfPresent: View {
     /// Compact sensor value used inside this leaf's shared panel, keeping its high-frequency updates
     /// isolated from the rest of the workout screen.
     private func stat(_ title: String, _ value: String, tint: Color = StrandPalette.textPrimary) -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.space1) {
+        VStack(alignment: .leading, spacing: PulseMetrics.space1) {
             Text(title)
                 .font(StrandFont.overline).tracking(StrandFont.overlineTracking)
                 .foregroundStyle(StrandPalette.textSecondary)
@@ -565,7 +565,7 @@ private struct DistancePaceRowIfPresent: View {
         // after a GPS one would show the previous session's stale distance. Together they mean "a GPS
         // recording is live AND has at least one accepted fix" — the Android `gpsEnabled && track` twin.
         if recorder.isRecording, recorder.pointCount > 0 {
-            NoopCard(padding: NoopMetrics.cardInnerPadding, tint: StrandPalette.effortColor) {
+            PulseCard(padding: PulseMetrics.cardInnerPadding, tint: StrandPalette.effortColor) {
                 HStack(spacing: 0) {
                     // "Distance"/"Pace" are already localized (reused from the detail view); uppercased for
                     // the caps stat grid, exactly as the detail route stats do.
@@ -580,7 +580,7 @@ private struct DistancePaceRowIfPresent: View {
     }
 
     private func stat(_ title: String, _ value: String) -> some View {
-        VStack(spacing: NoopMetrics.space1) {
+        VStack(spacing: PulseMetrics.space1) {
             Text(title)
                 .font(StrandFont.overline).tracking(StrandFont.overlineTracking)
                 .foregroundStyle(StrandPalette.textSecondary)

@@ -28,7 +28,7 @@ final class EcgRunningLatchKeyTests: XCTestCase {
     /// app stores under the same name.
     func testTheKeyIsNamespacedAndCarriesTheDeviceId() {
         let key = BLEManager.ecgRunningKey("my-whoop")
-        XCTAssertTrue(key.hasPrefix("noopEcgMayBeRunning."), key)
+        XCTAssertTrue(key.hasPrefix("pulseEcgMayBeRunning."), key)
         XCTAssertTrue(key.hasSuffix("my-whoop"), key)
         XCTAssertNotEqual(key, "my-whoop")
     }
@@ -37,7 +37,7 @@ final class EcgRunningLatchKeyTests: XCTestCase {
     /// id on every single-WHOOP install, so if any shortcut ever treated it as the shared/global case
     /// the two-strap bug would come straight back for the majority of installs.
     func testTheSeededSingleStrapIdIsKeyedLikeAnyOther() {
-        XCTAssertEqual(BLEManager.ecgRunningKey("my-whoop"), "noopEcgMayBeRunning.my-whoop")
+        XCTAssertEqual(BLEManager.ecgRunningKey("my-whoop"), "pulseEcgMayBeRunning.my-whoop")
         XCTAssertNotEqual(BLEManager.ecgRunningKey("my-whoop"), BLEManager.ecgRunningKey("whoop-1234"))
     }
 }

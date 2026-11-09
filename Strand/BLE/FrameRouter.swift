@@ -146,7 +146,7 @@ public final class FrameRouter {
                state.strapFirmware != fw {
                 state.strapFirmware = fw
                 // Persist so the debug export can name the firmware offline (state clears on disconnect).
-                UserDefaults.standard.set(fw, forKey: "noop.lastFirmware")
+                UserDefaults.standard.set(fw, forKey: "pulse.lastFirmware")
             }
 
             // #1634: the 5/MG hello decoded no firmware. The guards fail closed by design, so this is the
@@ -170,7 +170,7 @@ public final class FrameRouter {
             // POWER_CYCLE_STRAP is matched too: it's the 4.0 reboot probe's candidate B (#235), and its
             // result byte is exactly what tells "opcode rejected (recognized, wrong args)" from "ignored".
             if let cmd = parsed.cmdName, cmd.hasPrefix("REBOOT_STRAP") || cmd.hasPrefix("POWER_CYCLE_STRAP") {
-                // bhelm/noop#4: read the result at the FAMILY's offset (4.0 @8, 5/MG @12) and judge it with
+                // bhelm/pulse#4: read the result at the FAMILY's offset (4.0 @8, 5/MG @12) and judge it with
                 // the family's own polarity. 5/MG's CommandResult table is 1=SUCCESS / 0=FAILURE (BodyLocation
                 // Probe, MG vectors), so a raw byte at the fixed 4.0 offset read the inner *type* byte on 5/MG
                 // and printed REJECTED on a successful reboot — the Kotlin twin already judged the decoded
@@ -181,7 +181,7 @@ public final class FrameRouter {
                 let verdict = r == nil ? "no result byte" : (accepted ? "accepted" : "REJECTED")
                 state.append(log: "reboot: strap acked result=\(rhex) (\(verdict))")
             }
-            // #1823: the clock exchange, on BOTH families. NOOP wrote "clock synced" the instant it queued
+            // #1823: the clock exchange, on BOTH families. Pulse wrote "clock synced" the instant it queued
             // the writes and never read the answer, so a strap log asserted the clock was set while the
             // readout said 1970/71 — two contradictory lines with nothing to separate them. Same
             // accept/reject shape REBOOT_STRAP already uses: the family's own result offset and polarity
@@ -306,7 +306,7 @@ public final class FrameRouter {
                 } else if cmd.hasPrefix("SET_ALARM_TIME") {
                     // #34 (issue comment 2026-07-12): the strap's OWN answer to the arm we just sent — the
                     // accept/reject datum that was previously thrown away. armStrapAlarm logs "armed" the
-                    // instant the SET goes out, which only proves NOOP transmitted the frame; if the firmware
+                    // instant the SET goes out, which only proves Pulse transmitted the frame; if the firmware
                     // drops it the GET_ALARM_TIME readback then reads back epoch 0 (a silently-unpersisted
                     // alarm — the exact signature in this report). Logging the raw result byte lets a future
                     // report distinguish a strap that accepted the arm from one that rejected it. LOG-ONLY,
@@ -436,7 +436,7 @@ public final class FrameRouter {
             // text and then dropped it on the floor, so an Apple strap log has never carried a word of it.
             //
             // It is worth more than curiosity. `PullStats: Data: 0` is the STRAP stating it sent no
-            // records, which is a far stronger answer to a "synced but no data" report (#1683) than NOOP
+            // records, which is a far stronger answer to a "synced but no data" report (#1683) than Pulse
             // inferring emptiness from its own decode — the difference between the strap saying nothing
             // was there and us saying we found nothing.
             //
@@ -492,7 +492,7 @@ public final class FrameRouter {
                 // The strap raises CHARGING_ON(7)/CHARGING_OFF(8) the instant a pack goes on or comes off —
                 // flip the pill directly instead of waiting on the ~8-min BATTERY_LEVEL cadence above. Live-
                 // only like those blocks (backfill skips this router), so no replay guard is needed. Ported
-                // from tanarchytan/noop @72ac14d9. Twin of the Kotlin WhoopBleClient handler.
+                // from tanarchytan/pulse @72ac14d9. Twin of the Kotlin WhoopBleClient handler.
                 if ev.hasPrefix("CHARGING_ON") {
                     state.charging = true
                 } else if ev.hasPrefix("CHARGING_OFF") {
@@ -585,7 +585,7 @@ public final class FrameRouter {
     /// then result). WHOOP 4.0's inner starts at offset 4 (result @8); WHOOP 5/MG's starts at 8 (result
     /// @12 — the "+4 shift", Framing/Interpreter). Defaults to `.whoop4` so the WHOOP-4-only callers
     /// (rename, alarm-SET ack) stay untouched; only the both-families reboot ack passes the live family
-    /// (bhelm/noop#4 — reading @8 on a 5/MG frame hit the inner type byte, not the result).
+    /// (bhelm/pulse#4 — reading @8 on a 5/MG frame hit the inner type byte, not the result).
     static func commandResultByte(in frame: [UInt8], family: DeviceFamily = .whoop4) -> Int? {
         let inner = (family == .whoop5) ? 8 : whoop4InnerOffset
         let idx = inner + 4

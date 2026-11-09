@@ -4,7 +4,7 @@ import WhoopStore
 /// The metric columns the coverage line reports, in the order it reports them.
 ///
 /// This order is part of the emitted string, so it is a cross-platform contract: the Kotlin twin
-/// (`com.noop.ingest.IMPORT_COLUMN_LABELS`) lists the same labels in the same order, and both are pinned
+/// (`com.pulse.ingest.IMPORT_COLUMN_LABELS`) lists the same labels in the same order, and both are pinned
 /// by a test. Adding a column means adding it to both, in the same position.
 ///
 /// Scoped to the seven daily PHYSIOLOGICAL metrics — the ones a vitals card reads, and so the ones behind
@@ -28,7 +28,7 @@ public let importColumnLabels = ["recovery", "rhr", "hrv", "skin_temp", "spo2", 
 /// `filter{}.count` rather than `count(where:)`: the packages declare swift-tools-version 5.9, and this
 /// path has no local compile on Linux, so the form that has always existed is the right one to pick.
 ///
-/// Kotlin twin: `com.noop.ingest.importColumnCoverage`.
+/// Kotlin twin: `com.pulse.ingest.importColumnCoverage`.
 public func importColumnCoverage(_ rows: [DailyMetric]) -> [(String, Int)] {
     [
         ("recovery", rows.filter { $0.recovery != nil }.count),

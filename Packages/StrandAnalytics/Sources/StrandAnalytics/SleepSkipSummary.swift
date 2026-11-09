@@ -15,7 +15,7 @@ import Foundation
 /// and listed rather than summarised into a range that could hide a gap.
 ///
 /// Returns `nil` when nothing was skipped, so a healthy pass stays silent. Kotlin twin:
-/// `com.noop.analytics.skippedSleepDaysLine`.
+/// `com.pulse.analytics.skippedSleepDaysLine`.
 public func skippedSleepDaysLine(_ skipped: [(day: String, hrSamples: Int)], minHrSamples: Int) -> String? {
     if skipped.isEmpty { return nil }
     var byCount: [Int: [String]] = [:]

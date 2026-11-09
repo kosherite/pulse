@@ -1,11 +1,11 @@
 import XCTest
 @testable import Strand
 
-/// Resolver precedence must match the documented order: imported WHOOP > NOOP-computed > Apple.
+/// Resolver precedence must match the documented order: imported WHOOP > Pulse-computed > Apple.
 /// Before the fix, the strap-preferred candidate list tried the ACTIVE strap's computed sibling
 /// before the CANONICAL "my-whoop" import, so after a device re-add (active id != canonical) the
 /// new strap's computed estimates shadowed richer imported history. Swift twin of the
-/// ryanbr/noop#240 precedence fix.
+/// kosherite/pulse#240 precedence fix.
 @MainActor
 final class SourceCandidatesOrderTests: XCTestCase {
 
@@ -13,7 +13,7 @@ final class SourceCandidatesOrderTests: XCTestCase {
         let cs = Repository.sourceCandidates(forKey: "rhr", preferredSource: "my-whoop",
                                              actualWhoopSource: "whoop-4A0B")
         XCTAssertEqual(cs.map(\.source),
-                       ["whoop-4A0B", "my-whoop", "whoop-4A0B-noop", "my-whoop-noop", "apple-health"],
+                       ["whoop-4A0B", "my-whoop", "whoop-4A0B-pulse", "my-whoop-pulse", "apple-health"],
                        "canonical import must be tried before ANY computed sibling")
     }
 
@@ -27,7 +27,7 @@ final class SourceCandidatesOrderTests: XCTestCase {
         // active == canonical: `uniqued` collapses the pairs; path stays byte-identical to pre-fix.
         let cs = Repository.sourceCandidates(forKey: "rhr", preferredSource: "my-whoop",
                                              actualWhoopSource: "my-whoop")
-        XCTAssertEqual(cs.map(\.source), ["my-whoop", "my-whoop-noop", "apple-health"])
+        XCTAssertEqual(cs.map(\.source), ["my-whoop", "my-whoop-pulse", "apple-health"])
     }
 
     func testAppleFallbackKeepsCompatibleKeyMapping() {

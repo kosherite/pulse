@@ -71,7 +71,7 @@ own fresh issue, a specific reason, and this marker in the issue body:
 parity-governance-identity-sha256: <the disposition's identity_sha256>
 ```
 
-Issues cannot be reused across dispositions, and `bhelm/noop#17` is explicitly
+Issues cannot be reused across dispositions, and `bhelm/pulse#17` is explicitly
 forbidden as an umbrella.
 
 ## Updating the inventory

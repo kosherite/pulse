@@ -1,6 +1,6 @@
 import Foundation
 
-/// Pure mapping from NOOP's persisted sleep-stage JSON to the interval list the iOS HealthKit
+/// Pure mapping from Pulse's persisted sleep-stage JSON to the interval list the iOS HealthKit
 /// write-back turns into `sleepAnalysis` category samples. Lives here (not in the app target) so
 /// the parsing/clamping logic is covered by `swift test` — HealthKit itself can't be unit-tested.
 public enum HealthWriteback {
@@ -25,7 +25,7 @@ public enum HealthWriteback {
     /// Decode a session's `stagesJSON` into clamped stage intervals for HealthKit.
     ///
     /// Only the on-device SleepStager segment shape (`[{"start","end","stage"}]`, unix seconds)
-    /// carries timing, so only it yields intervals. The two aggregate shapes NOOP has also
+    /// carries timing, so only it yields intervals. The two aggregate shapes Pulse has also
     /// persisted (`{"deep":min,…}` and `[{"stage","min"}]` — see `WhoopCsvExporter.stageMinutes`)
     /// have no placement information; fabricating positions for them would write fiction into
     /// Health, so they return `[]` and the caller falls back to one `.asleepUnspecified` block.
@@ -157,26 +157,26 @@ public enum HealthWriteback {
 
     // MARK: - Apple Health external UUID keys (#1503)
 
-    /// The deterministic `HKMetadataKeyExternalUUID` for a NOOP-written Apple Health record.
+    /// The deterministic `HKMetadataKeyExternalUUID` for a Pulse-written Apple Health record.
     ///
-    /// The key is a natural key — `noop:<kind>:<identity>` — with NO device-id segment. The previous
-    /// scheme embedded the active strap id (`noop:<deviceId>:<kind>:<identity>`), which is NOT durable:
+    /// The key is a natural key — `pulse:<kind>:<identity>` — with NO device-id segment. The previous
+    /// scheme embedded the active strap id (`pulse:<deviceId>:<kind>:<identity>`), which is NOT durable:
     /// a re-pair or serial-based identification changes it, and every record written under the old id
     /// becomes unreachable to the delete-then-write reconciliation (the delete predicate is built from
     /// the id that is active NOW). The stranded records stay in Apple Health permanently as duplicates.
     ///
     /// Dropping the id segment matches the Android twin (`HealthConnectWriter.clientRecordId` carries
-    /// no device id — `noop-workout-<startTs>`) and makes the key mean what it is: a natural key over
+    /// no device id — `pulse-workout-<startTs>`) and makes the key mean what it is: a natural key over
     /// the record's own identity, stable across strap lifecycle changes.
     ///
     /// `kind` is the metric's `HKQuantityTypeIdentifier.rawValue` for vitals, `"sleep"` for sleep
     /// sessions, or `"workout"` for workouts. `identity` is the day key ("yyyy-MM-dd") for vitals or
     /// the unix-second start timestamp for sleep/workout.
     public static func appleHealthExternalUUID(kind: String, identity: String) -> String {
-        "noop:\(kind):\(identity)"
+        "pulse:\(kind):\(identity)"
     }
 
-    /// The vitals key: `noop:<metricId>:<day>`.
+    /// The vitals key: `pulse:<metricId>:<day>`.
     public static func appleHealthVitalKey(metricId: String, day: String) -> String {
         appleHealthExternalUUID(kind: metricId, identity: day)
     }
@@ -200,7 +200,7 @@ public enum HealthWriteback {
         newestHeartRateTs - endTs < openNightMarginSeconds && now - endTs < openNightMaxHoldSeconds
     }
 
-    /// The sleep key: `noop:sleep:<startTs>`.
+    /// The sleep key: `pulse:sleep:<startTs>`.
     public static func appleHealthSleepKey(startTs: Int) -> String {
         appleHealthExternalUUID(kind: "sleep", identity: "\(startTs)")
     }
@@ -211,9 +211,9 @@ public enum HealthWriteback {
     /// does not know the timestamp for: the orphan reconciliation in `HealthKitBridge` matches on this
     /// to tell a workout WE wrote from one another app wrote, before deciding anything about it. Kept
     /// beside the key builder so the two cannot drift. (#2210)
-    public static let appleHealthWorkoutKeyPrefix = "noop:workout:"
+    public static let appleHealthWorkoutKeyPrefix = "pulse:workout:"
 
-    /// The workout key: `noop:workout:<startTs>`.
+    /// The workout key: `pulse:workout:<startTs>`.
     public static func appleHealthWorkoutKey(startTs: Int) -> String {
         appleHealthExternalUUID(kind: "workout", identity: "\(startTs)")
     }

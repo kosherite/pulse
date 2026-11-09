@@ -125,13 +125,13 @@ behaviour change.
 
 ## Cross-platform parity (rule #1)
 
-The Android coordinator (`android/app/src/main/java/com/noop/ble/…`) mirrors the same shape and gets the
+The Android coordinator (`android/app/src/main/java/com/pulse/ble/…`) mirrors the same shape and gets the
 **same** refactor in the **same PR**:
 
 - Kotlin `interface LiveHrSource { fun scan(); fun connect(id: …); fun stop() }`.
 - The Android source-coordinator's per-kind fields/branches collapse to one `activeSource` + a
   `makeSource(kind)` factory, identical control flow to Swift.
-- No stored value, dedup key, or `.noopbak` field changes — this is an **in-memory runtime refactor
+- No stored value, dedup key, or `.pulsebak` field changes — this is an **in-memory runtime refactor
   only**, so there is no migration and no schema/backup-contract surface. (Call this out explicitly in
   the PR: parity here is *behavioural*, and the "numbers" — analytics, stored samples — are untouched by
   construction.)
@@ -160,7 +160,7 @@ Per [AGENTS.md](../AGENTS.md), know the coverage before claiming it works:
   for the single-WHOOP user) and one generic HR strap, switch active device both ways, confirm live HR
   streams and stops cleanly. State exactly what was tested on hardware in the PR.
 
-## Scope guardrails (unchanged NOOP constraints)
+## Scope guardrails (unchanged Pulse constraints)
 
 - **Clean-room only.** Recognition stays name-substring (see `ExperimentalBrand`); no decompiled app
   code, no vendor firmware, no DRM circumvention. Deep decoders are re-derived, never GPL-copied — see

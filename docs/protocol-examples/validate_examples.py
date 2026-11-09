@@ -2,7 +2,7 @@
 """Constructed protocol arithmetic examples, never device captures.
 
 Checks selected field/count arithmetic only. Buffers have no framing/checksums
-and are not valid transport frames. Does not test NOOP, firmware execution,
+and are not valid transport frames. Does not test Pulse, firmware execution,
 physical units, device compatibility, sensor rate or clinical interpretation.
 """
 from bisect import bisect_left

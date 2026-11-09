@@ -4,12 +4,12 @@
 Context (see docs/WHOOP5_DEEP_DATA.md and issue #103):
   • There is no GET_SPO2 BLE command.
   • On 5.0/MG, SpO₂ is believed to be a strap-computed scalar banked during sleep.
-  • NOOP decodes in-band values (70–100) at absolute frame offset 82 as spo2_candidate_82
+  • Pulse decodes in-band values (70–100) at absolute frame offset 82 as spo2_candidate_82
     (instrumentation only — never spo2Pct until multi-device evidence is solid).
 
 This tool answers the promote-or-not question as *known plaintext*:
 
-    capture.json OR a whoop_sync.py .db OR a NOOP app store  +  whoop_export
+    capture.json OR a whoop_sync.py .db OR a Pulse app store  +  whoop_export
                                        ──►  mean(@82 | asleep, 70–100, in-window)
                                        vs CSV blood_oxygen_pct
                                        ──►  r, MAE, bias, offset-specificity, window coverage
@@ -21,10 +21,10 @@ THREE INPUT KINDS, and the third is why #103 has been stuck (#845):
 
   • `capture.json` — hci_extract / whoop_capture output.
   • a `whoop_sync.py` `.db` — the CAPTURE TOOLING's frame store.
-  • a **NOOP app store** — the shipped app's own SQLite (GRDB), read from `v18AuxSample`, the table
+  • a **Pulse app store** — the shipped app's own SQLite (GRDB), read from `v18AuxSample`, the table
     PR #848 added. Until this existed, only someone running linux-capture could contribute evidence,
     so the app could not answer its own open question even though it banks the byte. An ordinary user
-    who syncs with NOOP can now run the promote gate on their own data.
+    who syncs with Pulse can now run the promote gate on their own data.
 
     The one thing an app store cannot do is the OFFSET SPECIFICITY SCAN: the app banks decoded slots,
     not frame bytes, so there is no neighbour byte to rank @82 against. That is reported as
@@ -56,8 +56,8 @@ Usage:
     # Multi-device batch:
     python3 validate_spo2_candidate.py --batch devices.json
 
-    # From a NOOP app database (no linux-capture needed):
-    python3 validate_spo2_candidate.py noop.sqlite my_whoop_data/ --device strap-a
+    # From a Pulse app database (no linux-capture needed):
+    python3 validate_spo2_candidate.py pulse.sqlite my_whoop_data/ --device strap-a
 
 devices.json example:
     [
@@ -102,7 +102,7 @@ SPECIFICITY_SCAN = range(74, 93)
 
 # --- Duty cycle ------------------------------------------------------------------------------------
 # @82 is NOT sampled every second. Measured on a corpus of 18,650 v18 records — 18,602 of them from
-# @digitalerdude's public PacketLogger capture of an official-app overnight sync, plus 48 from a NOOP
+# @digitalerdude's public PacketLogger capture of an official-app overnight sync, plus 48 from a Pulse
 # sync — the byte is nonzero in only 450 records (2.41 %), and every one of those falls inside a short
 # window that repeats on a fixed period: 15 windows, each exactly 30 records long, each starting at
 # the same `unix % 1200`, zero phase variance. Outside the window @82 is identically 0x00.
@@ -297,10 +297,10 @@ def looks_like_sqlite(path: str) -> bool:
         return False
 
 
-# --- NOOP app database ------------------------------------------------------------------------------
+# --- Pulse app database ------------------------------------------------------------------------------
 #
 # #845/#103: the app banks @82 (PR #848 added `v18AuxSample`), but until this path existed the harness
-# could only read the CAPTURE TOOLING's store — so a NOOP user could not run the promote gate on their
+# could only read the CAPTURE TOOLING's store — so a Pulse user could not run the promote gate on their
 # own synced data, and only someone running linux-capture could contribute evidence. That is the gap
 # #845 called "the app itself cannot currently contribute the data needed to resolve its own question".
 #
@@ -346,7 +346,7 @@ def unpack_v18_aux(blob: bytes) -> Dict[str, int]:
 
 
 def looks_like_app_db(path: str) -> bool:
-    """True if `path` is a NOOP app store (GRDB/iOS/macOS) rather than a `whoop_sync.py` capture DB.
+    """True if `path` is a Pulse app store (GRDB/iOS/macOS) rather than a `whoop_sync.py` capture DB.
 
     Discriminated on the `v18AuxSample` table, which only the app has; the capture store has `frames`
     and the app has no `frames` table at all.
@@ -369,13 +369,13 @@ def looks_like_app_db(path: str) -> bool:
 
 
 def load_app_db_records(path: str, *, device_id: Optional[str] = None) -> List[dict]:
-    """Records from a NOOP app store, shaped like `iter_v18_records` output.
+    """Records from a Pulse app store, shaped like `iter_v18_records` output.
 
     Joins `v18AuxSample` (the banked per-second slots, #848) to `sleepStateSample.state` on
     (deviceId, ts) — the band's own sleep state, which the asleep-only gate needs.
 
     ONE STRUCTURAL LIMITATION, and it is not a bug: the raw frame is gone. The strap trims its history
-    once NOOP acks the offload and the app banks decoded slots, not frame bytes, so the OFFSET
+    once Pulse acks the offload and the app banks decoded slots, not frame bytes, so the OFFSET
     SPECIFICITY SCAN (which reads neighbour bytes @70-@100 out of `_frame`) cannot run on this path.
     The correlation, MAE, bias, duty-cycle detection and window coverage all can. Records therefore
     carry no `_frame` key, which the scan already treats as "skip", and `main` says so rather than
@@ -404,7 +404,7 @@ def load_app_db_records(path: str, *, device_id: Optional[str] = None) -> List[d
             (device_id,),
         ).fetchall()
     except sqlite3.Error as e:
-        raise SystemExit(f"{path}: not a readable NOOP app store ({e})")
+        raise SystemExit(f"{path}: not a readable Pulse app store ({e})")
     finally:
         con.close()
 
@@ -431,7 +431,7 @@ def load_frame_records(path: str, *, device_id: int = 2) -> List[dict]:
 
     NOTE: this is the CAPTURE TOOLING's database, not the app's. Neither shipped app has a `frames`
     table — Android uses Room, iOS/macOS uses GRDB — so this cannot be pointed at a phone's store or
-    a `.noopbak`. It exists because `whoop_sync.py` writes `.db` while this tool read only `.json`,
+    a `.pulsebak`. It exists because `whoop_sync.py` writes `.db` while this tool read only `.json`,
     forcing a `whoop_sync.py export --only-type 47` round-trip between two tools in the same
     directory.
     """
@@ -508,7 +508,7 @@ def iter_v18_records(capture_records: Sequence[dict]) -> Iterable[dict]:
 def byte_at_offset(rec: dict, offset: int) -> Optional[int]:
     """The raw byte at absolute frame `offset` for one record, or None when it is unavailable.
 
-    Frame-derived records carry `_frame` and any offset can be read from it. Records loaded from a NOOP
+    Frame-derived records carry `_frame` and any offset can be read from it. Records loaded from a Pulse
     app store do NOT — the app banks decoded slots, not frame bytes — so only @82 is answerable there,
     from the banked `aux_byte_82`. Every other offset returns None, which is what correctly confines the
     OFFSET SPECIFICITY SCAN to captures while leaving the @82 correlation itself fully available.
@@ -756,7 +756,7 @@ def validate_device(
     min_window_coverage: float = DEFAULT_MIN_WINDOW_COVERAGE,
     min_distinct: int = MIN_DISTINCT_INBAND,
 ) -> dict:
-    # A NOOP app store and a whoop_sync.py capture store are both SQLite; they are told apart by the
+    # A Pulse app store and a whoop_sync.py capture store are both SQLite; they are told apart by the
     # `v18AuxSample` table rather than by extension or by a flag, so a user does not have to know which
     # kind of file they were handed.
     from_app_db = looks_like_app_db(capture_path)
@@ -911,7 +911,7 @@ def validate_device(
         # Both are reported rather than inferred from the numbers: "no specificity result" means
         # something completely different in the two cases, and a batch pooling both must be able to
         # tell them apart without re-opening the files.
-        "source": "noop_app_db" if from_app_db else "capture",
+        "source": "pulse_app_db" if from_app_db else "capture",
         "specificity_scan": "unavailable_app_db" if from_app_db else "ran",
         "v18_records": len(records),
         "export_nights_with_spo2": len(cycles),
@@ -1164,7 +1164,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                    help="device_id row filter when the capture is a whoop_sync.py .db "
                         "(default: 2, matching whoop_activity.py)")
     p.add_argument("--app-device", metavar="DEVICE_ID",
-                   help="deviceId row filter when the capture is a NOOP APP store (the text strap "
+                   help="deviceId row filter when the capture is a Pulse APP store (the text strap "
                         "id in v18AuxSample, not the integer --device-id). Optional when the store "
                         "holds exactly one strap; required when it holds several, since pooling "
                         "them would average away the per-device difference the gate is testing")

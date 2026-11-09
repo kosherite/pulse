@@ -1,7 +1,7 @@
 """Locate WHOOP record fields by correlating capture frames against a CSV-export ground truth.
 
 An HCI capture (issue #103) gives raw, un-decoded records — type-`0x2F` biometrics and the 5/MG
-history types NOOP still skips (see docs/WHOOP5_DEEP_DATA.md). This tool solves the "what byte is
+history types Pulse still skips (see docs/WHOOP5_DEEP_DATA.md). This tool solves the "what byte is
 what" problem as *known-plaintext*: the owner's own WHOOP CSV export lists the official per-night
 values (HRV, resting HR, skin temp, SpO₂, respiratory rate, sleep-stage minutes), so we search the
 records for the byte offset + encoding that reproduces each known value across every night.

@@ -1,10 +1,10 @@
 # Fork-only: ONE on-demand testing build that publishes ALL platforms into ONE release.
 #
 # A `meta` job creates a single dated prerelease, then the android / macOS / iOS jobs each attach
-# their artifact to that SAME tag — so every release has NOOP-android + NOOP-android-debug (Android)
-# + NOOP-macos.zip + NOOP-ios-unsigned.ipa together, each stamped with the base app version.
+# their artifact to that SAME tag — so every release has Pulse-android + Pulse-android-debug (Android)
+# + Pulse-macos.zip + Pulse-ios-unsigned.ipa together, each stamped with the base app version.
 # Replaces the older split fork-testing-apk.yml + fork-testing-apple.yml.
-# Unsigned/debug-keyed, no secrets. Trigger from the Actions tab. (Built from noop-staging via --ref.)
+# Unsigned/debug-keyed, no secrets. Trigger from the Actions tab. (Built from pulse-staging via --ref.)
 name: Testing build (fork)
 
 on:
@@ -88,13 +88,13 @@ jobs:
             fi
           fi
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --prerelease --target "${{ github.sha }}" \
-            --title "NOOP Staging — base ${VER} · ${DATE} · ${SHA}" \
-            --notes "Rolling **latest** testing build — refreshed in place, so this tag is always the newest. NOOP main + ryanbr's open PRs + vetted community PRs, built with the **NOOP Staging** identity. Android and macOS install **beside** the official app; the iOS ipa carries the **production** bundle id, so it **replaces** an installed official app and uses its data. Filenames carry the base app version (\`v${VER}\`).
+            --title "Pulse Staging — base ${VER} · ${DATE} · ${SHA}" \
+            --notes "Rolling **latest** testing build — refreshed in place, so this tag is always the newest. Pulse main + ryanbr's open PRs + vetted community PRs, built with the **Pulse Staging** identity. Android and macOS install **beside** the official app; the iOS ipa carries the **production** bundle id, so it **replaces** an installed official app and uses its data. Filenames carry the base app version (\`v${VER}\`).
 
-          - **Android (release)** — \`NOOP-android-v${VER}.apk\` — optimized, non-debuggable build; installs beside the official app. \`com.noop.whoop.staging\`.
-          - **Android (debug)** — \`NOOP-android-debug-v${VER}.apk\` — debuggable build. \`com.noop.whoop.debug\`.
-          - **macOS** — \`NOOP-macos-v${VER}.zip\` — unzip, then **right-click → Open** (ad-hoc signed, not notarized; Gatekeeper warns once). If it says *\"damaged\"*, run \`xattr -dr com.apple.quarantine /Applications/NOOP.app\`.
-          - **iOS** — \`NOOP-ios-unsigned-v${VER}.ipa\` — sideload via **AltStore / Sideloadly** (re-signs on-device). **Replaces** an installed official app (production bundle id, shared data), so back up first if you have one. Embedded watch app stripped, widget extension retained for Home/Lock-Screen widgets and Live Activities.
+          - **Android (release)** — \`Pulse-android-v${VER}.apk\` — optimized, non-debuggable build; installs beside the official app. \`com.pulse.whoop.staging\`.
+          - **Android (debug)** — \`Pulse-android-debug-v${VER}.apk\` — debuggable build. \`com.pulse.whoop.debug\`.
+          - **macOS** — \`Pulse-macos-v${VER}.zip\` — unzip, then **right-click → Open** (ad-hoc signed, not notarized; Gatekeeper warns once). If it says *\"damaged\"*, run \`xattr -dr com.apple.quarantine /Applications/Pulse.app\`.
+          - **iOS** — \`Pulse-ios-unsigned-v${VER}.ipa\` — sideload via **AltStore / Sideloadly** (re-signs on-device). **Replaces** an installed official app (production bundle id, shared data), so back up first if you have one. Embedded watch app stripped, widget extension retained for Home/Lock-Screen widgets and Live Activities.
 
           Base app version ${VER} · built ${DATE} · \`${SHA}\`."
           # Belt-and-braces: a rolling tag is deleted with --cleanup-tag and recreated seconds later, and
@@ -133,10 +133,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VER: ${{ needs.meta.outputs.ver }}
         run: |
-          cp app/build/outputs/apk/full/debug/*.apk "NOOP-android-debug-v${VER}.apk"
-          cp app/build/outputs/apk/full/release/*.apk "NOOP-android-v${VER}.apk"
+          cp app/build/outputs/apk/full/debug/*.apk "Pulse-android-debug-v${VER}.apk"
+          cp app/build/outputs/apk/full/release/*.apk "Pulse-android-v${VER}.apk"
           gh release upload "${{ needs.meta.outputs.tag }}" \
-            "NOOP-android-v${VER}.apk" "NOOP-android-debug-v${VER}.apk" \
+            "Pulse-android-v${VER}.apk" "Pulse-android-debug-v${VER}.apk" \
             --repo "$GITHUB_REPOSITORY" --clobber
 
   macos:
@@ -149,7 +149,7 @@ jobs:
         run: brew install xcodegen
       - name: Generate Xcode project
         run: xcodegen generate
-      - name: Build NOOP.app (macOS, unsigned, universal)
+      - name: Build Pulse.app (macOS, unsigned, universal)
         # #51: force a true universal (x86_64 + arm64) build — 'platform=macOS' on an Apple-Silicon runner
         # thins to arm64-only. Mirrors the release workflow so testing builds match what ships.
         # #2393: Release, for the reasons spelled out in fork-release.yml. A testing build that is not
@@ -183,8 +183,8 @@ jobs:
           # future UPDATE still needs the re-toggle the in-app #429/#295 banner already describes.)
           codesign --force --deep --sign - "$APP"
           codesign -dvv "$APP" 2>&1 | grep -Ei 'identifier|signature|flags' || true
-          ditto -c -k --keepParent "$APP" "NOOP-macos-v${VER}.zip"
-          gh release upload "${{ needs.meta.outputs.tag }}" "NOOP-macos-v${VER}.zip" --repo "$GITHUB_REPOSITORY" --clobber
+          ditto -c -k --keepParent "$APP" "Pulse-macos-v${VER}.zip"
+          gh release upload "${{ needs.meta.outputs.tag }}" "Pulse-macos-v${VER}.zip" --repo "$GITHUB_REPOSITORY" --clobber
 
   ios:
     needs: meta
@@ -197,12 +197,12 @@ jobs:
         run: brew install xcodegen
       - name: Generate Xcode project
         run: xcodegen generate
-      - name: Build NOOPiOS for device (unsigned, Release)
+      - name: Build PulseiOS for device (unsigned, Release)
         # #53: build RELEASE, not Debug. A Debug build carries get-task-allow + debug artifacts that make a
         # re-signed sideload fail "integrity could not be verified" on modern iOS; Release (the correct config
         # for a distributed app) installs clean — confirmed by the reporter's own Release build.
         run: >-
-          xcodebuild -scheme NOOPiOS -configuration Release -destination 'generic/platform=iOS'
+          xcodebuild -scheme PulseiOS -configuration Release -destination 'generic/platform=iOS'
           -derivedDataPath build/dd
           CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
           build
@@ -214,30 +214,30 @@ jobs:
           APP=$(find build/dd/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' -type d | head -1)
           test -n "$APP" || { echo ".app (iphoneos) not found"; exit 1; }
           rm -rf "$APP/Watch"
-          # Keep NOOPWidgets.appex. It renders both the Home/Lock-Screen widgets AND the Live Activity;
+          # Keep PulseWidgets.appex. It renders both the Home/Lock-Screen widgets AND the Live Activity;
           # deleting PlugIns still lets ActivityKit create an activity, but iOS can only show an empty
           # Dynamic Island shell because its renderer is gone.
-          test -d "$APP/PlugIns/NOOPWidgets.appex" || {
-            echo "NOOPWidgets.appex missing from iOS build"; exit 1;
+          test -d "$APP/PlugIns/PulseWidgets.appex" || {
+            echo "PulseWidgets.appex missing from iOS build"; exit 1;
           }
           # Preserve the requested App Group in a replaceable ad-hoc signature so the sideloader
           # provisions the shared container instead of treating both executables as entitlement-free.
           Tools/prepare-ios-sideload-app.sh "$APP"
           rm -rf Payload && mkdir Payload && cp -R "$APP" Payload/
-          zip -qr "NOOP-ios-unsigned-v${VER}.ipa" Payload
-          gh release upload "${{ needs.meta.outputs.tag }}" "NOOP-ios-unsigned-v${VER}.ipa" --repo "$GITHUB_REPOSITORY" --clobber
+          zip -qr "Pulse-ios-unsigned-v${VER}.ipa" Payload
+          gh release upload "${{ needs.meta.outputs.tag }}" "Pulse-ios-unsigned-v${VER}.ipa" --repo "$GITHUB_REPOSITORY" --clobber
 
-  # Fork-only housekeeping: the disposable `noop-staging` branch exists ONLY to feed this build. Once every
+  # Fork-only housekeeping: the disposable `pulse-staging` branch exists ONLY to feed this build. Once every
   # platform job has finished (pass OR fail — always()), delete it so GitHub's "Compare & pull request"
   # banner doesn't linger after each run. The rolling release tag (testing-latest) pins the built sha, so
   # deleting the branch orphans nothing. Guarded to the disposable branch name — a run dispatched from main
   # (or any other ref) is left alone.
   cleanup:
     needs: [meta, android, macos, ios]
-    if: ${{ always() && github.ref_type == 'branch' && github.ref_name == 'noop-staging' }}
+    if: ${{ always() && github.ref_type == 'branch' && github.ref_name == 'pulse-staging' }}
     runs-on: ubuntu-latest
     steps:
       - name: Delete the disposable staging branch
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/noop-staging" || true
+        run: gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/pulse-staging" || true

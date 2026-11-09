@@ -3,7 +3,7 @@ import StrandDesign
 
 /// Native journal logging, yes/no chips and numeric fields for the merged behaviour catalog plus a
 /// custom-question field, hosted at the top of Insights. Answers write under
-/// `Repository.journalDeviceId` ("noop-journal"), NEVER the imported source, so a CSV re-import can't
+/// `Repository.journalDeviceId` ("pulse-journal"), NEVER the imported source, so a CSV re-import can't
 /// clobber them and clearing is safe (imported rows are never touched). Tri-state: tapping the selected
 /// chip again clears the answer. Day attribution follows the importer's wake-day convention, answers
 /// describe the night and day leading into the selected morning, so logged days line up with imported
@@ -78,7 +78,7 @@ struct JournalLogCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             HStack(alignment: .center) {
                 SectionHeader("Journal", overline: "Log")
                 Spacer()
@@ -110,7 +110,7 @@ struct JournalLogCard: View {
                     .onChangeCompat(of: dayOffset) { _ in proxy.scrollTo(dayOffset, anchor: .center) }
                 }
             }
-            NoopCard(tint: StrandPalette.restColor) {
+            PulseCard(tint: StrandPalette.restColor) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(editing
                          ? "Rename, regroup, or remove an item to tidy your list. Renaming keeps the original question behind the scenes, so a WHOOP import still lines up. Custom items are deleted; built-in ones are hidden and can be restored below."
@@ -290,7 +290,7 @@ struct JournalLogCard: View {
     }
 
     private func renameSheet(_ item: JournalCatalogItem) -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             Text("Rename item").font(StrandFont.headline)
             TextField("Display name", text: $renameDraft)
                 .textFieldStyle(.roundedBorder)
@@ -309,7 +309,7 @@ struct JournalLogCard: View {
                 .buttonStyle(.borderedProminent)
             }
         }
-        .padding(NoopMetrics.space4)
+        .padding(PulseMetrics.space4)
         .frame(minWidth: 320)
     }
 
@@ -375,7 +375,7 @@ struct JournalLogCard: View {
         return pillButton(label, selected: selected) {
             Task {
                 // Tri-state: re-tapping the filled chip clears the answer (natural-key delete,
-                // scoped to "noop-journal", imported rows can never be removed this way).
+                // scoped to "pulse-journal", imported rows can never be removed this way).
                 if selected {
                     await repo.clearJournalAnswer(day: dayKey, question: q)
                 } else {

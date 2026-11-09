@@ -498,7 +498,7 @@ class CatalogSummaryPluralCoverage(unittest.TestCase):
         self.assertIn("de missing=1", self._summary(cat))
 
     def test_should_translate_false_is_skipped(self):
-        cat = {"strings": {"NOOP": {"shouldTranslate": False, "localizations": {}}}}
+        cat = {"strings": {"Pulse": {"shouldTranslate": False, "localizations": {}}}}
         self.assertIn("de missing=0", self._summary(cat))
 
 

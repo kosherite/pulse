@@ -2,7 +2,7 @@ import XCTest
 
 final class WidgetSnapshotTests: XCTestCase {
     func testAltStoreProvisionedGroupWinsOverBuildTimeIdentifier() {
-        let configured = "group.com.noopapp.noop.staging"
+        let configured = "group.com.pulseapp.pulse.staging"
         let remapped = configured + ".TEAM123456"
 
         XCTAssertEqual(
@@ -17,31 +17,31 @@ final class WidgetSnapshotTests: XCTestCase {
     func testXcodeBuildFallsBackToConfiguredGroup() {
         XCTAssertEqual(
             WidgetSnapshot.resolveSuiteName(infoDictionary: [
-                "AppGroupIdentifier": "group.example.noop"
+                "AppGroupIdentifier": "group.example.pulse"
             ]),
-            "group.example.noop"
+            "group.example.pulse"
         )
     }
 
     func testUnrelatedAltStoreGroupsDoNotOverrideConfiguredGroup() {
         XCTAssertEqual(
             WidgetSnapshot.resolveSuiteName(infoDictionary: [
-                "AppGroupIdentifier": "group.example.noop",
+                "AppGroupIdentifier": "group.example.pulse",
                 "ALTAppGroups": [
                     "group.example.first",
                     "group.example.second"
                 ]
             ]),
-            "group.example.noop"
+            "group.example.pulse"
         )
     }
 
     func testSingleProvisionedGroupIsUsableWithoutConfiguredIdentifier() {
         XCTAssertEqual(
             WidgetSnapshot.resolveSuiteName(infoDictionary: [
-                "ALTAppGroups": ["group.example.noop.TEAM123456"]
+                "ALTAppGroups": ["group.example.pulse.TEAM123456"]
             ]),
-            "group.example.noop.TEAM123456"
+            "group.example.pulse.TEAM123456"
         )
     }
 

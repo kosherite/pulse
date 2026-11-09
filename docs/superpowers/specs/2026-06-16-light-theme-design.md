@@ -13,7 +13,7 @@
 Color is centralised: `StrandPalette` (Swift, 69 tokens, 1,697 refs, ~6 bypasses) and `Palette` (Kotlin, ~91 tokens incl. gradient lists, ~1,740 refs across 46 files). Both are dark-only single-value constants today; both apps force dark.
 
 - **iOS / macOS:** convert every token from `Color(hex:)` to a dynamic `Color(light:dark:)` backed by an `NSColor`/`UIColor` dynamic provider. All 1,697 call sites resolve automatically per active `colorScheme` — **zero call-site churn**. Drop the two `.preferredColorScheme(.dark)` locks; drive from the setting. The gradient sampler (`recoveryColor()` etc.) resolves token components at render time via `UITraitCollection.current` / `NSAppearance` — correct during SwiftUI body eval; re-samples on scheme change.
-- **Android:** introduce `LocalPalette` (`compositionLocalOf`) + a `PaletteTheme` data class holding all tokens; Dark + Light instances. Convert `object Palette`'s properties to `@Composable @ReadOnlyComposable get() = LocalPalette.current.X` so composable call sites stay byte-identical. The exceptions — `Canvas`/`DrawScope` lambdas (gauges, charts, scenic hero) and the Glance widget — read colour outside composable scope and must capture colours above the draw call / take them as params. `NoopTheme` selects Dark/Light/System; persisted in `noop_prefs`.
+- **Android:** introduce `LocalPalette` (`compositionLocalOf`) + a `PaletteTheme` data class holding all tokens; Dark + Light instances. Convert `object Palette`'s properties to `@Composable @ReadOnlyComposable get() = LocalPalette.current.X` so composable call sites stay byte-identical. The exceptions — `Canvas`/`DrawScope` lambdas (gauges, charts, scenic hero) and the Glance widget — read colour outside composable scope and must capture colours above the draw call / take them as params. `PulseTheme` selects Dark/Light/System; persisted in `pulse_prefs`.
 
 ## The Light idiom (NOT an inversion)
 
@@ -104,7 +104,7 @@ Multi-stop gradients (`recoveryStops`, `strainStops`, `*Gradient`) rebuild autom
 1. **iOS foundation** — dynamic `Color(light:dark:)`; convert all 69 tokens; `AppearanceMode` enum + `@AppStorage` + apply at both app roots (drop forced dark); fix gradient sampler resolution. *Build-verify.*
 2. **iOS special surfaces** — `RecoveryRing`/`StrainGauge`/`BevelGauge` (bloom→shadow, deepen ramp, dark core, track), `StrandCard`/`FrostedCardSurface` (raised-by-shadow), `ScenicHeroBackground` (light radial, drop stars), charts (`TrendChart`/`OverviewHRChart`/`Sparkline`/`Hypnogram`/`YearHeatStrip`). File-disjoint → parallelisable.
 3. **iOS chrome + Settings UI + WidgetKit** — appearance Picker in `SettingsView`; status bar / macOS titlebar; light WidgetKit variant.
-4. **Android** — `LocalPalette` + `PaletteTheme` + `@Composable` getters; fix Canvas/Glance non-composable usages; `NoopTheme` 3-way + `noop_prefs`; `values-night`/status bar; Glance light; Components.kt + Charts.kt special-surface parity.
+4. **Android** — `LocalPalette` + `PaletteTheme` + `@Composable` getters; fix Canvas/Glance non-composable usages; `PulseTheme` 3-way + `pulse_prefs`; `values-night`/status bar; Glance light; Components.kt + Charts.kt special-surface parity.
 5. **Lockstep ship** — all three platforms, changelog, release.
 
 Previews drop their hardcoded `.preferredColorScheme(.dark)` so the palette preview shows both schemes.

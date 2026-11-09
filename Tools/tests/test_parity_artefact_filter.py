@@ -82,7 +82,7 @@ class BuildArtefactFilterTests(unittest.TestCase):
             gen = root / "android" / "app" / "build" / "generated" / "ksp" / "main" / "kotlin"
             gen.mkdir(parents=True)
             (gen / "Generated.kt").write_text("// generated\n", encoding="utf-8")
-            src = root / "android" / "app" / "src" / "main" / "java" / "com" / "noop"
+            src = root / "android" / "app" / "src" / "main" / "java" / "com" / "pulse"
             src.mkdir(parents=True)
             (src / "Hand.kt").write_text("// hand-written\n", encoding="utf-8")
 

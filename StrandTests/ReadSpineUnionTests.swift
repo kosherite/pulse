@@ -6,7 +6,7 @@ import WhoopStore
 /// `ReadSpineUnionTest` cases (same fixtures, same numbers). A day two source ids in the SAME bucket both
 /// cover is folded per column — the winner keeps every column it carries and the filler supplies only the
 /// nils — with the sleep block and the raw red/IR pair moving as whole groups. Ported from
-/// tanarchytan/noop @de370b85.
+/// tanarchytan/pulse @de370b85.
 final class ReadSpineUnionTests: XCTestCase {
 
     /// Swift `DailyMetric` carries no `deviceId` (external to the row); the value columns are the parity

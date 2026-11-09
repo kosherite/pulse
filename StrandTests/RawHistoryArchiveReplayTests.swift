@@ -44,7 +44,7 @@ final class RawHistoryArchiveReplayTests: XCTestCase {
 
     func testReplayDecodesArchivedV25IntoGravityRows() async throws {
         let dir = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("noop-replay-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("pulse-replay-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
 
@@ -70,7 +70,7 @@ final class RawHistoryArchiveReplayTests: XCTestCase {
 
     func testReplayOnEmptyArchiveIsNoOp() async throws {
         let dir = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("noop-replay-empty-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("pulse-replay-empty-\(UUID().uuidString)", isDirectory: true)
         let archive = RawHistoryArchive(directory: dir)
         XCTAssertEqual(archive.readAll().count, 0)
         let rows = try await archive.replay(into: CaptureStore(), deviceId: "test")
@@ -81,7 +81,7 @@ final class RawHistoryArchiveReplayTests: XCTestCase {
     /// the replay gate un-advanced so these records (only copy: the archive) retry next launch. (#152)
     func testReplayThrowsWhenStoreFailsSoGateCanHold() async throws {
         let dir = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("noop-replay-throw-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("pulse-replay-throw-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
 
@@ -120,7 +120,7 @@ final class RawHistoryArchiveReplayTests: XCTestCase {
     func testArchiveAndDirectoryUseBackgroundReadableProtection() throws {
         #if os(iOS)
         let dir = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("noop-protection-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("pulse-protection-\(UUID().uuidString)", isDirectory: true)
         defer { try? FileManager.default.removeItem(at: dir) }
 
         let archive = RawHistoryArchive(directory: dir)

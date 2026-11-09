@@ -12,7 +12,7 @@ final class TestBundleRobustnessTests: XCTestCase {
     // MARK: - raw-capture / crash gather
 
     func testFileEntryReadsAnExistingFile() throws {
-        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("noop-raw-\(UUID()).jsonl")
+        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("pulse-raw-\(UUID()).jsonl")
         let body = "{\"console\":\"connected to WHOOP 4C1594026\"}"
         try body.write(to: tmp, atomically: true, encoding: .utf8)
         defer { try? FileManager.default.removeItem(at: tmp) }
@@ -45,7 +45,7 @@ final class TestBundleRobustnessTests: XCTestCase {
 
     func testCrashLogURLLivesInCaches() {
         let url = TestBundleAssembler.crashLogURL()
-        XCTAssertEqual(url?.lastPathComponent, "noop-last-crash.txt")
+        XCTAssertEqual(url?.lastPathComponent, "pulse-last-crash.txt")
         XCTAssertTrue(url?.path.contains("Caches") ?? false, "crash log must live in the caches dir (not iCloud)")
     }
 

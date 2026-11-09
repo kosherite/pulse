@@ -144,7 +144,7 @@ def _validate_dispositions(value: dict, location: str, root: Path | None = None)
         raise RatchetError(f"{location}: dispositions must be an array")
     seen_identities: set[str] = set()
     seen_issues: set[issue_ref.IssueRef] = set()
-    forbidden = issue_ref.parse_current("bhelm/noop#17")
+    forbidden = issue_ref.parse_current("bhelm/pulse#17")
     allowed_kinds = {
         "add-unpaired-file", "add-unpaired-function", "add-unpaired-property",
         "add-unpaired-constant",
@@ -186,7 +186,7 @@ def _validate_dispositions(value: dict, location: str, root: Path | None = None)
                 raise RatchetError(f"{prefix} twin_path does not exist: {twin_path}")
         issue = issue_ref.parse_current(item["issue"]) if disposition_type == "experimental" else None
         if issue == forbidden:
-            raise RatchetError(f"{prefix}: umbrella issue bhelm/noop#17 is forbidden")
+            raise RatchetError(f"{prefix}: umbrella issue bhelm/pulse#17 is forbidden")
         if disposition_type == "experimental":
             try:
                 datetime.strptime(item["expires_on"], "%Y-%m-%d")

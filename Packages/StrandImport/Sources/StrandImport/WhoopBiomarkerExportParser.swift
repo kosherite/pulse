@@ -3,7 +3,7 @@ import Foundation
 // MARK: - WHOOP biomarker CSV export parser (source "whoop-biomarkers")
 //
 // WhoopBiomarkerExportParser.swift — Kotlin twin of
-// android/app/src/main/java/com/noop/ingest/WhoopBiomarkerExportParser.kt. Keep the two
+// android/app/src/main/java/com/pulse/ingest/WhoopBiomarkerExportParser.kt. Keep the two
 // byte-identical.
 //
 // WHOOP's own biomarker export ("Biomarker Name","Value","Status","Recorded On Date") matches
@@ -24,7 +24,7 @@ import Foundation
 //
 // NON-CLINICAL: WHOOP's own "Status" column (Optimal / Sufficient / Out of Range) is carried
 // VERBATIM into `LabMarkerCsvRow.note` with a "WHOOP:" prefix — the user's own provider's word,
-// source-attributed, never NOOP asserting anything. Units are stored verbatim, never converted.
+// source-attributed, never Pulse asserting anything. Units are stored verbatim, never converted.
 //
 // Pure and deterministic — no DB, no I/O.
 

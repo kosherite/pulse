@@ -3,7 +3,7 @@ import StrandDesign
 
 /// Backup & Sync (folder destination). The Apple mirror of the Android `BackupSyncScreen`: pick a
 /// folder, turn on daily auto-backup (an on-launch catch-up), back up now, or restore from a snapshot
-/// already in that folder. Snapshots are the existing `.noopbak` whole-DB format. Point the folder at
+/// already in that folder. Snapshots are the existing `.pulsebak` whole-DB format. Point the folder at
 /// Google Drive / iCloud / Dropbox for off-device sync with no in-app cloud account.
 struct BackupSyncView: View {
     @EnvironmentObject var model: AppModel
@@ -31,7 +31,7 @@ struct BackupSyncView: View {
             title: "Backup & Sync",
             subtitle: "Save a full backup to a folder you choose - point it at Google Drive, iCloud or Dropbox for off-device sync."
         ) {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                 folderCard
                 autoCard
                 restoreCard
@@ -75,7 +75,7 @@ struct BackupSyncView: View {
                 Text("Tip: choose a folder in iCloud Drive and your backups sync to all your Apple devices automatically, no account setup needed.")
                     .font(StrandFont.caption).foregroundStyle(StrandPalette.accent)
                     .fixedSize(horizontal: false, vertical: true)
-                // #644: these .noopbak snapshots are a plain, unencrypted ZIP — pointing this folder at
+                // #644: these .pulsebak snapshots are a plain, unencrypted ZIP — pointing this folder at
                 // a cloud sync app (per the tip above) also uploads that readable file there. Say so
                 // plainly next to the folder picker, before anyone turns auto-backup on.
                 HStack(alignment: .top, spacing: 8) {
@@ -87,15 +87,15 @@ struct BackupSyncView: View {
                         .font(StrandFont.caption).foregroundStyle(StrandPalette.statusWarning)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                NoopButton(folderLabel == nil ? "Choose folder" : "Change folder",
+                PulseButton(folderLabel == nil ? "Choose folder" : "Change folder",
                            systemImage: "folder", kind: .secondary) { chooseFolder() }
                     .disabled(busy)
                 #if os(iOS)
                 // #52: some iOS 26 users can't select a folder in the system picker (its "Open" button
-                // never fires). This backs up inside NOOP's own Files-visible folder instead — no picker.
+                // never fires). This backs up inside Pulse's own Files-visible folder instead — no picker.
                 if !FolderBackup.useInternalFolder {
-                    NoopButton("Use Pulse's own folder (browse in Files)",
-                               systemImage: "iphone", kind: .tertiary) { useNoopFolder() }
+                    PulseButton("Use Pulse's own folder (browse in Files)",
+                               systemImage: "iphone", kind: .tertiary) { usePulseFolder() }
                         .disabled(busy)
                 }
                 #endif
@@ -140,7 +140,7 @@ struct BackupSyncView: View {
                 Text(lastMs > 0 ? "Last backup: \(relativeTime(lastMs))" : "No backup yet.")
                     .font(StrandFont.caption).foregroundStyle(StrandPalette.textTertiary)
                 // Auto is ON but the last SUCCESSFUL backup is stale — the on-launch catch-up isn't landing
-                // (a moved/disconnected cloud folder stops backups silently, or NOOP hasn't been opened).
+                // (a moved/disconnected cloud folder stops backups silently, or Pulse hasn't been opened).
                 // Surface it so a silently-failing auto-backup is visible, not discovered only at restore.
                 // `lastMs > 0` excludes the never-backed-up state (the "No backup yet." line above owns that,
                 // and it would otherwise false-fire the moment auto is switched on, before the first backup).
@@ -157,7 +157,7 @@ struct BackupSyncView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
-                NoopButton(busy ? "Working…" : "Back up now",
+                PulseButton(busy ? "Working…" : "Back up now",
                            systemImage: "icloud.and.arrow.up", kind: .primary, fullWidth: true) { backupNow() }
                     .disabled(folderLabel == nil || busy)
             }
@@ -172,7 +172,7 @@ struct BackupSyncView: View {
                 Text("Replace this device's data with one of the backups in your folder. This overwrites current data, so back up first if you're unsure.")
                     .font(StrandFont.footnote).foregroundStyle(StrandPalette.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
-                NoopButton("Restore from a backup…", systemImage: "arrow.uturn.backward", kind: .secondary) {
+                PulseButton("Restore from a backup…", systemImage: "arrow.uturn.backward", kind: .secondary) {
                     openRestorePicker()
                 }
                 .disabled(folderLabel == nil || busy)
@@ -198,7 +198,7 @@ struct BackupSyncView: View {
         Task {
             // Clear in a `defer` so it clears on ANY exit. It matters more here than elsewhere: every
             // control on this screen is `.disabled(busy)`, so a pick that never returned wedged the whole
-            // screen — including the "Use NOOP's own folder" escape hatch. DocumentPicker now guarantees
+            // screen — including the "Use Pulse's own folder" escape hatch. DocumentPicker now guarantees
             // the continuation resumes, but the flag must not depend on that promise holding.
             defer { busy = false }
             let picked = await FolderBackup.pickFolder()
@@ -217,10 +217,10 @@ struct BackupSyncView: View {
     }
 
     #if os(iOS)
-    // #52: picker-free fallback. Back up inside NOOP's own Files-visible folder (On My iPhone → NOOP →
+    // #52: picker-free fallback. Back up inside Pulse's own Files-visible folder (On My iPhone → Pulse →
     // Backups). No folder picker, no security-scoped bookmark — works even where the picker won't select.
-    private func useNoopFolder() {
-        FolderBackup.useNoopFolder()
+    private func usePulseFolder() {
+        FolderBackup.usePulseFolder()
         folderLabel = FolderBackup.folderLabel()
         alertTitle = String(localized: "Using Pulse's folder")
         alertMessage = String(localized: "Backups will be saved inside Pulse. Open the Files app → On My iPhone → Pulse → Backups to see them, or drag that folder into iCloud Drive to read it on your Mac. To use a different folder later, tap Change folder.")

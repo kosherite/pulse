@@ -1,5 +1,5 @@
 //  LiquidCore.swift
-//  NOOP · Liquid design language (experimental redesign)
+//  Pulse · Liquid design language (experimental redesign)
 //
 //  The physics + motion foundation shared by every liquid element. Ported from the
 //  HTML design prototype: a spring-damped surface that stays level with the world
@@ -11,7 +11,7 @@
 //  that drifts and re-catches the light, a reflection that follows the tilt.
 
 import SwiftUI
-import StrandDesign   // NoopMotionState / QuietMotionPrefs — the shared quiet-motion gate
+import StrandDesign   // PulseMotionState / QuietMotionPrefs — the shared quiet-motion gate
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -79,7 +79,7 @@ final class LiquidMotion {
     /// read from the Canvas draw on main — a one-frame-stale value is harmless for a decorative slosh.
     private let motionQueue: OperationQueue = {
         let q = OperationQueue()
-        q.name = "com.noop.liquid.motion"
+        q.name = "com.pulse.liquid.motion"
         q.qualityOfService = .userInteractive
         q.maxConcurrentOperationCount = 1
         return q
@@ -91,7 +91,7 @@ final class LiquidMotion {
     private init() {
         #if os(iOS) && !targetEnvironment(macCatalyst)
         // Stop at the app boundary. `onDisappear` is NOT called when the app is backgrounded, and
-        // NOOP declares `bluetooth-central` + `location` background modes, so it keeps RUNNING
+        // Pulse declares `bluetooth-central` + `location` background modes, so it keeps RUNNING
         // behind the lock screen while a strap is connected — which meant a decorative 60 Hz
         // accelerometer+gyro fusion kept being delivered all day for a picture nobody could see.
         // That is the always-on half of this cost; posing the Canvas still never touched it.
@@ -112,7 +112,7 @@ final class LiquidMotion {
     }
 
     /// The three signals that mean "no decorative motion", read imperatively. Views read
-    /// `NoopMotionState` instead (it publishes, so they invalidate); this is the sensor's own read,
+    /// `PulseMotionState` instead (it publishes, so they invalidate); this is the sensor's own read,
     /// off the same underlying facts, so the two can never disagree.
     static var quietNow: Bool {
         if ProcessInfo.processInfo.isLowPowerModeEnabled { return true }

@@ -1,4 +1,4 @@
-"""Tests for hci_extract — btsnoop/pklg parsing, L2CAP/ATT reassembly, WHOOP frame extraction.
+"""Tests for hci_extract — btspulse/pklg parsing, L2CAP/ATT reassembly, WHOOP frame extraction.
 
 Run: python3 -m unittest -v   (no third-party deps; does not import bleak)
 
@@ -34,10 +34,10 @@ def acl_packet(conn: int, l2cap_payload: bytes, pb: int = 0b10) -> bytes:
     return struct.pack("<HH", handle_flags, len(l2cap_payload)) + l2cap_payload
 
 
-def btsnoop_file(packets) -> bytes:
-    """packets: list of (direction, acl_bytes). Wrap in a datalink-1002 btsnoop container."""
-    out = bytearray(b"btsnoop\x00" + struct.pack(">II", 1, 1002))
-    ts = hx.BTSNOOP_EPOCH_DELTA_US + 1_000_000
+def btspulse_file(packets) -> bytes:
+    """packets: list of (direction, acl_bytes). Wrap in a datalink-1002 btspulse container."""
+    out = bytearray(b"btspulse\x00" + struct.pack(">II", 1, 1002))
+    ts = hx.BTSPULSE_EPOCH_DELTA_US + 1_000_000
     for direction, acl in packets:
         pkt = bytes([hx.H4_ACL]) + acl
         flags = 1 if direction == "rx" else 0
@@ -59,15 +59,15 @@ def pklg_file(packets) -> bytes:
     return bytes(out)
 
 
-class BtsnoopParseTests(unittest.TestCase):
+class BtspulseParseTests(unittest.TestCase):
     def test_rejects_bad_magic(self):
         with self.assertRaises(ValueError):
-            list(hx.parse_btsnoop(b"nope" + b"\x00" * 20))
+            list(hx.parse_btspulse(b"nope" + b"\x00" * 20))
 
     def test_direction_and_payload(self):
         acl = acl_packet(0x40, l2cap_att(att_notify(0x10, b"hello")))
-        data = btsnoop_file([("rx", acl), ("tx", acl)])
-        pkts = list(hx.parse_btsnoop(data))
+        data = btspulse_file([("rx", acl), ("tx", acl)])
+        pkts = list(hx.parse_btspulse(data))
         self.assertEqual(len(pkts), 2)
         self.assertEqual(pkts[0][1], "rx")
         self.assertEqual(pkts[1][1], "tx")
@@ -75,7 +75,7 @@ class BtsnoopParseTests(unittest.TestCase):
 
     def test_timestamp_is_unix_ms(self):
         acl = acl_packet(0x40, l2cap_att(att_notify(0x10, b"x")))
-        pkts = list(hx.parse_btsnoop(btsnoop_file([("rx", acl)])))
+        pkts = list(hx.parse_btspulse(btspulse_file([("rx", acl)])))
         self.assertEqual(pkts[0][0], 1000)         # 1_000_000 µs after epoch delta → 1000 ms
 
 
@@ -142,7 +142,7 @@ class ExtractTests(unittest.TestCase):
         for fr in frames:
             packets.append(("rx", acl_packet(0x40, l2cap_att(att_notify(0x21, fr)))))
         packets.append(("rx", acl_packet(0x41, l2cap_att(att_notify(0x99, b"\xaa\x01not a frame")))))
-        records, stats = hx.extract(hx.parse_btsnoop(btsnoop_file(packets)), "whoop5")
+        records, stats = hx.extract(hx.parse_btspulse(btspulse_file(packets)), "whoop5")
         self.assertEqual(len(records), len(frames))            # junk stream dropped (no CRC-valid frame)
         self.assertTrue(all(r["char"].startswith("handle-0x0021") for r in records))
         self.assertEqual(sum(s["frames"] for s in stats.values()), len(frames))
@@ -151,7 +151,7 @@ class ExtractTests(unittest.TestCase):
         # The app's tx write (e.g. an enable-sequence command) must be captured and marked dir=tx.
         cmd = wf.build_puffin_command(wf.PUFFIN_CMD_GET_CLOCK, seq=0)
         pkt = ("tx", acl_packet(0x40, l2cap_att(att_write_cmd(0x22, cmd))))
-        records, _stats = hx.extract(hx.parse_btsnoop(btsnoop_file([pkt])), "whoop5")
+        records, _stats = hx.extract(hx.parse_btspulse(btspulse_file([pkt])), "whoop5")
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]["dir"], "tx")
 
@@ -167,7 +167,7 @@ class ExtractTests(unittest.TestCase):
             ("rx", acl_packet(0x40, l2cap_att(att_notify(0x31, bytes([0x00, 62]))))),  # HR 62 bpm
             ("rx", acl_packet(0x40, l2cap_att(att_notify(0x21, frame)))),
         ]
-        records, _ = hx.extract(hx.parse_btsnoop(btsnoop_file(packets)), "whoop5")
+        records, _ = hx.extract(hx.parse_btspulse(btspulse_file(packets)), "whoop5")
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]["hr"], 62)
 

@@ -3,8 +3,8 @@ import SwiftUI
 import AppIntents
 import StrandDesign
 
-/// Surfaces NOOP's already-registered App Intents (see StrandiOS/System/NOOPAppIntents.swift) in the
-/// UI so users discover them. `NOOPShortcuts` auto-registers "Sync Strap", "Buzz Strap" and "Mark a Moment" with
+/// Surfaces Pulse's already-registered App Intents (see StrandiOS/System/PulseAppIntents.swift) in the
+/// UI so users discover them. `PulseShortcuts` auto-registers "Sync Strap", "Buzz Strap" and "Mark a Moment" with
 /// Siri/Spotlight/Shortcuts, but nothing in-app advertised them — this is the iOS analogue of the
 /// Mac's strap-double-tap-runs-a-Shortcut feature. Apple's `SiriTipView`/`ShortcutsLink` (iOS 16+)
 /// do exactly that: tip the user on the spoken phrase and deep-link into the Shortcuts app, scoped to
