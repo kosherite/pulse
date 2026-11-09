@@ -159,7 +159,7 @@ def main():
     doc = collections.OrderedDict([
         ("note",
          "Golden vectors for the WHOOP 5/MG layout-v20 (R20, 2,140-byte) optical record. Both `hex` "
-         "strings are REAL records from a NOOP deep-buffer capture (issue #423); the expected values "
+         "strings are REAL records from a Pulse deep-buffer capture (issue #423); the expected values "
          "were produced by an independent third implementation of the published byte layout, so Swift "
          "and Kotlin each have to reproduce them rather than agreeing with each other by construction. "
          "Regenerate with Tools/gen_r20_oracle.py, which writes both copies at once — they MUST stay "

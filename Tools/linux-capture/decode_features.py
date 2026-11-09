@@ -242,7 +242,7 @@ def find_whoop_decode():
     if found:
         return found
     raise FileNotFoundError(
-        "whoop-decode not found. Build it: cd noop/Packages/WhoopProtocol && "
+        "whoop-decode not found. Build it: cd pulse/Packages/WhoopProtocol && "
         "swift build --product whoop-decode  (or set WHOOP_DECODE).")
 
 

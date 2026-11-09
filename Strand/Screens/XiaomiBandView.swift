@@ -249,7 +249,7 @@ struct XiaomiBandView: View {
     }
 
     private var loadingState: some View {
-        NoopCard(tint: StrandPalette.metricAmber) {
+        PulseCard(tint: StrandPalette.metricAmber) {
             HStack(spacing: 10) {
                 ConnectionDot(tone: .accent, pulsing: true)
                 Text("Reading your Mi Band history…")
@@ -268,7 +268,7 @@ struct XiaomiBandView: View {
            let decoded = decodeStages(night.stagesJSON, sessionStart: night.startTs),
            decoded.intervals.count >= 2 {
             let s = decoded.stages
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                 SectionHeader("Last sleep", overline: "Hypnogram",
                               trailing: Self.nightFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(night.startTs))))
                 ChartCard(
@@ -277,11 +277,11 @@ struct XiaomiBandView: View {
                         String(localized: "\(durationString(Double(night.endTs - night.startTs) / 60)) in bed · \(Int(eff.rounded()))% efficiency")
                     } ?? String(localized: "\(durationString(Double(night.endTs - night.startTs) / 60)) in bed"),
                     trailing: durationString(s.asleepMin),
-                    height: NoopMetrics.chartHeight,
+                    height: PulseMetrics.chartHeight,
                     tint: StrandPalette.restColor,
                     chart: {
                         Hypnogram(intervals: decoded.intervals,
-                                  height: NoopMetrics.chartHeight,
+                                  height: PulseMetrics.chartHeight,
                                   showsStageAxis: true,
                                   nightStart: Date(timeIntervalSince1970: TimeInterval(night.startTs)),
                                   showsTimeAxis: true)
@@ -337,9 +337,9 @@ struct XiaomiBandView: View {
 
     private var tileGrid: some View {
         LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 168), spacing: NoopMetrics.gap)],
+            columns: [GridItem(.adaptive(minimum: 168), spacing: PulseMetrics.gap)],
             alignment: .leading,
-            spacing: NoopMetrics.gap
+            spacing: PulseMetrics.gap
         ) {
             statTile(key: "steps", label: "Steps", accent: StrandPalette.metricCyan, fmt: { intString($0) })
             statTile(key: "rhr", label: "Resting HR", accent: StrandPalette.metricRose, unit: "bpm",
@@ -416,7 +416,7 @@ struct XiaomiBandView: View {
                 if pts.count >= 2 {
                     TrendChart(points: pts, gradient: gradient,
                                valueRange: valueRange(pts, fallback: fallback),
-                               showsArea: true, height: NoopMetrics.chartHeight, valueFormat: fmt)
+                               showsArea: true, height: PulseMetrics.chartHeight, valueFormat: fmt)
                 } else if let only = vals.last {
                     singlePoint(only, fmt: fmt, accent: StrandPalette.sample(stops: gradient.stops, at: 0.85))
                 } else {

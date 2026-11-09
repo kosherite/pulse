@@ -2,7 +2,7 @@ import Foundation
 import StrandAnalytics
 import WhoopProtocol
 
-// sleeppsg — score NOOP's shipped sleep stager against polysomnography.
+// sleeppsg — score Pulse's shipped sleep stager against polysomnography.
 //
 // USAGE:  sleeppsg --dataset /path/to/sleep-accel-1.0.0 [--section all] [--csv out.csv] [--subjects N]
 //         sleeppsg --section port                        (no dataset needed — the port check alone)

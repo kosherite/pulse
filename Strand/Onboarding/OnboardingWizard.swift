@@ -6,12 +6,12 @@ import UserNotifications
 
 // MARK: - OnboardingWizard
 //
-// A full-screen, paged onboarding + pairing flow for NOOP. Cinematic and calm:
+// A full-screen, paged onboarding + pairing flow for Pulse. Cinematic and calm:
 // a dark surfaceBase substrate with a slow ambient glow, a bottom progress "thread"
 // that fills as you advance, Back always available, and a forward CTA per step.
 //
 // Steps:
-//  1 Welcome           — NOOP + "all your data, none of the cloud"
+//  1 Welcome           — Pulse + "all your data, none of the cloud"
 //  2 What it does      — 3 calm value slides
 //  3 Bluetooth priming — explain BEFORE the OS prompt
 //  4 Wear & wake       — put your strap on, make sure it's charged
@@ -47,9 +47,9 @@ public struct OnboardingWizard: View {
     @State private var step: Step = .welcome
     @State private var glow = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    /// Low Power Mode / "Reduce motion in NOOP" pose these looping glows still too. Onboarding is
+    /// Low Power Mode / "Reduce motion in Pulse" pose these looping glows still too. Onboarding is
     /// first-run only, but a `repeatForever` is a `repeatForever` wherever it lives.
-    @ObservedObject private var motion = NoopMotionState.shared
+    @ObservedObject private var motion = PulseMotionState.shared
     private var poseStill: Bool { motion.poseStill(reduceMotion) }
 
     public var body: some View {
@@ -219,7 +219,7 @@ public struct OnboardingWizard: View {
 
     /// Leaving the Notifications step is the one point in onboarding where we actually ask the OS for
     /// notification permission — everything before this only explained why (the `NotificationsStep`
-    /// card). Without this, NOOP never showed up under Settings → Notifications at all unless a user
+    /// card). Without this, Pulse never showed up under Settings → Notifications at all unless a user
     /// later found and enabled one of the opt-in automations (wind-down, battery, illness) buried in
     /// More → Alarms/Automations, each of which lazily requests on its own toggle. Mirrors the Android
     /// onboarding's `OnboardingPage.Notifications` step (`OnboardingScreen.kt`): request only if not
@@ -399,7 +399,7 @@ private struct ExpectationsStep: View {
                     }
                     .padding(14)
                     .frame(maxWidth: 520, alignment: .leading)
-                    .background(NoopPanelSurface(cornerRadius: 14))
+                    .background(PulsePanelSurface(cornerRadius: 14))
                     .opacity(shown ? 1 : 0)
                     .offset(y: shown ? 0 : 8)
                     .animation(StrandMotion.gentle.delay(Double(index) * 0.08), value: shown)
@@ -442,7 +442,7 @@ private struct ExpectationsStep: View {
         }
         .padding(14)
         .frame(maxWidth: 520, alignment: .leading)
-        .background(NoopPanelSurface(cornerRadius: 14))
+        .background(PulsePanelSurface(cornerRadius: 14))
     }
 }
 
@@ -451,9 +451,9 @@ private struct ExpectationsStep: View {
 private struct BluetoothStep: View {
     @State private var pulse = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    /// Low Power Mode / "Reduce motion in NOOP" pose these looping glows still too. Onboarding is
+    /// Low Power Mode / "Reduce motion in Pulse" pose these looping glows still too. Onboarding is
     /// first-run only, but a `repeatForever` is a `repeatForever` wherever it lives.
-    @ObservedObject private var motion = NoopMotionState.shared
+    @ObservedObject private var motion = PulseMotionState.shared
     private var poseStill: Bool { motion.poseStill(reduceMotion) }
     var body: some View {
         StepShell(title: String(localized: "A quick word before we connect"),
@@ -579,7 +579,7 @@ private struct ScanStep: View {
 
                     if showHelp { reassurance }
 
-                    // WHOOP is NOOP's primary band, so onboarding leads with it — but it isn't required.
+                    // WHOOP is Pulse's primary band, so onboarding leads with it — but it isn't required.
                     // Make that obvious so a non-WHOOP user doesn't feel stuck here: they can continue now
                     // and pair a heart-rate strap or import data afterwards (in Devices / Data Sources).
                     Text("No WHOOP? You can still continue. Pair a heart-rate strap (Polar, Wahoo, Coospo, Garmin HRM…) or a gym machine under Devices, or import from WHOOP, Apple Health, Oura, Fitbit, Garmin and more under Data Sources. You can do either any time.")
@@ -965,9 +965,9 @@ private struct ImportStep: View {
 private struct NotificationsStep: View {
     @State private var pulse = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    /// Low Power Mode / "Reduce motion in NOOP" pose these looping glows still too. Onboarding is
+    /// Low Power Mode / "Reduce motion in Pulse" pose these looping glows still too. Onboarding is
     /// first-run only, but a `repeatForever` is a `repeatForever` wherever it lives.
-    @ObservedObject private var motion = NoopMotionState.shared
+    @ObservedObject private var motion = PulseMotionState.shared
     private var poseStill: Bool { motion.poseStill(reduceMotion) }
     var body: some View {
         StepShell(title: String(localized: "Stay in the loop"),
@@ -991,7 +991,7 @@ private struct NotificationsStep: View {
                 #if os(iOS)
                 // iOS gives an app no way to observe *other* apps' notifications, and the per-app picker
                 // behind it is NSWorkspace-based (macOS-only). So drop the cross-app relay claim here and
-                // keep only what iOS genuinely does: NOOP's own strain nudges + smart alarm buzz the strap
+                // keep only what iOS genuinely does: Pulse's own strain nudges + smart alarm buzz the strap
                 // directly over BLE.
                 InfoCard(
                     icon: "applewatch.radiowaves.left.and.right",
@@ -1147,9 +1147,9 @@ private struct RadarSweep: View {
     @State private var angle: Double = 0
     @State private var ping = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    /// Low Power Mode / "Reduce motion in NOOP" pose these looping glows still too. Onboarding is
+    /// Low Power Mode / "Reduce motion in Pulse" pose these looping glows still too. Onboarding is
     /// first-run only, but a `repeatForever` is a `repeatForever` wherever it lives.
-    @ObservedObject private var motion = NoopMotionState.shared
+    @ObservedObject private var motion = PulseMotionState.shared
     private var poseStill: Bool { motion.poseStill(reduceMotion) }
 
     var body: some View {
@@ -1410,7 +1410,7 @@ private struct SecondaryButtonStyle: ButtonStyle {
             .foregroundStyle(StrandPalette.textPrimary)
             .padding(.vertical, 11)
             .padding(.horizontal, 18)
-            .background(NoopPanelSurface(cornerRadius: 12))
+            .background(PulsePanelSurface(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(configuration.isPressed ? StrandPalette.hairlineStrong : StrandPalette.hairline, lineWidth: 1)

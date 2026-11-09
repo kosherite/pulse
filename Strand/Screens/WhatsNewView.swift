@@ -2,7 +2,7 @@ import SwiftUI
 import StrandDesign
 
 /// "What's New" — a proper in-app changelog, shown automatically after an update and reachable any
-/// time from Settings. It also restates, up top, what NOOP is and what to expect, so people who never
+/// time from Settings. It also restates, up top, what Pulse is and what to expect, so people who never
 /// open GitHub still understand the experimental footing and the WHOOP 5/MG status.
 struct WhatsNewView: View {
     let onClose: () -> Void
@@ -21,7 +21,7 @@ struct WhatsNewView: View {
                 // LazyVStack (byte-identical layout to VStack inside a ScrollView — same leading
                 // alignment + sectionGap spacing) builds the off-screen release cards on demand instead
                 // of constructing the entire history up-front each time the sheet opens.
-                LazyVStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+                LazyVStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                     expectationsCard
                     ForEach(Array(AppChangelog.releases.enumerated()), id: \.element.id) { index, release in
                         // The newest release is the headline — give it the brand-green wash; the
@@ -48,7 +48,7 @@ struct WhatsNewView: View {
         #else
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         // A long changelog scroll → open full-height, with a grabber for swipe-to-dismiss.
-        .noopSheetPresentation(largeFirst: true)
+        .pulseSheetPresentation(largeFirst: true)
         #endif
         .background(StrandPalette.surfaceBase)
     }
@@ -78,7 +78,7 @@ struct WhatsNewView: View {
     }
 
     private var expectationsCard: some View {
-        NoopCard(tint: StrandPalette.accent) {
+        PulseCard(tint: StrandPalette.accent) {
             VStack(alignment: .leading, spacing: 14) {
                 Text("What to expect").font(StrandFont.overline)
                     .tracking(StrandFont.overlineTracking)
@@ -104,7 +104,7 @@ struct WhatsNewView: View {
     }
 
     private func releaseCard(_ release: AppChangelog.Release, isLatest: Bool = false) -> some View {
-        NoopCard(tint: isLatest ? StrandPalette.accent : nil) {
+        PulseCard(tint: isLatest ? StrandPalette.accent : nil) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 8) {
                     SourceBadge("v\(release.version)")

@@ -114,20 +114,20 @@ final class MetricSeriesStoreTests: XCTestCase {
         try await store.upsertMetricSeries([
             MetricPoint(day: "2026-07-20", key: "period_start", value: 1),
             MetricPoint(day: "2026-07-21", key: "period_start", value: 1),
-        ], deviceId: "noop-cycle")
+        ], deviceId: "pulse-cycle")
         try await store.upsertMetricSeries([
             MetricPoint(day: "2026-07-20", key: "period_start", value: 1),
         ], deviceId: "other-source")
 
         let firstDelete = try await store.deleteMetricSeriesPoint(
-            deviceId: "noop-cycle", day: "2026-07-20", key: "period_start")
+            deviceId: "pulse-cycle", day: "2026-07-20", key: "period_start")
         let secondDelete = try await store.deleteMetricSeriesPoint(
-            deviceId: "noop-cycle", day: "2026-07-20", key: "period_start")
+            deviceId: "pulse-cycle", day: "2026-07-20", key: "period_start")
         XCTAssertEqual(firstDelete, 1)
         XCTAssertEqual(secondDelete, 0)
 
         let cycleRows = try await store.metricSeries(
-            deviceId: "noop-cycle", key: "period_start", from: "2026-07-01", to: "2026-07-31")
+            deviceId: "pulse-cycle", key: "period_start", from: "2026-07-01", to: "2026-07-31")
         XCTAssertEqual(cycleRows.map(\.day), ["2026-07-21"])
         let foreignRows = try await store.metricSeries(
             deviceId: "other-source", key: "period_start", from: "2026-07-01", to: "2026-07-31")
@@ -140,22 +140,22 @@ final class MetricSeriesStoreTests: XCTestCase {
             MetricPoint(day: "2026-07-20", key: "period_start", value: 1),
             MetricPoint(day: "2026-07-21", key: "period_start", value: 1),
             MetricPoint(day: "2026-07-21", key: "other", value: 1),
-        ], deviceId: "noop-cycle")
+        ], deviceId: "pulse-cycle")
         try await store.upsertMetricSeries([
             MetricPoint(day: "2026-07-20", key: "period_start", value: 1),
         ], deviceId: "other-source")
 
         let firstDelete = try await store.deleteMetricSeries(
-            deviceId: "noop-cycle", key: "period_start")
+            deviceId: "pulse-cycle", key: "period_start")
         let secondDelete = try await store.deleteMetricSeries(
-            deviceId: "noop-cycle", key: "period_start")
+            deviceId: "pulse-cycle", key: "period_start")
         XCTAssertEqual(firstDelete, 2)
         XCTAssertEqual(secondDelete, 0)
 
         let cyclePeriodRows = try await store.metricSeries(
-            deviceId: "noop-cycle", key: "period_start", from: "2026-07-01", to: "2026-07-31")
+            deviceId: "pulse-cycle", key: "period_start", from: "2026-07-01", to: "2026-07-31")
         let cycleOtherRows = try await store.metricSeries(
-            deviceId: "noop-cycle", key: "other", from: "2026-07-01", to: "2026-07-31")
+            deviceId: "pulse-cycle", key: "other", from: "2026-07-01", to: "2026-07-31")
         let foreignRows = try await store.metricSeries(
             deviceId: "other-source", key: "period_start", from: "2026-07-01", to: "2026-07-31")
         XCTAssertTrue(cyclePeriodRows.isEmpty)

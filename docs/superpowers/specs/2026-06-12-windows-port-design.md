@@ -1,10 +1,10 @@
-# NOOP for Windows — Design & Implementation Plan
+# Pulse for Windows — Design & Implementation Plan
 
-**Status:** Design (2026-06-12). NOOP for Windows is **not built**. This is the blueprint, grounded in
+**Status:** Design (2026-06-12). Pulse for Windows is **not built**. This is the blueprint, grounded in
 a 4-track architecture study. It cannot be built or BLE-tested from a macOS machine — see "Build &
 test reality."
 
-**Goal:** A Windows desktop NOOP with the same functionality and the same design language as the macOS
+**Goal:** A Windows desktop Pulse with the same functionality and the same design language as the macOS
 app: pair a WHOOP strap over Bluetooth, store everything on-device, compute recovery/strain/HRV/sleep
 locally, import WHOOP CSV + Apple Health, the AI Coach — all offline, no account, no cloud.
 
@@ -19,7 +19,7 @@ mandatory** (GATT central: scan, connect, **bond**, subscribe notifications, wri
 > **Primary path: Compose Multiplatform Desktop (Kotlin) — gated on a Bluetooth spike.**
 > **Fallback if the BLE spike fails: .NET 8 + Avalonia with native WinRT Bluetooth.**
 
-Why, in one paragraph: the **Android app is already a Kotlin/Compose twin** of NOOP — the protocol
+Why, in one paragraph: the **Android app is already a Kotlin/Compose twin** of Pulse — the protocol
 decoder (incl. the v25 work), the recovery/strain/HRV/sleep analytics, the data layer, and the *screens
 themselves* are Compose. Compose Multiplatform Desktop runs that same Kotlin/Compose code on the JVM on
 Windows, and **the entire app — UI, analytics, data — builds and iterates from the Mac** (`./gradlew
@@ -49,17 +49,17 @@ same engine, one interop layer removed. That layer is the spike.
 ```
 windows/  (new Gradle module, or a desktopMain source set in a Kotlin Multiplatform restructure)
 ├── shared Kotlin (REUSED from android/app, moved to a commonMain/jvmMain shared module):
-│   ├── com.noop.protocol   ── BLE framing/CRC/decode incl. v25  ── reuses ~100%, pure Kotlin
-│   ├── com.noop.analytics  ── recovery/strain/HRV/sleep math     ── reuses ~100%, pure Kotlin
-│   ├── com.noop.ingest     ── WHOOP CSV + Apple Health importers ── reuses (drop Health Connect, Android-only)
-│   └── com.noop.ui (Compose) ── the screens                       ── reuses with adaptation (window vs phone, no Android nav)
+│   ├── com.pulse.protocol   ── BLE framing/CRC/decode incl. v25  ── reuses ~100%, pure Kotlin
+│   ├── com.pulse.analytics  ── recovery/strain/HRV/sleep math     ── reuses ~100%, pure Kotlin
+│   ├── com.pulse.ingest     ── WHOOP CSV + Apple Health importers ── reuses (drop Health Connect, Android-only)
+│   └── com.pulse.ui (Compose) ── the screens                       ── reuses with adaptation (window vs phone, no Android nav)
 ├── data:  Room → SQLDelight (JVM)   ── Room is Android-only; SQLDelight gives the same schema on JVM/Windows
 ├── ble:   NEW — WindowsBleClient    ── the from-scratch piece (see below)
 └── app:   Compose Desktop window + tray, wires it together
 ```
 
-- **Protocol + analytics + importers:** lift `com.noop.protocol`, `com.noop.analytics`, the pure parts
-  of `com.noop.ingest` into a shared module. They're plain Kotlin/Foundation-free — they compile on the
+- **Protocol + analytics + importers:** lift `com.pulse.protocol`, `com.pulse.analytics`, the pure parts
+  of `com.pulse.ingest` into a shared module. They're plain Kotlin/Foundation-free — they compile on the
   JVM unchanged. This is the whole reason to choose this path.
 - **Data:** the Android app uses **Room** (Android-only). Swap to **SQLDelight** for the JVM target — same
   SQL schema, generates typed Kotlin. (Or bundle the SQLite JDBC driver.) One-time port of the DAO layer.
@@ -73,7 +73,7 @@ windows/  (new Gradle module, or a desktopMain source set in a Kotlin Multiplatf
   v25 decode, the Backfiller, the retro-decode) is already written and reuses.
 
 ### AI Coach
-Reuses directly — `com.noop.ai.AiCoach` is plain Kotlin + OkHttp (BYOK to Anthropic/OpenAI/local LLM).
+Reuses directly — `com.pulse.ai.AiCoach` is plain Kotlin + OkHttp (BYOK to Anthropic/OpenAI/local LLM).
 No change.
 
 ---
@@ -116,7 +116,7 @@ ongoing cost, and it's unavoidable for *any* Windows port that does Bluetooth.
 ## Anonymity & distribution (clears cleanly — same model as macOS/Android)
 
 - Ship an **unsigned, portable** Windows artifact (a `.zip` of a self-contained build, or an unsigned
-  installer) from **GitHub Releases** — exactly the no-store, no-cert, no-identity model NOOP already uses.
+  installer) from **GitHub Releases** — exactly the no-store, no-cert, no-identity model Pulse already uses.
   **No Microsoft Store account, no paid Authenticode cert** — both would attach a real identity.
 - **Anonymize the binary** with a Windows twin of `anonymize-macos-app.sh` / `anonymize-ios-app.sh`: scrub
   the builder's home path out of every binary in the bundle before zipping (JVM apps embed fewer such
@@ -131,7 +131,7 @@ ongoing cost, and it's unavoidable for *any* Windows port that does Bluetooth.
 
 1. **BLE spike (go/no-go)** — btleplug-via-JNI scan→connect→bond→subscribe→write to a real strap on Windows.
    *Gate the whole project on this.*
-2. **Shared-module extraction** — move `com.noop.protocol` / `analytics` / pure `ingest` into a Kotlin
+2. **Shared-module extraction** — move `com.pulse.protocol` / `analytics` / pure `ingest` into a Kotlin
    shared module that builds for both Android and JVM. Unit tests (already exist) run on the Mac. No behaviour change to Android.
 3. **Data port** — Room DAOs → SQLDelight (JVM). Verify schema parity against the Android DB.
 4. **`WindowsBleClient`** — implement the transport from the spike; reuse the platform-agnostic handshake /

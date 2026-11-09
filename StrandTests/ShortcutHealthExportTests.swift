@@ -3,7 +3,7 @@ import WhoopStore
 import WhoopProtocol
 @testable import Strand
 
-/// Pins the pure logic behind the #155 Shortcuts drop file (Documents/noop_sync.txt): the exact
+/// Pins the pure logic behind the #155 Shortcuts drop file (Documents/pulse_sync.txt): the exact
 /// `HR,HRV,Steps,yyyy-MM-dd HH:mm` line shape the reporter's pre-built Siri Shortcut parses (empty
 /// fields keep their commas, 1-decimal HRV, LOCAL-zone timestamp), the 15-minute windowing, the
 /// cumulative-u16 step delta math, and the advance-only-on-success watermark — a watermark that

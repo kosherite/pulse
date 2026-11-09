@@ -22,7 +22,7 @@ import Foundation
 /// which is worse than "unknown" because it looks authoritative.
 ///
 /// Pure, and the window is clamped to the payload, so a short or malformed frame cannot trap. Kotlin
-/// twin: `com.noop.protocol.firmwareGateDiagnostic`.
+/// twin: `com.pulse.protocol.firmwareGateDiagnostic`.
 public func firmwareGateDiagnostic(payload: [UInt8], nameEndIndex: Int) -> String {
     let at93 = payload.count > 93 ? String(payload[93]) : "n/a"
     let lo = min(88, payload.count)

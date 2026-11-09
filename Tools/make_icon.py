@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""NOOP app icon — Titanium & Gold v3.1 "gold on navy".
+"""Pulse app icon — Titanium & Gold v3.1 "gold on navy".
 
 A deep-navy tile + a THICK open gold recovery ring (round-capped, gold gradient
 along the sweep) + a solid gold core dot. Matches the in-app BrandMark geometry
 (open ~80% arc from 12 o'clock, clockwise) but on navy with a heavier stroke.
 
-Usage: make_icon.py            -> writes noop_icon_1024.png + noop_icon_432.png
+Usage: make_icon.py            -> writes pulse_icon_1024.png + pulse_icon_432.png
 Distribute with distribute_icons.sh.
 """
 import os, math, sys
@@ -90,6 +90,6 @@ if __name__ == '__main__':
     # Flatten to RGB (no alpha) for the iOS/macOS app icon. iOS app icons MUST be fully opaque, an
     # RGBA icon renders glitched when applied as an alternate icon (#708). The art already fills the
     # whole opaque navy tile, so dropping the all-255 alpha channel changes nothing visible.
-    render(1024, ring_scale=1.00).convert('RGB').save(os.path.join(OUT, 'noop_icon_1024.png'))   # iOS/macOS (squircle shows full art)
-    render(432,  ring_scale=0.80).save(os.path.join(OUT, 'noop_icon_432.png'))     # Android adaptive bg (ring inside safe-zone)
-    print('wrote noop_icon_1024.png, noop_icon_432.png, noop_icon_preview.png')
+    render(1024, ring_scale=1.00).convert('RGB').save(os.path.join(OUT, 'pulse_icon_1024.png'))   # iOS/macOS (squircle shows full art)
+    render(432,  ring_scale=0.80).save(os.path.join(OUT, 'pulse_icon_432.png'))     # Android adaptive bg (ring inside safe-zone)
+    print('wrote pulse_icon_1024.png, pulse_icon_432.png, pulse_icon_preview.png')

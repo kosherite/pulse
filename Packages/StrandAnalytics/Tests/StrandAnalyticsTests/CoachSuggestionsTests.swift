@@ -4,7 +4,7 @@ import XCTest
 import WhoopStore
 
 /// Byte-identity pin for the contextual Coach suggestion chips. The same inputs MUST produce the
-/// same chip strings as the Android twin `com.noop.analytics.CoachSuggestionsTest`. Cross-platform
+/// same chip strings as the Android twin `com.pulse.analytics.CoachSuggestionsTest`. Cross-platform
 /// parity is the contract; if you change a chip string here, change it there in the same PR.
 final class CoachSuggestionsTests: XCTestCase {
 

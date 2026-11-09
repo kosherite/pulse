@@ -2,7 +2,7 @@ import Foundation
 import WhoopProtocol
 
 /// The ONE place the Oura ring's respiration rows are scaled, displayed and — deliberately — kept out
-/// of scoring. Twin of Kotlin `com.noop.data.OuraRespScale`.
+/// of scoring. Twin of Kotlin `com.pulse.data.OuraRespScale`.
 ///
 /// `respSample` was built for a WHOOP 4.0's raw respiration ADC WAVEFORM (`resp_rate_raw@47`, 1 Hz,
 /// unit `raw_adc`): a signal the stager runs a peak detector over. The ring sends no waveform at all;

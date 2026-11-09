@@ -3,14 +3,14 @@ import StrandAnalytics
 
 // MARK: - Unit system preference
 //
-// NOOP stores EVERYTHING in SI (km, kg, cm, °C) — the importers normalise on the way in, so this is a
+// Pulse stores EVERYTHING in SI (km, kg, cm, °C) — the importers normalise on the way in, so this is a
 // purely cosmetic, display-only layer. There is no data migration and nothing on disk changes when the
 // user flips this. Body measurements and exercise distance each have their own Metric/Imperial choice,
 // with a SEPARATE temperature override, because regional conventions commonly mix pounds with kilometres
 // (or kg/cm with °F). Default is Metric — most of the world, and it matches what we store.
 //
-// Persisted via @AppStorage (UserDefaults), the same mechanism every other macOS NOOP preference uses.
-// The Android side mirrors this exactly in Units.kt + NoopPrefs.
+// Persisted via @AppStorage (UserDefaults), the same mechanism every other macOS Pulse preference uses.
+// The Android side mirrors this exactly in Units.kt + PulsePrefs.
 
 /// A Metric/Imperial display choice. Body measurements and exercise distance persist separate values.
 enum UnitSystem: String, CaseIterable, Identifiable {
@@ -30,11 +30,11 @@ enum TemperatureUnit: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-/// How the Effort score is displayed (#268). NOOP's Effort is stored 0–100 (StrainScorer.maxStrain = 100);
+/// How the Effort score is displayed (#268). Pulse's Effort is stored 0–100 (StrainScorer.maxStrain = 100);
 /// people coming from WHOOP often think in its 0–21 Day Strain axis, so this purely cosmetic toggle lets
-/// the SAME stored value be shown on either scale. Default is NOOP's own 0–100 — the data never changes.
+/// the SAME stored value be shown on either scale. Default is Pulse's own 0–100 — the data never changes.
 enum EffortScale: String, CaseIterable, Identifiable {
-    /// NOOP's native 0–100 axis (the stored value, one decimal).
+    /// Pulse's native 0–100 axis (the stored value, one decimal).
     case hundred
     /// WHOOP's 0–21 Day Strain axis — the stored 0–100 value rescaled down for display only.
     case whoop
@@ -44,7 +44,7 @@ enum EffortScale: String, CaseIterable, Identifiable {
 /// How the trend charts (Trends tab) are drawn — a purely cosmetic, display-only toggle. The plotted
 /// data is identical on both settings; only the mark geometry changes (gradient line + area vs vertical
 /// bars). Default is the classic line. Distinct from `ChartStyle`, which chooses the colour ramp; this
-/// chooses line-vs-bar. Mirrored on Android by NoopPrefs("trend.chart.style").
+/// chooses line-vs-bar. Mirrored on Android by PulsePrefs("trend.chart.style").
 enum TrendChartStyle: String, CaseIterable, Identifiable {
     /// The classic gradient-stroked line with a soft area fill (the long-standing look).
     case line
@@ -55,17 +55,17 @@ enum TrendChartStyle: String, CaseIterable, Identifiable {
     var label: String { self == .bar ? "Bars" : "Line" }
 }
 
-/// Which sleep window the nightly HRV is measured over (#141). NOOP historically averages RMSSD across the
+/// Which sleep window the nightly HRV is measured over (#141). Pulse historically averages RMSSD across the
 /// WHOLE night (every stage); WHOOP/Polar/etc. sample the last slow-wave-sleep window, which reads lower.
 /// This lets a user match that. It CHANGES the computed avgHrv (NOT display-only), so a switch re-scores +
-/// re-baselines. Default is the historical whole-night value. Mirrored on Android by NoopPrefs("hrv.window").
+/// re-baselines. Default is the historical whole-night value. Mirrored on Android by PulsePrefs("hrv.window").
 enum HrvWindow: String, CaseIterable, Identifiable {
-    /// RMSSD averaged over every 5-min window of the night (NOOP's long-standing value).
+    /// RMSSD averaged over every 5-min window of the night (Pulse's long-standing value).
     case whole
     /// RMSSD over DEEP (slow-wave) sleep windows only — the window WHOOP samples.
     ///
     /// "Comparable to WHOOP" describes the METHOD, not the accuracy of the resulting number: the deep
-    /// windows come from NOOP's own stager, not the strap. `Tools/SleepPSG` scores that stager against
+    /// windows come from Pulse's own stager, not the strap. `Tools/SleepPSG` scores that stager against
     /// PSG truth over 31 subjects / 26 773 epochs and measures deep at 18.94 % predicted vs 13.76 %
     /// truth — a +5.18 pp bias, roughly 38 % more deep epochs than exist, at four-class kappa 0.356.
     /// An over-inclusive deep window pulls this value back toward the whole-night mean, which is the
@@ -94,17 +94,17 @@ enum UnitPrefs {
     /// stored ever changes. Same key string as the Android `units.skinTempDisplay` pref.
     static let skinTempDisplayKey = "units.skinTempDisplay"
     /// Effort display scale (#268). Stored raw is an `EffortScale` rawValue; an unset/unknown value
-    /// resolves to `.hundred` (NOOP's native axis). Mirrored on Android by NoopPrefs("effort.scale").
+    /// resolves to `.hundred` (Pulse's native axis). Mirrored on Android by PulsePrefs("effort.scale").
     static let effortScaleKey = "effort.scale"
 
     /// Trend chart style (line vs bar). Stored raw is a `TrendChartStyle` rawValue; an unset/unknown
     /// value resolves to `.line` (the classic look). Display-only — the plotted data never changes.
-    /// Mirrored on Android by NoopPrefs("trend.chart.style").
+    /// Mirrored on Android by PulsePrefs("trend.chart.style").
     static let trendChartStyleKey = "trend.chart.style"
 
     /// Nightly-HRV window (#141). Stored raw is an `HrvWindow` rawValue; unset/unknown resolves to `.whole`
     /// (the historical whole-night value). NOT display-only — it changes the computed avgHrv, so the engine
-    /// reads it and a Settings switch re-scores. Mirrored on Android by NoopPrefs("hrv.window").
+    /// reads it and a Settings switch re-scores. Mirrored on Android by PulsePrefs("hrv.window").
     static let hrvWindowKey = "hrv.window"
 
     /// Display factor for the #268 Effort scale: the stored 0-100 value multiplied by this renders on
@@ -154,7 +154,7 @@ enum UnitPrefs {
         UnitSystem(rawValue: raw) ?? system
     }
 
-    /// Resolve the stored Effort-scale raw value, defaulting to NOOP's native 0–100 axis.
+    /// Resolve the stored Effort-scale raw value, defaulting to Pulse's native 0–100 axis.
     static func resolveEffortScale(_ raw: String) -> EffortScale {
         EffortScale(rawValue: raw) ?? .hundred
     }
@@ -339,7 +339,7 @@ enum UnitFormatter {
 
     // MARK: Effort scale (stored 0–100 — #268)
 
-    /// NOOP stores Effort 0–100 (StrainScorer.maxStrain = 100). WHOOP's Day Strain axis is 0–21, and
+    /// Pulse stores Effort 0–100 (StrainScorer.maxStrain = 100). WHOOP's Day Strain axis is 0–21, and
     /// the import boundary rescales by 100/21 (WhoopExportImporter.dayStrainToEffortScale), so the exact
     /// inverse for a display-only 0–100 → 0–21 conversion is ×21/100. Kept byte-identical to that factor
     /// and to the Android `UnitFormatter.EFFORT_SCALE_FACTOR`. A wrong factor is pinned by the formatter tests.

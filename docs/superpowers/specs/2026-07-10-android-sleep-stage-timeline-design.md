@@ -77,10 +77,10 @@ The rows stack is taller than the old strip. iOS uses `height: 524` for the time
 
 ## Files touched
 
-- `android/app/src/main/java/com/noop/ui/SleepScreen.kt` — new `StageTimeline`, `StageTimelineRow`,
+- `android/app/src/main/java/com/pulse/ui/SleepScreen.kt` — new `StageTimeline`, `StageTimelineRow`,
   `StageHatchedTrack`, interval reconstruction + `displaySmoothed` port, `selectedStage` state, hero card
   body rewrite, `StageLegend` deletion, MotionStrip relocation.
-- `android/app/src/main/java/com/noop/ui/Theme.kt` — new `Metrics` constants.
+- `android/app/src/main/java/com/pulse/ui/Theme.kt` — new `Metrics` constants.
 - Android unit tests — interval reconstruction, 90 s smoothing parity with Swift fixtures, percent math.
 
 ## Risks

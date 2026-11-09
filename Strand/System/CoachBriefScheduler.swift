@@ -9,7 +9,7 @@ import WidgetKit
 /// generated on-device via the user's already-configured Coach provider, at a chosen time each day.
 /// Tap → opens Coach with the full brief. No push server, no cloud — the network call is the SAME
 /// bring-your-own-key request Coach already makes on every send, just user-armed on a daily timer
-/// instead of triggered by a tap. Default OFF, like every NOOP automation.
+/// instead of triggered by a tap. Default OFF, like every Pulse automation.
 ///
 /// Cross-platform (macOS + iOS), same architecture as `ScheduledDebugExport`:
 /// - **macOS** — the app is usually running; a foreground `DispatchSourceTimer` fires at the chosen
@@ -50,15 +50,15 @@ enum CoachBriefScheduler {
     static let notificationCategoryId = "coach-brief"
     private static let requestIdPrefix = "coach-brief-"
 
-    /// The Coach master switch, under the same `noop.` key Android writes and `RootTabView` binds.
+    /// The Coach master switch, under the same `pulse.` key Android writes and `RootTabView` binds.
     ///
     /// Read through `object(forKey:)` rather than `bool(forKey:)` because this pref defaults to TRUE and
     /// `bool(forKey:)` answers FALSE for a key that was never written. Taking the shorter spelling here
     /// would have disabled the Coach for every install that had never opened the toggle, which is exactly
     /// the population whose behaviour must not change.
     static var coachMasterEnabled: Bool {
-        guard UserDefaults.standard.object(forKey: "noop.coachEnabled") != nil else { return true }
-        return UserDefaults.standard.bool(forKey: "noop.coachEnabled")
+        guard UserDefaults.standard.object(forKey: "pulse.coachEnabled") != nil else { return true }
+        return UserDefaults.standard.bool(forKey: "pulse.coachEnabled")
     }
 
     /// Tear down whatever the brief has left lying around when the Coach master switch goes off.
@@ -383,7 +383,7 @@ enum CoachBriefScheduler {
     #if os(iOS)
     /// iOS BGTask identifier, derived from the running bundle id so it tracks `BUNDLE_ID_PREFIX` and
     /// matches the iOS target's `BGTaskSchedulerPermittedIdentifiers` (Info.plist / project.yml).
-    static let bgTaskIdentifier = (Bundle.main.bundleIdentifier ?? "com.noopapp.noop") + ".coachbrief"
+    static let bgTaskIdentifier = (Bundle.main.bundleIdentifier ?? "com.pulseapp.pulse") + ".coachbrief"
     private static var logBackgroundFailure: ((String) -> Void)?
 
     /// Register the BGTask handler. MUST be called from the app's launch (before launch finishes) — call

@@ -45,7 +45,7 @@ HELP = [
     ("1. Fill in one row per exercise, in the order you want to do them.", False),
     ("2. Put the same name in 'Program' for every exercise that belongs to the same session.", False),
     ("   You can keep several programs in one file - Upper A, Lower A - just change the name.", False),
-    ("3. Save the file, put it on your phone, and open NOOP > Lift Log > Import a program.", False),
+    ("3. Save the file, put it on your phone, and open Pulse > Lift Log > Import a program.", False),
     ("", False),
     ("Only 'Exercise' is required. Every other column can be left blank and filled in later", False),
     ("in the app, or during the session itself.", False),

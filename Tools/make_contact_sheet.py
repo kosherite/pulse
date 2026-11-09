@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Compose a single contact-sheet preview of the NOOP brand pack."""
+"""Compose a single contact-sheet preview of the Pulse brand pack."""
 import os
 from PIL import Image, ImageDraw, ImageFont
 from make_icon import hx, NAVY_TOP, NAVY_BOT, GLOW
 import numpy as np
 
-SRC = os.path.expanduser('~/Downloads/noop-brand')
+SRC = os.path.expanduser('~/Downloads/pulse-brand')
 HNE = '/System/Library/Fonts/HelveticaNeue.ttc'
 TEXT = hx('#F4F6F8'); SUB = hx('#AEB9C7'); MUT = hx('#7E8A9B')
 HAIR = hx('#21304A')
@@ -32,7 +32,7 @@ def heading(x, y, s):
 
 PAD = 80
 # title
-label(PAD, 54, 'NOOP', 64, TEXT, bold=True)
+label(PAD, 54, 'Pulse', 64, TEXT, bold=True)
 label(PAD + 200, 78, 'Brand Pack', 34, SUB)
 label(PAD, 132, 'Titanium & Gold  ·  gold on navy  ·  v3.6', 24, MUT)
 D.line([(PAD, 186), (W - PAD, 186)], fill=HAIR + (255,), width=2)
@@ -112,7 +112,7 @@ label(px0, ty + 78, 'AaBbCc 0123 — recovery · strain', 20, MUT)
 y += oh + 50
 
 D.line([(PAD, y), (W - PAD, y)], fill=HAIR + (255,), width=2)
-label(PAD, y + 18, 'All assets → ~/Downloads/noop-brand/', 22, MUT)
+label(PAD, y + 18, 'All assets → ~/Downloads/pulse-brand/', 22, MUT)
 label(PAD, y + 50, 'Mark: open gold recovery ring + solid gold core on deep navy.', 22, SUB)
 
 out = f'{SRC}/contact-sheet.png'

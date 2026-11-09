@@ -11,13 +11,13 @@ final class TestReportFlowTests: XCTestCase {
         let name = TestReportFlow.Plan.bundleName(
             profile: .sleep, platform: "ios", version: "7.3.0",
             date: Date(timeIntervalSince1970: 1_781_500_320)) // fixed instant for a stable stamp
-        XCTAssertTrue(name.hasPrefix("noop-sleep-ios-v7.3.0-"))
+        XCTAssertTrue(name.hasPrefix("pulse-sleep-ios-v7.3.0-"))
         XCTAssertTrue(name.hasSuffix(".zip"))
     }
 
     func testAttachToastNamesTheSavedFile() {
-        let toast = TestReportFlow.Plan.attachToast(savedName: "noop-sleep-ios-v7.3.0-260626-0712.zip")
-        XCTAssertTrue(toast.contains("noop-sleep-ios-v7.3.0-260626-0712.zip"))
+        let toast = TestReportFlow.Plan.attachToast(savedName: "pulse-sleep-ios-v7.3.0-260626-0712.zip")
+        XCTAssertTrue(toast.contains("pulse-sleep-ios-v7.3.0-260626-0712.zip"))
         XCTAssertTrue(toast.contains("Attach"))
         XCTAssertFalse(toast.contains("\u{2014}"))   // hard rule: no em-dash
         // The flow no longer opens a GitHub issue composer, so the toast must not walk the user through

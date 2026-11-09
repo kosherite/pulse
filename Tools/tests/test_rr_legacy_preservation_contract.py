@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SWIFT_ENGINE = ROOT / "Strand/Data/IntelligenceEngine.swift"
 ANDROID_PERSISTENCE = (
     ROOT
-    / "android/app/src/main/java/com/noop/analytics/IntelligencePersistence.kt"
+    / "android/app/src/main/java/com/pulse/analytics/IntelligencePersistence.kt"
 )
 
 

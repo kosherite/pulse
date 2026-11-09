@@ -75,28 +75,28 @@ final class TimestampHealTests: XCTestCase {
             day("2025-06-14"),   // genuine prior day — keep
             day("2025-07-12"),   // FUTURE (> todayKey) — the "12 Jul" carry-over bug — drop
             day("2019-01-01"),   // far-past (< the 2023-11 floor day) — drop
-        ], deviceId: "dev1-noop")
+        ], deviceId: "dev1-pulse")
         // sleepSession rows keyed by startTs: one real, one future.
         _ = try await store.upsertSleepSessions([
             CachedSleepSession(startTs: now - 30_000, endTs: now - 1000, efficiency: nil,
                                restingHr: nil, avgHrv: nil, stagesJSON: nil),
             CachedSleepSession(startTs: now + 30 * 86_400, endTs: now + 30 * 86_400 + 1000,
                                efficiency: nil, restingHr: nil, avgHrv: nil, stagesJSON: nil),
-        ], deviceId: "dev1-noop")
+        ], deviceId: "dev1-pulse")
 
         let result = try await store.healImplausibleTimestamps(now: now, todayLocalDayKey: todayKey)
         XCTAssertEqual(result.computedRowsDeleted, 3, "2 bad daily + 1 future sleep session")
 
-        let days = try await store.dailyMetrics(deviceId: "dev1-noop", from: "1900-01-01", to: "2999-12-31")
+        let days = try await store.dailyMetrics(deviceId: "dev1-pulse", from: "1900-01-01", to: "2999-12-31")
         XCTAssertEqual(days.map(\.day), ["2025-06-14"], "only the genuine prior day survives")
-        let sleeps = try await store.sleepSessions(deviceId: "dev1-noop", from: 0, to: Int.max, limit: 1000)
+        let sleeps = try await store.sleepSessions(deviceId: "dev1-pulse", from: 0, to: Int.max, limit: 1000)
         XCTAssertEqual(sleeps.count, 1)
         XCTAssertEqual(sleeps[0].startTs, now - 30_000)
     }
 
     func testImportedHistoryBelowFloorSurvivesButComputedGarbageIsPurged() async throws {
         // The far-past floor must NOT touch IMPORTED rows (bare "my-whoop"): a WHOOP CSV export carries
-        // real dates going back years. It STILL purges computed ("...-noop") rows below the floor, which
+        // real dates going back years. It STILL purges computed ("...-pulse") rows below the floor, which
         // can only be bad-clock garbage. Regression for the import-history purge (v8.2.1).
         let store = try await WhoopStore.inMemory()
         func day(_ d: String) -> DailyMetric {
@@ -107,7 +107,7 @@ final class TimestampHealTests: XCTestCase {
         // Imported history (bare device id) years before the 2023-11 floor — must survive.
         _ = try await store.upsertDailyMetrics([day("2018-03-04"), day("2020-11-20")], deviceId: "my-whoop")
         // A computed row below the floor — bad-clock garbage, must be purged.
-        _ = try await store.upsertDailyMetrics([day("2019-01-01")], deviceId: "my-whoop-noop")
+        _ = try await store.upsertDailyMetrics([day("2019-01-01")], deviceId: "my-whoop-pulse")
         let oldImportTs = 1_520_000_000   // 2018-03, below MIN_PLAUSIBLE_UNIX
         _ = try await store.upsertSleepSessions([
             CachedSleepSession(startTs: oldImportTs, endTs: oldImportTs + 20_000, efficiency: nil,
@@ -116,14 +116,14 @@ final class TimestampHealTests: XCTestCase {
         _ = try await store.upsertSleepSessions([
             CachedSleepSession(startTs: oldImportTs, endTs: oldImportTs + 20_000, efficiency: nil,
                                restingHr: nil, avgHrv: nil, stagesJSON: nil),
-        ], deviceId: "my-whoop-noop")
+        ], deviceId: "my-whoop-pulse")
 
         let result = try await store.healImplausibleTimestamps(now: now, todayLocalDayKey: todayKey)
         XCTAssertEqual(result.computedRowsDeleted, 2, "only the computed daily + computed sleep below the floor")
 
         let imported = try await store.dailyMetrics(deviceId: "my-whoop", from: "1900-01-01", to: "2999-12-31")
         XCTAssertEqual(imported.map(\.day).sorted(), ["2018-03-04", "2020-11-20"], "imported history preserved")
-        let computed = try await store.dailyMetrics(deviceId: "my-whoop-noop", from: "1900-01-01", to: "2999-12-31")
+        let computed = try await store.dailyMetrics(deviceId: "my-whoop-pulse", from: "1900-01-01", to: "2999-12-31")
         XCTAssertTrue(computed.isEmpty, "computed pre-floor garbage purged")
         let importedSleeps = try await store.sleepSessions(deviceId: "my-whoop", from: 0, to: Int.max, limit: 1000)
         XCTAssertEqual(importedSleeps.count, 1, "imported sleep session preserved")
@@ -136,10 +136,10 @@ final class TimestampHealTests: XCTestCase {
             DailyMetric(day: todayKey, totalSleepMin: 400, efficiency: nil, deepMin: nil, remMin: nil,
                         lightMin: nil, disturbances: nil, restingHr: nil, avgHrv: nil,
                         recovery: 0.6, strain: nil, exerciseCount: nil),
-        ], deviceId: "dev1-noop")
+        ], deviceId: "dev1-pulse")
         let result = try await store.healImplausibleTimestamps(now: now, todayLocalDayKey: todayKey)
         XCTAssertEqual(result.computedRowsDeleted, 0)
-        let days = try await store.dailyMetrics(deviceId: "dev1-noop", from: "1900-01-01", to: "2999-12-31")
+        let days = try await store.dailyMetrics(deviceId: "dev1-pulse", from: "1900-01-01", to: "2999-12-31")
         XCTAssertEqual(days.map(\.day), [todayKey])
     }
 

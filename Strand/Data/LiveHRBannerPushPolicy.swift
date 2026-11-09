@@ -1,6 +1,6 @@
 import Foundation
 
-/// When NOOP's Live HR banner (the Lock Screen / Dynamic Island Live Activity) is worth a push.
+/// When Pulse's Live HR banner (the Lock Screen / Dynamic Island Live Activity) is worth a push.
 ///
 /// WHY THIS EXISTS. The banner is driven off the live heart-rate stream, which ticks about once a second for as
 /// long as a strap stays connected, and it used to be pushed on the first tick more than 2 s after the last
@@ -17,7 +17,7 @@ import Foundation
 ///
 /// Pure and platform-free so `StrandTests` covers it: `StrandTests` runs on macOS and cannot exercise
 /// ActivityKit, so the rule has to live outside the controller to be unit tested at all. (The controller
-/// itself IS compiled in CI, by `app-build.yml`'s `NOOPiOS` leg.)
+/// itself IS compiled in CI, by `app-build.yml`'s `PulseiOS` leg.)
 enum LiveHRBannerPushPolicy {
 
     /// The shortest time between two pushes, as before: well under ActivityKit's update budget.

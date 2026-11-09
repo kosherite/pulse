@@ -16,7 +16,7 @@ Limits (be honest):
   rejection help, but treat RMSSD as approximate and require enough clean beats (see `quality`).
 - HRV only, not SpO2 (the PPG is AC-coupled -- no DC red/IR).
 
-Reads the per-second `feat_ppg` channel-0 grid that noop decodes into whoop.db (read-only).
+Reads the per-second `feat_ppg` channel-0 grid that pulse decodes into whoop.db (read-only).
 
 Usage:
   whoop_spot_hrv.py --db captures/whoop.db --device 1                 # auto: every PPG-covered window

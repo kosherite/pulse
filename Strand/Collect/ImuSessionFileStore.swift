@@ -13,7 +13,7 @@ final class ImuSessionFileStore {
     static let sampleRate = 100, axes = 6, blockSeconds = 30
     static let segmentSeconds: Int64 = 30 * 60
     private static let payloadBytes = sampleRate * axes * 2
-    private static let magic = Data("NOOPIMU2".utf8)
+    private static let magic = Data("PulseIMU2".utf8)
     private let defaults = UserDefaults.standard
     private let key = "imu-session-windows-v1"
     private let directory: URL

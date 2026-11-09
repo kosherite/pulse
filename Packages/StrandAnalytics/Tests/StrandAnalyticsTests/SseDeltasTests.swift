@@ -2,7 +2,7 @@ import XCTest
 @testable import StrandAnalytics
 
 /// Byte-identity pin for the SSE delta parser. The same SSE lines MUST produce the same text as
-/// the Android twin `com.noop.analytics.SseDeltasTest`. Cross-platform parity is the contract.
+/// the Android twin `com.pulse.analytics.SseDeltasTest`. Cross-platform parity is the contract.
 final class SseDeltasTests: XCTestCase {
 
     // MARK: - SSE line splitting

@@ -7,7 +7,7 @@ import Foundation
 /// Pure + deterministic, so `swift test` covers it with no strap. Structurally the twin of
 /// `BodyLocationProbe` / `ExtendedBatteryProbe`.
 ///
-/// Mirrored in Kotlin as `com.noop.protocol.Whoop5EcgProbe` even though the Android client has no ECG
+/// Mirrored in Kotlin as `com.pulse.protocol.Whoop5EcgProbe` even though the Android client has no ECG
 /// app layer to drive it. The classification below decides how a null result gets reported, which is
 /// the claim this probe exists to make — a rule that important is worth two independent
 /// implementations and two test suites, and both suites pin the same runs.

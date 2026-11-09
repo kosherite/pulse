@@ -12,13 +12,13 @@ import UniformTypeIdentifiers
 // sheet opened by hand.
 //
 // This exposes the SAME renderer to Shortcuts, so an automation can take the file and hand it to
-// whichever app the wearer already uses. NOOP gains no account, no credential and no network call:
+// whichever app the wearer already uses. Pulse gains no account, no credential and no network call:
 // the file leaves only when the wearer's own automation moves it, exactly like the share sheet.
 // Issue #2679 records why a direct Strava API client is a separate scope decision rather than this.
 //
 // It reads `RouteStore` (the UserDefaults side-store, since `WorkoutRow` has no route column on
 // Apple) rather than the database, so it needs no store handle and cannot contend with a running
-// sync. An App Intent declared in the app target runs in NOOP's own process, so the plain
+// sync. An App Intent declared in the app target runs in Pulse's own process, so the plain
 // `UserDefaults` suite `RouteStore` writes is readable here.
 
 /// Why an export can fail. Only one case: a route either carries the per-point measurements an
@@ -91,9 +91,9 @@ struct ExportWorkoutRouteIntent: AppIntent {
             endTs: newest.endTs,
             sport: newest.sport,
             distanceM: newest.distanceM)
-        // Named by the workout's start, matching the share sheet's `noop-route-<startTs>.<ext>` so the
+        // Named by the workout's start, matching the share sheet's `pulse-route-<startTs>.<ext>` so the
         // same session exports to the same filename whichever path produced it.
-        let name = "noop-route-\(newest.startTs).\(format.rawValue)"
+        let name = "pulse-route-\(newest.startTs).\(format.rawValue)"
         // `.data` rather than a guessed media type: GPX and FIT have no system `UTType`, and the
         // receiving app keys off the extension. Declaring something more specific would be asserting
         // a type the system does not actually know.

@@ -24,7 +24,7 @@ struct StrandiOSApp: App {
     /// Shared cross-screen navigation hook (e.g. Live → Devices). The iOS shell (`RootTabView`)
     /// observes it and presents the Devices manager.
     @StateObject private var router: NavRouter
-    /// NOOP's live heart rate banner. Built in `init` and fed from there (`LiveActivityController.follow`), not from
+    /// Pulse's live heart rate banner. Built in `init` and fed from there (`LiveActivityController.follow`), not from
     /// a view: a process iOS starts in the background need not build one.
     @State private var liveActivity: LiveActivityController
     /// The Lift Log session's own Live Activity. Separate from the live-HR one above: while a gym
@@ -79,7 +79,7 @@ struct StrandiOSApp: App {
         // never fires; the macOS timer, foreground catch-up, and "Run now" already work without it.
         ScheduledDebugExport.register()
         // Foreground presentation: without a delegate, iOS suppresses a notification's banner while the app
-        // is open, so a user testing the wind-down reminder with NOOP foregrounded sees nothing. Register
+        // is open, so a user testing the wind-down reminder with Pulse foregrounded sees nothing. Register
         // before the first scene so any early-fired notification is presented.
         UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
         // K5: tapping a scheduled morning-brief notification routes to Coach via the shared NavRouter.
@@ -98,7 +98,7 @@ struct StrandiOSApp: App {
         // The strap-sync Live Activity (Lock Screen + Dynamic Island). Same placement, same reason — and
         // it must also run in a process the Sync Strap shortcut launched with no scene.
         SyncLiveActivityController.shared.attach(to: model.live)
-        // iOS's own daily report of NOOP's CPU, memory, disk writes, hangs and exits, and its crash/hang reports,
+        // iOS's own daily report of Pulse's CPU, memory, disk writes, hangs and exits, and its crash/hang reports,
         // one strap-log line each. Registering is the whole cost; iOS gathers and delivers them (MetricKitLog).
         MetricKitLog.shared.attach(to: model.live)
         // The buzz and the strap-gesture claim are injected, so the controller itself knows nothing
@@ -154,7 +154,7 @@ struct StrandiOSApp: App {
         let bridge = HealthKitBridge(
             repo: model.repo,
             appleDeviceId: model.appleDeviceId,
-            noopDeviceId: model.deviceId
+            pulseDeviceId: model.deviceId
         )
         _health = StateObject(wrappedValue: bridge)
         // Register a separate, always-on-while-authorized refresh task for Apple Health write-back.
@@ -163,7 +163,7 @@ struct StrandiOSApp: App {
         HealthWritebackBackgroundScheduler.register { [weak bridge] in
             guard let bridge else { return false }
             let succeeded = await bridge.writeBackAfterNewData()
-            // A person can revoke every write type in Settings while NOOP is closed. Stop requesting
+            // A person can revoke every write type in Settings while Pulse is closed. Stop requesting
             // wakes once the cold-launched bridge can no longer resume a prior share grant.
             if bridge.auth != .authorized {
                 HealthWritebackBackgroundScheduler.cancel()
@@ -241,7 +241,7 @@ struct StrandiOSApp: App {
                 // changes are process-wide on Apple and are applied after the documented reopen.
                 .environment(\.locale, AppLanguage.activeLocale)
                 .chartStyle(chartStyleRaw)
-                .noopAccent(accentRaw, customHex: accentCustomHex)
+                .pulseAccent(accentRaw, customHex: accentCustomHex)
                 .pulseTheme(pulsePaletteRaw, pulseFinishRaw)
                 // Dynamic Type now scales the prose/label roles (StrandFont). Cap the upper end so the
                 // fixed-geometry tiles/gauges stay legible at the largest accessibility sizes rather than
@@ -318,7 +318,7 @@ struct StrandiOSApp: App {
                 .onChange(of: health.auth) { _, auth in
                     HealthWritebackBackgroundScheduler.updateSchedule(isAuthorized: auth == .authorized)
                 }
-                // #581: the `noop://import-health` deep link the iOS Shortcut opens after building the
+                // #581: the `pulse://import-health` deep link the iOS Shortcut opens after building the
                 // HealthKit-free payload. Filter on the host so other future schemes don't trip the
                 // importer; macOS never registers the scheme so this stays iOS-only.
                 .onOpenURL { url in
@@ -352,7 +352,7 @@ struct StrandiOSApp: App {
             if phase == .active {
                 CoachBriefScheduler.activateIfEnabled { await model.coach.generateBrief() }
                 model.drainPendingIntents(router: router)
-                // iOS starts a Lift Log banner only for an app on screen, so a banner lost while NOOP was in
+                // iOS starts a Lift Log banner only for an app on screen, so a banner lost while Pulse was in
                 // the background comes back now, whether or not the strap is sending anything.
                 pushLiftActivity()
                 // Only the foreground may start the live heart rate banner: offer it now.
@@ -409,7 +409,7 @@ struct StrandiOSApp: App {
                 // the user just saw — its battery/HR/score otherwise lag to the last FOREGROUND refreshSeq
                 // bump. One reload per app-exit is low-frequency and well within WidgetKit's daily budget.
                 Task { await WidgetSnapshot.publish(from: model) }
-                // #155: refresh the Documents/noop_sync.txt drop file the user's Siri Shortcut logs
+                // #155: refresh the Documents/pulse_sync.txt drop file the user's Siri Shortcut logs
                 // into Apple Health. Gated inside writeIfEnabled on the opt-in default (OFF) — a
                 // no-op until the user turns on Shortcuts Export.
                 Task { await ShortcutHealthExport.writeIfEnabled(repo: model.repo) }
@@ -442,7 +442,7 @@ struct StrandiOSApp: App {
                 stageStartedAt: p.stageStartedAt,
                 restEndsAt: p.restEndsAt),
             alert: alert)
-        // One line per strap step into NOOP's strap log: whether the Lock Screen was asked to light.
+        // One line per strap step into Pulse's strap log: whether the Lock Screen was asked to light.
         if let lightUp { model.live.append(log: AppModel.stamped(lightUp.logLine)) }
     }
 }
@@ -455,9 +455,9 @@ struct StrandiOSApp: App {
 /// excluded `RootView()` sidebar for `RootTabView()`. The shared `OnboardingWizard`, `TermsGateView`,
 /// `WhatsNewView`, `AppChangelog`, and `Terms` symbols all compile into the iOS target unchanged.
 private struct iOSRootView: View {
-    @AppStorage("noop.onboarded") private var onboarded = false
-    @AppStorage("noop.lastSeenChangelogVersion") private var lastSeenChangelog = ""
-    @AppStorage("noop.acceptedTermsVersion") private var acceptedTerms = ""
+    @AppStorage("pulse.onboarded") private var onboarded = false
+    @AppStorage("pulse.lastSeenChangelogVersion") private var lastSeenChangelog = ""
+    @AppStorage("pulse.acceptedTermsVersion") private var acceptedTerms = ""
     @State private var showWhatsNew = false
     /// Starts false so a cold-launch external action can't race this view's onAppear decision about the
     /// automatic What's New sheet. It becomes true only when no sheet is due or its dismissal completes.
@@ -528,7 +528,7 @@ private struct iOSRootView: View {
             // collects it even if the user dismisses the auto sheet.
             UpdateStore.shared.seedWhatsNewIfNeeded()
             // #1659: iOS cannot auto-update a sideloaded build - no API lets an app install or re-sign an
-            // .ipa - so the most NOOP can do is NOTICE a release and say so.
+            // .ipa - so the most Pulse can do is NOTICE a release and say so.
             //
             // Gated on the SAME condition as showWhatsNewIfDue above, and the Android hook. This matters
             // now that the check is on by default: without it a brand-new install would reach the network
@@ -577,7 +577,7 @@ enum DemoScreens {
         guard let i = args.firstIndex(of: "--demo-screen"), i + 1 < args.count else { return nil }
         switch args[i + 1].lowercased() {
         case "today":    return AnyView(TodayView())
-        // The DEFAULT iOS Today (`noop.liquidTodayEnabled` ships true), so it needs its own entry — plain
+        // The DEFAULT iOS Today (`pulse.liquidTodayEnabled` ships true), so it needs its own entry — plain
         // "today" renders the CLASSIC screen, which is exactly the screen whose behaviour Liquid was found
         // to have diverged from. Without this, the default Today was the one screen the harness could not
         // capture.

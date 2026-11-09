@@ -20,7 +20,7 @@ struct WorkoutStartControl: View {
     @State private var showStartSport = false
 
     var body: some View {
-        NoopButton(model.activeWorkout == nil ? "Start workout" : "View active workout",
+        PulseButton(model.activeWorkout == nil ? "Start workout" : "View active workout",
                    systemImage: model.activeWorkout == nil ? "figure.run" : "timer",
                    kind: .primary,
                    fullWidth: true) {

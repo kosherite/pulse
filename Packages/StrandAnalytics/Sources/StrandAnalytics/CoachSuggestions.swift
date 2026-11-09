@@ -4,7 +4,7 @@ import WhoopStore
 // CoachSuggestions.swift — contextual coaching prompt chips derived from the user's own bands.
 //
 // Pure + deterministic so it is unit-testable without a strap, network, or app target, and so the
-// output can be byte-identical to the Android twin `com.noop.analytics.CoachSuggestions` (the
+// output can be byte-identical to the Android twin `com.pulse.analytics.CoachSuggestions` (the
 // cross-platform parity contract: the same inputs produce the same chip strings on both platforms).
 // Reads only DailyMetric fields that already live on-device; no new egress, no telemetry.
 

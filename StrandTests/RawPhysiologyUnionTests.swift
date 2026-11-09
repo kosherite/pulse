@@ -149,11 +149,11 @@ final class RawPhysiologyUnionTests: XCTestCase {
         let session = CachedSleepSession(startTs: 1_000, endTs: 5_000, efficiency: 0.9,
                                          restingHr: 52, avgHrv: 60, stagesJSON: nil)
         _ = try await store.upsertSleepSessions([session], deviceId: "my-whoop")
-        _ = try await store.upsertSleepSessions([session], deviceId: "my-whoop-noop")
-        _ = try await store.persistSessionMotion(deviceId: "my-whoop-noop", sessionStart: 1_000,
+        _ = try await store.upsertSleepSessions([session], deviceId: "my-whoop-pulse")
+        _ = try await store.persistSessionMotion(deviceId: "my-whoop-pulse", sessionStart: 1_000,
                                                  motionEpochs: [0.1, 0.2])
-        _ = try await store.upsertSleepSessions([session], deviceId: "whoop-new-noop")
-        _ = try await store.persistSessionMotion(deviceId: "whoop-new-noop", sessionStart: 1_000,
+        _ = try await store.upsertSleepSessions([session], deviceId: "whoop-new-pulse")
+        _ = try await store.persistSessionMotion(deviceId: "whoop-new-pulse", sessionStart: 1_000,
                                                  motionEpochs: [9.0])
         let repo = Repository(deviceId: "whoop-new")
         repo.setStoreForTesting(store)
@@ -177,9 +177,9 @@ final class RawPhysiologyUnionTests: XCTestCase {
                                restingHr: 52, avgHrv: 60, stagesJSON: nil)
         }
         _ = try await store.upsertSleepSessions(sessions, deviceId: "my-whoop")
-        _ = try await store.upsertSleepSessions(sessions, deviceId: "my-whoop-noop")
+        _ = try await store.upsertSleepSessions(sessions, deviceId: "my-whoop-pulse")
         for (i, start) in starts.enumerated() {
-            _ = try await store.persistSessionMotion(deviceId: "my-whoop-noop", sessionStart: start,
+            _ = try await store.persistSessionMotion(deviceId: "my-whoop-pulse", sessionStart: start,
                                                      motionEpochs: [Double(i) + 0.5])
         }
         let repo = Repository(deviceId: "my-whoop")
@@ -196,7 +196,7 @@ final class RawPhysiologyUnionTests: XCTestCase {
     ///
     /// The stored block carries the device it was read from and skips the ownership probe; the same block
     /// with that field stripped falls back to the probe. Both must resolve to the same motion. They do
-    /// because the search normalises whichever id it finds to its `-noop` twin, and the computed ids are
+    /// because the search normalises whichever id it finds to its `-pulse` twin, and the computed ids are
     /// exactly the raw ids under that suffix, so both namespaces land on one source.
     @MainActor
     func testProvenanceAndTheOwnerProbeResolveTheSameMotion() async throws {
@@ -204,8 +204,8 @@ final class RawPhysiologyUnionTests: XCTestCase {
         let session = CachedSleepSession(startTs: 1_000, endTs: 5_000, efficiency: 0.9,
                                          restingHr: 52, avgHrv: 60, stagesJSON: nil)
         _ = try await store.upsertSleepSessions([session], deviceId: "my-whoop")
-        _ = try await store.upsertSleepSessions([session], deviceId: "my-whoop-noop")
-        _ = try await store.persistSessionMotion(deviceId: "my-whoop-noop", sessionStart: 1_000,
+        _ = try await store.upsertSleepSessions([session], deviceId: "my-whoop-pulse")
+        _ = try await store.persistSessionMotion(deviceId: "my-whoop-pulse", sessionStart: 1_000,
                                                  motionEpochs: [0.3, 0.4])
         let repo = Repository(deviceId: "my-whoop")
         repo.setStoreForTesting(store)

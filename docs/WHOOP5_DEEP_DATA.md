@@ -22,13 +22,13 @@ Use the [WHOOP 5 connection profile](PROTOCOL_WHOOP5.md) and
 [format-1 framing](PROTOCOL_TRANSPORT.md#format-1-framing).
 
 <a id="the-enable-sequence-whoop5config"></a>
-<a id="how-noop-uses-it-opt-in-reversible"></a>
+<a id="how-pulse-uses-it-opt-in-reversible"></a>
 
 ## Configuration interface
 
 Use the complete [named configuration body](PROTOCOL_CONFIGURATION.md#named-configuration-interface)
 and [feature inventory](PROTOCOL_CONFIGURATION.md#feature-flag-inventory).
-The older NOOP encoder uses a 40-byte key/value block after its revision byte;
+The older Pulse encoder uses a 40-byte key/value block after its revision byte;
 that client implementation is not the current 65-byte semantic request contract.
 Acceptance of truncated bodies remains unresolved. This page supplies no bulk
 “unlock” recipe.
@@ -62,11 +62,11 @@ These sources contributed earlier protocol observations and client work:
 - [judes.club — Cracking the WHOOP 5 Bluetooth Protocol](https://judes.club/writing/cracking-the-whoop-5-bluetooth-protocol/)
   and its [interactive specification](https://judes.club/experiments/whoop5/).
 - [Asherlc/dofek protocol notes](https://github.com/Asherlc/dofek/blob/main/docs/whoop-ble-protocol.md).
-- The community Bluetooth capture in [#103](https://github.com/ryanbr/noop/issues/103).
+- The community Bluetooth capture in [#103](https://github.com/kosherite/pulse/issues/103).
 
 ## High-rate IMU capture is a separate switch
 
-NOOP’s raw IMU workflow uses command 81 followed by command 106 with `[1,1]`;
+Pulse’s raw IMU workflow uses command 81 followed by command 106 with `[1,1]`;
 stop uses command 82 followed by command 106 with `[1,0]`. Requests, effective
 collection state and packet delivery are separate; see the
 [collection controls](PROTOCOL_CONFIGURATION.md#collection-and-live-stream-coordination)
@@ -74,7 +74,7 @@ and [R21 layout](PROTOCOL_SENSORS.md#r21-six-axis-imu).
 
 ## Honest limits
 
-- **Measurements are not product scores.** NOOP computes its own metrics from
+- **Measurements are not product scores.** Pulse computes its own metrics from
   the available records; decoded measurements do not reproduce WHOOP recovery,
   strain or sleep scores by themselves.
 - **The large records are no longer an undifferentiated type-`0x2F` blob.** Layout v21 (1,244 bytes)
@@ -87,7 +87,7 @@ and [R21 layout](PROTOCOL_SENSORS.md#r21-six-axis-imu).
 
 The documented WHOOP 5 optical layouts do not establish calibrated SpO₂ or a raw
 respiration waveform. Keep R18 byte 82 uninterpreted; see the
-[sensor reference](PROTOCOL_SENSORS.md#r18-biometric-summary). NOOP’s candidate
+[sensor reference](PROTOCOL_SENSORS.md#r18-biometric-summary). Pulse’s candidate
 validation tools are research instrumentation, not a source of validated health metrics.
 
 ### Comparison tool
@@ -112,7 +112,7 @@ values across every night pins the field without guesswork.
 
 Three stdlib tools in [`Tools/linux-capture/`](../Tools/linux-capture/) do this:
 
-- **`hci_extract.py`** converts a phone HCI log (iOS `.pklg` / Android `btsnoop_hci.log`) of the
+- **`hci_extract.py`** converts a phone HCI log (iOS `.pklg` / Android `btspulse_hci.log`) of the
   official app into the project's `capture.json` frame format — so an official-app full-sync capture
   feeds the same decoder as a Linux capture. It keeps only CRC-valid WHOOP frames.
 - **`correlate_ground_truth.py`** cross-references those frames against the CSV export and reports
@@ -124,7 +124,7 @@ Three stdlib tools in [`Tools/linux-capture/`](../Tools/linux-capture/) do this:
 
 Crucially this is **privacy-preserving**: both tools run locally and the correlation output is only
 offsets/encodings, never health values — so a 5/MG owner can contribute a confirmed field mapping to
-[#103](https://github.com/ryanbr/noop/issues/103) without posting their capture or their data export.
+[#103](https://github.com/kosherite/pulse/issues/103) without posting their capture or their data export.
 A mapped offset still follows the project rule — *real captures, never invented offsets* — before it
 lands in `parseFrameWhoop5` / `whoop_protocol.json`.
 

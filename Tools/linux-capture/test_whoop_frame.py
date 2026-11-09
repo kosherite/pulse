@@ -184,7 +184,7 @@ def _whoop5_frame_of_total(total: int) -> bytes:
 class MinimumFrameLengthTests(unittest.TestCase):
     """The family minimums from WhoopProtocol's `FrameLimits` (11 bytes on WHOOP 4.0, 13 on 5.0/MG).
 
-    The 4.0 value preserves its real type/seq/cmd minimum. The 5.0 value is an empirical NOOP policy:
+    The 4.0 value preserves its real type/seq/cmd minimum. The 5.0 value is an empirical Pulse policy:
     a 12-byte empty-payload envelope is internally consistent and Goose accepts it, but no such frame
     has been observed from hardware. It is rejected here so this tool and the protocol package answer
     the same question; trim-ack callers already demand more bytes than either floor.

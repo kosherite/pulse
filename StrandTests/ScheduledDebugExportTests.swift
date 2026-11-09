@@ -3,30 +3,30 @@ import XCTest
 
 /// Pure retention logic behind the scheduled debug export's "Clear scheduled exports" / keep-count
 /// pruning (#650). Mirror of `LogExportRetentionTest` on Android — same shape (stamp extraction,
-/// keep-N, oldest-first) applied to the `noop-strap-log-<stamp>.txt` / `noop-raw-capture-<stamp>.json`
-/// pair NOOP drops into Documents instead of a `.noopbak` snapshot.
+/// keep-N, oldest-first) applied to the `pulse-strap-log-<stamp>.txt` / `pulse-raw-capture-<stamp>.json`
+/// pair Pulse drops into Documents instead of a `.pulsebak` snapshot.
 ///
 /// `ScheduledDebugExport` is @MainActor (mirrors `WindDownNudge`), so this test class is too.
 @MainActor
 final class ScheduledDebugExportTests: XCTestCase {
 
     func testStampExtractedFromLogAndRawFilenames() {
-        XCTAssertEqual(ScheduledDebugExport.exportStamp(fromFilename: "noop-strap-log-260617-0700.txt"), "260617-0700")
-        XCTAssertEqual(ScheduledDebugExport.exportStamp(fromFilename: "noop-raw-capture-260617-0700.json"), "260617-0700")
+        XCTAssertEqual(ScheduledDebugExport.exportStamp(fromFilename: "pulse-strap-log-260617-0700.txt"), "260617-0700")
+        XCTAssertEqual(ScheduledDebugExport.exportStamp(fromFilename: "pulse-raw-capture-260617-0700.json"), "260617-0700")
     }
 
     func testStampRejectsUnrelatedFilenames() {
         XCTAssertNil(ScheduledDebugExport.exportStamp(fromFilename: "random.txt"))
-        XCTAssertNil(ScheduledDebugExport.exportStamp(fromFilename: "noop-strap-log-260617-0700.json")) // wrong ext for this prefix
-        XCTAssertNil(ScheduledDebugExport.exportStamp(fromFilename: "noop-raw-capture-260617-0700.txt")) // wrong ext for this prefix
-        XCTAssertNil(ScheduledDebugExport.exportStamp(fromFilename: "noop-backup-20260617-070000.noopbak")) // unrelated feature
+        XCTAssertNil(ScheduledDebugExport.exportStamp(fromFilename: "pulse-strap-log-260617-0700.json")) // wrong ext for this prefix
+        XCTAssertNil(ScheduledDebugExport.exportStamp(fromFilename: "pulse-raw-capture-260617-0700.txt")) // wrong ext for this prefix
+        XCTAssertNil(ScheduledDebugExport.exportStamp(fromFilename: "pulse-backup-20260617-070000.pulsebak")) // unrelated feature
     }
 
     func testPruneKeepsNewestNGenerations() {
         // Five generations, each with a log+raw pair sharing one stamp — a pair must count as ONE
         // generation, not two, when measured against `keep`.
         let stamps = (10...14).map { "26061\($0 % 10)-0700" }
-        let names = stamps.flatMap { ["noop-strap-log-\($0).txt", "noop-raw-capture-\($0).json"] }
+        let names = stamps.flatMap { ["pulse-strap-log-\($0).txt", "pulse-raw-capture-\($0).json"] }
         let pruned = ScheduledDebugExport.exportStampsToPrune(names, keep: 2)
         XCTAssertEqual(pruned.count, 3)
         XCTAssertTrue(pruned.contains(stamps[0]))    // oldest generations pruned
@@ -37,15 +37,15 @@ final class ScheduledDebugExportTests: XCTestCase {
     }
 
     func testPruneNoOpWithinBudget() {
-        let names = ["noop-strap-log-260617-0700.txt", "noop-raw-capture-260617-0700.json"]
+        let names = ["pulse-strap-log-260617-0700.txt", "pulse-raw-capture-260617-0700.json"]
         XCTAssertTrue(ScheduledDebugExport.exportStampsToPrune(names, keep: 10).isEmpty)
     }
 
     func testPruneIgnoresUnrelatedFiles() {
         let names = [
-            "noop-strap-log-260610-0700.txt", "noop-raw-capture-260610-0700.json",
-            "noop-strap-log-260617-0700.txt", "noop-raw-capture-260617-0700.json",
-            "noop-backup-20260617-070000.noopbak", // Backup & Sync file — never a prune candidate here
+            "pulse-strap-log-260610-0700.txt", "pulse-raw-capture-260610-0700.json",
+            "pulse-strap-log-260617-0700.txt", "pulse-raw-capture-260617-0700.json",
+            "pulse-backup-20260617-070000.pulsebak", // Backup & Sync file — never a prune candidate here
         ]
         let pruned = ScheduledDebugExport.exportStampsToPrune(names, keep: 1)
         XCTAssertEqual(pruned, ["260610-0700"])

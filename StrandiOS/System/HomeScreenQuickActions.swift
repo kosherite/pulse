@@ -3,16 +3,16 @@ import StrandAnalytics
 import SwiftUI
 import UIKit
 
-/// The app-specific actions shown when someone touches and holds NOOP's Home Screen icon.
+/// The app-specific actions shown when someone touches and holds Pulse's Home Screen icon.
 ///
-/// These are dynamic rather than Info.plist actions so their titles come from NOOP's existing
+/// These are dynamic rather than Info.plist actions so their titles come from Pulse's existing
 /// localization catalog and follow the language selected in the app. The menu is installed at launch;
 /// changing the app language requires the same process restart that updates every other localized bundle.
 enum HomeScreenQuickAction: String, CaseIterable {
-    case liveHeartRate = "com.noop.quick-action.live-heart-rate"
-    case startWorkout = "com.noop.quick-action.start-workout"
-    case logJournal = "com.noop.quick-action.log-journal"
-    case breathe = "com.noop.quick-action.breathe"
+    case liveHeartRate = "com.pulse.quick-action.live-heart-rate"
+    case startWorkout = "com.pulse.quick-action.start-workout"
+    case logJournal = "com.pulse.quick-action.log-journal"
+    case breathe = "com.pulse.quick-action.breathe"
 
     init?(shortcutItem: UIApplicationShortcutItem) {
         self.init(rawValue: shortcutItem.type)

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""NOOP brand pack — Titanium & Gold v3.6 "gold on navy".
+"""Pulse brand pack — Titanium & Gold v3.6 "gold on navy".
 
 Builds the full asset set (app icons, subreddit avatar + banner, wordmark
 lockups, social/OG image, favicons, transparent mark) + a contact sheet, all
-from the shipping app-icon mark. Output: ~/Downloads/noop-brand/.
+from the shipping app-icon mark. Output: ~/Downloads/pulse-brand/.
 """
 import os, math
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from make_icon import render as render_icon, hx, NAVY_TOP, NAVY_BOT, GLOW, GOLD_LIGHT, GOLD, GOLD_DEEP, grade
 
-OUT = os.path.expanduser('~/Downloads/noop-brand')
+OUT = os.path.expanduser('~/Downloads/pulse-brand')
 os.makedirs(OUT, exist_ok=True)
 TEXT = hx('#F4F6F8')   # off-white (StrandPalette.textPrimary)
 SUB  = hx('#AEB9C7')   # secondary text
@@ -59,11 +59,11 @@ def text_w(d, s, f):
     b = d.textbbox((0, 0), s, font=f); return b[2] - b[0], b[3] - b[1]
 
 def wordmark(D, x, y, px, color=TEXT, track=0.06):
-    """Draw 'NOOP' with letter-spacing; returns total width."""
+    """Draw 'Pulse' with letter-spacing; returns total width."""
     f = font(px, bold=True)
     cx = x
     sp = int(px * track)
-    for ch in 'NOOP':
+    for ch in 'Pulse':
         D.text((cx, y), ch, font=f, fill=color + (255,))
         w, _ = text_w(D, ch, f)
         cx += w + sp
@@ -85,7 +85,7 @@ mark_transparent(1024).save(f'{OUT}/mark-transparent-1024.png')
 for s in (16, 32, 48):
     render_icon(s, 0.84).save(f'{OUT}/favicon-{s}.png')
 
-# ---- 5. wordmark lockup (mark + NOOP), transparent + on-navy ----
+# ---- 5. wordmark lockup (mark + Pulse), transparent + on-navy ----
 def lockup(on_navy):
     W, H, SS = 1600, 480, 2
     base = navy_bg(W * SS, H * SS) if on_navy else Image.new('RGBA', (W * SS, H * SS), (0, 0, 0, 0))
@@ -95,7 +95,7 @@ def lockup(on_navy):
     draw_mark(D, mcx, H * SS / 2, mr)
     px = int(H * SS * 0.46)
     f = font(px, bold=True)
-    _, th = text_w(D, 'NOOP', f)
+    _, th = text_w(D, 'Pulse', f)
     wordmark(D, mcx + mr + H * SS * 0.14, H * SS / 2 - px * 0.62, px)
     return base.resize((W, H), Image.LANCZOS)
 lockup(False).save(f'{OUT}/wordmark-lockup-transparent.png')
@@ -133,9 +133,9 @@ def og():
     px = int(H * SS * 0.165)
     f = font(px, bold=True)
     tw, _ = 0, 0
-    # measure NOOP width for centring
+    # measure Pulse width for centring
     sp = int(px * 0.06); total = 0
-    for ch in 'NOOP':
+    for ch in 'Pulse':
         w, _ = text_w(D, ch, f); total += w + sp
     total -= sp
     wordmark(D, W * SS / 2 - total / 2, H * SS * 0.55, px)

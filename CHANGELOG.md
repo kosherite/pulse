@@ -1,18 +1,18 @@
 # Changelog
 
-All notable changes to NOOP. NOOP is an independent, experimental project — not the WHOOP app, and
+All notable changes to Pulse. Pulse is an independent, experimental project — not the WHOOP app, and
 not affiliated with WHOOP. It reads a strap you own, on your own device, fully offline. Dates are
-approximate; downloads are on the [Releases](https://github.com/NoopApp/noop/releases) page.
+approximate; downloads are on the [Releases](https://github.com/kosherite/pulse/releases) page.
 
 ## What to expect
 
-- **Independent, and experimental.** Treat NOOP as a capable work-in-progress rather than a finished
+- **Independent, and experimental.** Treat Pulse as a capable work-in-progress rather than a finished
   product.
 - **WHOOP 4.0 is the supported path.** It is tested and works end to end. WHOOP 5.0/MG is newer: live
   heart rate works today, but deeper metrics (recovery, strain, sleep) for 5/MG are still being
-  figured out. NOOP always tells you what's live versus still building.
+  figured out. Pulse always tells you what's live versus still building.
 - **Your scores build over a few nights.** Live heart rate is instant; recovery, strain and sleep
-  sharpen as NOOP learns your baseline. Import your WHOOP export to backfill your history instantly.
+  sharpen as Pulse learns your baseline. Import your WHOOP export to backfill your history instantly.
 - **Everything stays on your device.** No account, no cloud, no sync.
 
 ---
@@ -21,7 +21,7 @@ approximate; downloads are on the [Releases](https://github.com/NoopApp/noop/rel
 
 A major release about choice and about honesty. Today can be drawn two different ways, a WHOOP 4.0 can
 hand its heart rate to any app on your phone, daytime stress is measured against your own baseline
-rather than a population's, and NOOP speaks a tenth language. Behind that, a long run of readouts that
+rather than a population's, and Pulse speaks a tenth language. Behind that, a long run of readouts that
 had been claiming slightly more than they could attribute now say only what they know.
 
 **Today, drawn your way**
@@ -66,7 +66,7 @@ had been claiming slightly more than they could attribute now say only what they
 
 **Language**
 
-- **Italian (#2454).** NOOP's tenth language.
+- **Italian (#2454).** Pulse's tenth language.
 - **Russian that counts properly.** Grammatical plurals across the app, the Watch complications and the
   Apple catalogues, so counts take the right form instead of always one. Eight mistranslated Android
   strings are corrected, and the copy a widened scanner surfaced is localised.
@@ -117,7 +117,7 @@ had been claiming slightly more than they could attribute now say only what they
   says what a FIT leaves out.
 - **Apple Health export names its chart heart-rate sources** and refreshes write authorization.
 - **Android reads your profile weight from Health Connect (thanks @paradix86).**
-- **One Lock Screen switch per thing NOOP shows,** each touching only its own.
+- **One Lock Screen switch per thing Pulse shows,** each touching only its own.
 
 **Smaller corrections**
 
@@ -157,7 +157,7 @@ until the handshake does.
 
 - **A night can be found from heart rate alone (#1801).** Sleep detection is built on stillness, so a
   strap that banks no movement scored no nights at all — the everyday reality of a WHOOP 5/MG that will
-  not complete pairing. NOOP can now detect and stage such a night from heart rate. It is display-only by
+  not complete pairing. Pulse can now detect and stage such a night from heart rate. It is display-only by
   design: an HR-only night never feeds resting heart rate, HRV or SDNN baselines, because it was not
   established with the evidence those depend on.
 - **The AI coach receives your sleep stages (#1816).** It had been answering that it could not see them,
@@ -172,8 +172,8 @@ until the handshake does.
 - **Every disconnect records what actually happened (#1809, thanks @supremesynergy).** How long the link
   held, how many frames and bytes arrived, whether the realtime stream was armed, and how it ended. A
   strap log could not previously state whether a strap had transmitted anything; you had to infer it from
-  every logged line happening to be outgoing, which measures NOOP's logging rather than the strap.
-- **The clock exchange quotes the strap's reply (#1823).** NOOP wrote "clock synced" the moment it queued
+  every logged line happening to be outgoing, which measures Pulse's logging rather than the strap.
+- **The clock exchange quotes the strap's reply (#1823).** Pulse wrote "clock synced" the moment it queued
   the write, before any answer existed, so a log could assert the clock was set while the connection
   readout said 1970/71. It now says what it *sent* and records the reply frame. On a WHOOP 5/MG the
   readout also claimed "RTC reads 1970/71" when no clock had ever been read on that family; it now
@@ -214,9 +214,9 @@ A release about the numbers being right, on top of 9.2.1.
 **New**
 
 - **Water imports from Apple Health and Health Connect (#949, #974, #986).** Imported water is stored in its own row and added to the manual total only for display, so a sync can never overwrite, edit or delete a hand-logged entry, and disconnecting removes only the imported side. The sync reads its window once and writes only the days that actually differ.
-- **Caffeine imports from Apple Health (#949, #985).** Each intake keeps Apple's identity, so re-syncing updates existing entries instead of duplicating them, and imported entries cannot be edited or deleted inside NOOP. Health Connect has no caffeine-only scope — caffeine is a field behind the whole nutrition permission — so this is iPhone-only.
-- **iPhone asks for the two new read permissions once (#974).** HealthKit never reports read authorisation, and permission is only ever presented for types not yet determined, so an existing install would otherwise have silently imported nothing. NOOP now records the set of types it has asked for and re-asks when that set grows, in the foreground only.
-- **The R22 deep-data unlock is reversible (#174, #932).** A matching disable sequence with a mandatory read-back, so the strap confirms its actual state rather than NOOP assuming the write landed.
+- **Caffeine imports from Apple Health (#949, #985).** Each intake keeps Apple's identity, so re-syncing updates existing entries instead of duplicating them, and imported entries cannot be edited or deleted inside Pulse. Health Connect has no caffeine-only scope — caffeine is a field behind the whole nutrition permission — so this is iPhone-only.
+- **iPhone asks for the two new read permissions once (#974).** HealthKit never reports read authorisation, and permission is only ever presented for types not yet determined, so an existing install would otherwise have silently imported nothing. Pulse now records the set of types it has asked for and re-asks when that set grows, in the foreground only.
+- **The R22 deep-data unlock is reversible (#174, #932).** A matching disable sequence with a mandatory read-back, so the strap confirms its actual state rather than Pulse assuming the write landed.
 
 **Fixed**
 
@@ -236,14 +236,14 @@ A release about the numbers being right, on top of 9.2.1.
 **Privacy**
 
 - **Scheduled debug exports have a retention policy on both platforms (#642, #650, #960),** including the iOS ones visible in Files.
-- **`.noopbak` backups warn that they are readable and unencrypted (#644, #962).**
+- **`.pulsebak` backups warn that they are readable and unencrypted (#644, #962).**
 
 **Diagnostics**
 
 - **A nightly mean and sample count for the 5/MG blood-oxygen candidate (#112, #995),** so the v18 candidate byte can be checked rather than trusted. Still instrumentation, not a shipped metric.
 - **A history offload counts the packet types it drops (#891, #927)** instead of discarding them silently.
 - **Raw Oura history-notification capture to a file (#937).**
-- **The blood-oxygen promote gate can read a NOOP store (#845, #103, #942),** so the diagnostic can answer its own question.
+- **The blood-oxygen promote gate can read a Pulse store (#845, #103, #942),** so the diagnostic can answer its own question.
 - **Three probes stopped overstating what they knew (#690, #761, #103, #913, #914, #918).** A body-location probe's detail line contradicted its own verdict; a feature-flag probe reported silence, and one verb's refusal, as a verdict about firmware; and an unread key list was described as a strap named "none".
 
 **Infrastructure**
@@ -261,7 +261,7 @@ A reliability-and-accuracy release on top of 9.0.2.
 
 **New**
 
-- **Diagnostic WHOOP GATT family detection (#688, #713).** NOOP now scans for and logs the additional WHOOP service families (Puffin, Monument, Symphony) seen in the decompiled app. Detected-but-unsupported straps get a clear log message instead of being silently missed.
+- **Diagnostic WHOOP GATT family detection (#688, #713).** Pulse now scans for and logs the additional WHOOP service families (Puffin, Monument, Symphony) seen in the decompiled app. Detected-but-unsupported straps get a clear log message instead of being silently missed.
 - **WHOOP 5.0 SpO2 candidate instrumentation (#103, #709).** The v18 byte @82 is now decoded as an instrumentation-only SpO2 candidate for multi-device correlation — not a shipped metric, per the derived-biosignal rule.
 - **Oura feature-status probe (#710).** A read-only diagnostic confirms from the ring itself that SpO2 and real-steps are server-flag-gated off for offline rings.
 - **Configurable bundle ID and team for iOS builds (#701, #722).** A single gitignored xcconfig file now drives every target's bundle ID, App Group, and development team — no more hand-editing project.yml in six places after every xcodegen run.
@@ -273,7 +273,7 @@ A reliability-and-accuracy release on top of 9.0.2.
 - **Journal import zeroed out every answer from a real WHOOP export (#631, #706).** The real WHOOP export column is "Answered yes", not "Answered yes/no" — every imported journal entry silently read as "Without."
 - **Sleep Schedule card drew phantom bars from night-tail fragments (#699, #703).** The card now bridges split/biphasic nights the same way the hero does.
 - **Steps calibration slider was unusable (#698, #704).** Replaced with a stepper (0.1 increments), matching the Profile card pattern.
-- **Backfill clock retry (#700, #721).** If the strap silently drops the GET_CLOCK response, NOOP now retries up to 3 times, then falls back to a rough correlation from the Data Range timestamp — preventing all rows from landing on the wrong day.
+- **Backfill clock retry (#700, #721).** If the strap silently drops the GET_CLOCK response, Pulse now retries up to 3 times, then falls back to a rough correlation from the Data Range timestamp — preventing all rows from landing on the wrong day.
 - **Oura IBI timestamps were wrong (#677).** Banked overnight beats were stamped at the drain-arrival time instead of their real ring-time, leaving the sleep window with zero R-R data.
 
 **Diagnostics**
@@ -295,10 +295,10 @@ A feature-and-accuracy release on top of 9.0.1.
 
 **New**
 
-- **"Optimal strain reached" notification (#593).** Opt in and NOOP buzzes once when your day's effort lands in the optimal range for your recovery. Off by default; it only fires for the day you're actually building, never for a backfilled past day.
-- **Strap pack voltage in Devices (#592).** Alongside the battery percent, NOOP now shows the strap's measured pack voltage — a truer read of remaining charge than the percentage alone.
+- **"Optimal strain reached" notification (#593).** Opt in and Pulse buzzes once when your day's effort lands in the optimal range for your recovery. Off by default; it only fires for the day you're actually building, never for a backfilled past day.
+- **Strap pack voltage in Devices (#592).** Alongside the battery percent, Pulse now shows the strap's measured pack voltage — a truer read of remaining charge than the percentage alone.
 - **Faster history sync (experimental, #533).** New opt-in toggles ask the strap for a higher-priority connection and a faster radio mode during a history offload, so a deep backlog drains in fewer, quicker syncs. Off by default while it's being proven out.
-- **Recompute a sleep you deleted (#526).** Removing a bad sleep window no longer leaves a hole — you can ask NOOP to recompute the night from the raw stream.
+- **Recompute a sleep you deleted (#526).** Removing a bad sleep window no longer leaves a hole — you can ask Pulse to recompute the night from the raw stream.
 
 **Fixed**
 
@@ -344,21 +344,21 @@ A major release. Power saving now looks after *your strap's* battery, the AI Coa
 
 **New.**
 
-- **Power saving (#477).** A Settings → Power saving section keyed on the connected strap's battery: when your WHOOP is low and discharging, NOOP syncs it less often (every 45 min instead of 15) and can release the always-on background HRV stream, so the band lasts until you can charge it. You pick the strap-battery level (10–30%); off by default, never runs while charging, nothing lost. iPhone, Mac and Android.
+- **Power saving (#477).** A Settings → Power saving section keyed on the connected strap's battery: when your WHOOP is low and discharging, Pulse syncs it less often (every 45 min instead of 15) and can release the always-on background HRV stream, so the band lasts until you can charge it. You pick the strap-battery level (10–30%); off by default, never runs while charging, nothing lost. iPhone, Mac and Android.
 - **Google Gemini in the AI Coach on Android (#400).** Android gains the native Gemini provider iPhone and Mac already had — same coach, same model choice, everywhere. On-device and opt-in.
 - **Richer metric detail (#430, #432, #433, #435).** A Detailed-tiles option for Key Metrics with tap-through detail, plus selectable trend windows (1D / 2D / 2W … 3M / 6M / 1Y / All) on every metric's timeline, matched across platforms.
 - **Arrange your Today screen on iPhone and Mac (#428)**, plus new Recovery Index + Activity Balance Charge drivers (#417) and an opt-in coarse workout-type hint (#414).
-- **Keep NOOP alive overnight, on Android (#386).** An opt-in battery-optimisation exemption so an overnight re-score isn't killed in the background.
+- **Keep Pulse alive overnight, on Android (#386).** An opt-in battery-optimisation exemption so an overnight re-score isn't killed in the background.
 
 **Fixed.**
 
-- **A carried Charge could name the wrong source (#412).** Fixed so a NOOP-computed carried Charge reads "On-device," not "Whoop." Thanks kavemang.
+- **A carried Charge could name the wrong source (#412).** Fixed so a Pulse-computed carried Charge reads "On-device," not "Whoop." Thanks kavemang.
 - **Sleep accuracy.** Elevated HR on a motionless wrist no longer scores as awake (#462); split nights report the whole night's Asleep total and hypnogram (#345); a wake-staging tune that over-called "awake" for healthy sleepers in the field is reverted (#431); and the "Calibrating N of 4" count no longer stalls after a recalibration (#393).
 - **Today catches up a killed overnight re-score on resume (#386)**, live-BLE installs export their real history instead of an empty CSV (#458), and a stuck Bluetooth-permission banner is fixed (#391, #429).
 
 **For WHOOP 5.0 / MG.**
 
-- **6-axis motion decoded, for research (#423).** NOOP decodes the strap's 100 Hz accelerometer + gyroscope offload buffer and extracts activity features, and can passively capture the high-rate sensor buffers when you enable capture — the groundwork for real activity detection. Byte-identical across all platforms. Thanks vishk23 and tanarchytan. The v26 raw PPG waveform is now stored too (#156).
+- **6-axis motion decoded, for research (#423).** Pulse decodes the strap's 100 Hz accelerometer + gyroscope offload buffer and extracts activity features, and can passively capture the high-rate sensor buffers when you enable capture — the groundwork for real activity detection. Byte-identical across all platforms. Thanks vishk23 and tanarchytan. The v26 raw PPG waveform is now stored too (#156).
 
 **Localization.**
 
@@ -373,7 +373,7 @@ review turned up. Everything runs on your own device, offline, no account.
 
 - **Coupled view.** An optional one-glance day screen that puts recovery, day strain on the 0 to 21
   scale, and sleep together. Off by default; turn it on as a card in Customise. It is a different
-  lens on NOOP's own scores, nothing is recomputed.
+  lens on Pulse's own scores, nothing is recomputed.
 - **Workout list, rebuilt on iPhone.** All Sessions is now a compact native list with sport, source
   and search filters and a merge tool to split or join your own sessions. Merges keep the real
   active time and re-derive effort; imported history stays read only. Android gets the same filters
@@ -477,7 +477,7 @@ A fast follow-up to 7.0.0.
 
 ## 7.0.0 "Everything" — full redesign + hydration + auto workout detection + smarter sleep (all platforms)
 
-The biggest NOOP release yet.
+The biggest Pulse release yet.
 
 - **A complete redesign.** Every screen rebuilt around a clean Apple-Fitness-meets-WHOOP look: flat colour rings for Charge/Effort/Rest, a living day-cycle scene behind Today, SF Pro + rounded numbers, borderless cards, pip bars in place of gauges, a green brand mark (gold dropped), a customisable Today, and a softly-glowing header while recording. Same on iPhone, Mac and Android, light or dark.
 - **Hydration tracking (new, opt-in).** A local water log with a daily goal that adapts to your sex and the day's Effort. Tap Sip/Cup/Bottle. Settings → Features. (#685)
@@ -493,7 +493,7 @@ The biggest NOOP release yet.
 
 - **Deep Timeline can reach your other days.** It was today-only; now it steps back through previous days and opens on your most recent day with data instead of a blank today. Thanks @ruedigermunz (#597).
 - **Manual workouts fill in immediately + absolute start time.** Average/peak HR, strain and calories now appear straight away from the strap's HR for the window (not on the next background pass), and Android gains the exact start date/time picker the iPhone/Mac already had. Thanks @virajshoor, @pilleuspulcher-blip (#598).
-- **Storage clean-up (iPhone).** A failed/retried Apple Health import could strand a multi-GB unzipped copy the Storage screen never scanned; NOOP now reclaims those leftovers automatically on launch and via Clean up now. Thanks @exzanimo (#590).
+- **Storage clean-up (iPhone).** A failed/retried Apple Health import could strand a multi-GB unzipped copy the Storage screen never scanned; Pulse now reclaims those leftovers automatically on launch and via Clean up now. Thanks @exzanimo (#590).
 - **Russian localization** across the Apple app. Thanks @Te1man (#594).
 - **Coach tables on Android** render as a real grid instead of raw `| ... |` text. Thanks @Divad27 (#593).
 
@@ -501,7 +501,7 @@ The biggest NOOP release yet.
 
 ## 6.2.1 — Fix: imported phone steps were being double-counted (all platforms)
 
-- **Your imported steps add up properly now.** If you wear an Apple Watch as well as carrying your iPhone, Apple Health stores both their step counts for the same walk. NOOP was adding them together, so a busy day could read close to double the real number, which also threw off the steps calibration. It now does what the Health app does: it counts each source on its own and keeps the higher one, so a 7,000-step day reads 7,000, not 14,000. Re-import your Apple Health export after updating to clean up past days. Thanks @bringiton321 (#589).
+- **Your imported steps add up properly now.** If you wear an Apple Watch as well as carrying your iPhone, Apple Health stores both their step counts for the same walk. Pulse was adding them together, so a busy day could read close to double the real number, which also threw off the steps calibration. It now does what the Health app does: it counts each source on its own and keeps the higher one, so a 7,000-step day reads 7,000, not 14,000. Re-import your Apple Health export after updating to clean up past days. Thanks @bringiton321 (#589).
 
 ---
 
@@ -513,7 +513,7 @@ A large update built straight from the open board: one big new feature plus a wa
 
 **Sleep**
 - A **movement / restlessness graph** now draws under your hypnogram so you can see how much you stirred (#407, thanks @mad201802).
-- **Tighter sleep dates (#547):** a WHOOP with a wandering internal clock could re-send records stamped with wrong dates and scramble which night was which. NOOP now checks every record against the strap's own data range and drops the impossible ones, while keeping legitimately old history.
+- **Tighter sleep dates (#547):** a WHOOP with a wandering internal clock could re-send records stamped with wrong dates and scramble which night was which. Pulse now checks every record against the strap's own data range and drops the impossible ones, while keeping legitimately old history.
 
 **WHOOP 5.0 & sync**
 - A connected 5.0 streaming live HR but offloading no history now honestly says **history sync is experimental on the 5.0** instead of "not connected", and **stops the battery-draining reconnect loop** while it waits (#580).
@@ -551,7 +551,7 @@ A large update built from the open issues, discussions and community PRs, cross-
 - **Phantom morning naps suppressed.** A still stretch right after you wake is no longer mistaken for a second sleep unless there's a clear, sustained re-onset. (#531)
 - **Honest stage confidence.** When the deep/REM split can't be trusted on a quiet night, the stage breakdown says so rather than implying precision. (#469)
 - **Your edits win.** A night you've hand-edited now takes precedence over an imported value, so edits aren't masked by an Apple/WHOOP import. (#509)
-- **On-device nap detection.** Opt in and NOOP spots a likely nap from your motion and offers it for a one-tap add; nothing is auto-logged and your sleep scores are untouched. (PR#569, thanks @cbarrado)
+- **On-device nap detection.** Opt in and Pulse spots a likely nap from your motion and offers it for a one-tap add; nothing is auto-logged and your sleep scores are untouched. (PR#569, thanks @cbarrado)
 - **WHOOP 4.0 sleep on the v19 offload layout.** Straps that previously banked nothing on this firmware now hand over the motion the stager needs. (#344, thanks airtonzanon)
 
 **Devices, glanceable surfaces & features**
@@ -574,7 +574,7 @@ A large update built from the open issues, discussions and community PRs, cross-
 - German localization completed (444/444).
 
 **Install / update**
-- **macOS:** the universal app zip on the Releases page (or `brew upgrade --cask noop`).
+- **macOS:** the universal app zip on the Releases page (or `brew upgrade --cask pulse`).
 - **iOS:** sideload the IPA (AltStore / SideStore).
 - **Android:** the APK on the Releases page.
 
@@ -584,7 +584,7 @@ A large update built from the open issues, discussions and community PRs, cross-
 
 A targeted robustness fix for a real bug pikapik487 caught with detailed logs.
 
-- **Fixed: a WHOOP whose internal clock or flash is in a bad state could scramble your dashboard.** Such a strap can hand over historical records stamped with implausible dates (years in the past, or even in the future). NOOP trusted those timestamps, which let one phantom ~12-hour block get attributed to every day (the same sleep duration repeating across dates) and could make the Today screen show a future date as "last night". NOOP now sanity-checks every record's timestamp at ingestion and drops anything implausible (before 2023 or more than a day in the future), regardless of what the strap's clock claims. Normal records are unaffected.
+- **Fixed: a WHOOP whose internal clock or flash is in a bad state could scramble your dashboard.** Such a strap can hand over historical records stamped with implausible dates (years in the past, or even in the future). Pulse trusted those timestamps, which let one phantom ~12-hour block get attributed to every day (the same sleep duration repeating across dates) and could make the Today screen show a future date as "last night". Pulse now sanity-checks every record's timestamp at ingestion and drops anything implausible (before 2023 or more than a day in the future), regardless of what the strap's clock claims. Normal records are unaffected.
 - **Heals existing data.** If your data already got scrambled by this, updating to 6.0.3 does a one-time cleanup of the bad rows and re-scores your real days cleanly, so the fix actually repairs your dashboard rather than just preventing it going forward.
 - A defensive guard so the Today "last night" carry-over can never select a day after today. (#547)
 
@@ -595,18 +595,18 @@ A targeted robustness fix for a real bug pikapik487 caught with detailed logs.
 
 ## 6.0.2 — Sleep, properly sorted, and an app that explains itself (all platforms)
 
-A from-scratch rework of how NOOP picks your main sleep, plus a new layer of in-app explanations so you are never left guessing what the app is doing or why.
+A from-scratch rework of how Pulse picks your main sleep, plus a new layer of in-app explanations so you are never left guessing what the app is doing or why.
 
 **Sleep**
-- **Your night is your night.** NOOP now scores every sleep block on how much you actually slept and how close it was to your usual hours (learned from your own history), instead of the old rigid evening-wins rule. A long sleep that started at an odd time is no longer filed away as a nap, and the Sleep tab and your recovery scores always land on the same night. Grounded in real strap logs and the sleep-staging research, not a quick patch. (#547)
+- **Your night is your night.** Pulse now scores every sleep block on how much you actually slept and how close it was to your usual hours (learned from your own history), instead of the old rigid evening-wins rule. A long sleep that started at an odd time is no longer filed away as a nap, and the Sleep tab and your recovery scores always land on the same night. Grounded in real strap logs and the sleep-staging research, not a quick patch. (#547)
 - The recovery side no longer blanks to "No Data" after midnight while live metrics are running; it carries last night's value, clearly stamped, until tonight's lands. (#543)
 
 **The app explains itself**
 - Tap the info on a sleep block to see exactly why it is your main sleep or a nap, with a nudge to edit if it is wrong.
 - Charge, Effort and Rest tiles tell you when they are still calibrating (and how many nights are left), when they are showing last night's number, or when they simply need the strap, instead of a bare dash.
 - A Recording chip shows when the strap is actually connected and saving data.
-- A small badge on each number shows whether NOOP worked it out on your device or imported it from WHOOP or Apple Health.
-- **New: a "How NOOP works" page** in Settings, a short plain-English read on sleep sorting, how scores build, what recording means, and where your numbers come from.
+- A small badge on each number shows whether Pulse worked it out on your device or imported it from WHOOP or Apple Health.
+- **New: a "How Pulse works" page** in Settings, a short plain-English read on sleep sorting, how scores build, what recording means, and where your numbers come from.
 
 **Help us get sleep right**
 - If your sleep still looks off after this, open an issue with a strap log and the dates. That is the fastest way for us to pin your case.
@@ -623,9 +623,9 @@ A from-scratch rework of how NOOP picks your main sleep, plus a new layer of in-
 **Install / update**
 - **Android:** the APK on the Releases page.
 
-## 6.0.0 — NOOP grows up: not just for WHOOP anymore (all platforms)
+## 6.0.0 — Pulse grows up: not just for WHOOP anymore (all platforms)
 
-The biggest release yet. NOOP started as a way to read your own WHOOP over Bluetooth, fully offline, and it still does all of that, exactly as before. 6.0 opens it up to a lot more gear while keeping everything on your device.
+The biggest release yet. Pulse started as a way to read your own WHOOP over Bluetooth, fully offline, and it still does all of that, exactly as before. 6.0 opens it up to a lot more gear while keeping everything on your device.
 
 **More than WHOOP**
 - **Standard Bluetooth chest straps and arm bands** (Polar H10 and the like) work as a live heart-rate and HRV source, now with an on-demand **spot HRV reading** computed the same way as your overnight HRV.
@@ -634,17 +634,17 @@ The biggest release yet. NOOP started as a way to read your own WHOOP over Bluet
 - **Strap battery** now reads from standard Bluetooth devices that report it.
 
 **Import your history, fully offline**
-- **Oura, Fitbit and Garmin data exports.** Download your own export file and NOOP imports sleep, resting heart rate, HRV and steps wherever the file has them. It never talks to their cloud. Their own readiness or sleep scores are kept as reference only; your NOOP scores are recomputed from the raw signals, never copied.
+- **Oura, Fitbit and Garmin data exports.** Download your own export file and Pulse imports sleep, resting heart rate, HRV and steps wherever the file has them. It never talks to their cloud. Their own readiness or sleep scores are kept as reference only; your Pulse scores are recomputed from the raw signals, never copied.
 - **GPX, TCX and FIT workout files** import too, with their route.
 
 **Broadcast out**
-- **NOOP as a heart-rate sensor.** Turn on Broadcast in Data Sources and NOOP re-shares your strap's live heart rate as a standard Bluetooth HR sensor, so a treadmill, Zwift, Peloton or any fitness app can read it. Local Bluetooth only, nothing leaves your device. Off by default.
+- **Pulse as a heart-rate sensor.** Turn on Broadcast in Data Sources and Pulse re-shares your strap's live heart rate as a standard Bluetooth HR sensor, so a treadmill, Zwift, Peloton or any fitness app can read it. Local Bluetooth only, nothing leaves your device. Off by default.
 
 **Experimental: more bands (help us test)**
 - **New Experimental tier in Add a device.** A clearly-labeled section lists Amazfit / Zepp (including Helio), Xiaomi Mi Band, Garmin watches, and Oura rings. Best-effort, opt-in, and honest about what they can actually do. None of them ever makes up a number.
 - **Amazfit / Zepp and Mi Band:** live heart rate over the standard profile where the band exposes it, otherwise the documented custom Huami characteristic. Bands that need a pairing handshake we can't do yet say so plainly and point you at file import, instead of faking a reading.
 - **Garmin:** turn on Broadcast Heart Rate on the watch and it shows up like a normal strap. We walk you through it.
-- **Oura:** the ring is proprietary and only syncs to the Oura app, so there's no open live stream. NOOP scans for it and checks its services so you can see we looked, then points you at file import.
+- **Oura:** the ring is proprietary and only syncs to the Oura app, so there's no open live stream. Pulse scans for it and checks its services so you can see we looked, then points you at file import.
 
 **New on iPhone and Mac**
 - **GPS workout routes.** Outdoor runs, rides, walks and hikes record a route with distance, pace and a map, matching Android. Recording keeps going while the screen is off.
@@ -663,7 +663,7 @@ The biggest release yet. NOOP started as a way to read your own WHOOP over Bluet
 Big thanks to everyone who reverse-engineered, reported and tested their way into this one. A pile of 6.0 came straight from your issues and PRs.
 
 **Install / update**
-- **Mac:** `brew upgrade --cask noopapp/noop/noop`, or the universal app from Releases.
+- **Mac:** `brew upgrade --cask pulseapp/pulse/pulse`, or the universal app from Releases.
 - **iPhone:** AltStore / SideStore from the .ipa on the Releases page.
 - **Android:** the APK on the Releases page.
 
@@ -685,10 +685,10 @@ A big bundled update that clears out a stack of reported issues in one release i
 - Android: workout durations on the Today "Last Workouts" tiles no longer clip to "4…" next to the calorie chip. (#332)
 
 **Notifications / inbox**
-- **The "New data added" inbox spam is fixed.** It fired every time NOOP re-scored your recent days in the background, even on a week-old import with nothing new. It now announces only a genuinely newer day, once, remembers what it told you across restarts, and stops stacking duplicates. (#521, thanks @voodoomusic)
+- **The "New data added" inbox spam is fixed.** It fired every time Pulse re-scored your recent days in the background, even on a week-old import with nothing new. It now announces only a genuinely newer day, once, remembers what it told you across restarts, and stops stacking duplicates. (#521, thanks @voodoomusic)
 
 **iPhone & Mac**
-- **New: a daily auto-export of your strap log.** Settings → Diagnostics, pick a time, and NOOP saves a timestamped copy once a day. Off by default, on-device. macOS runs it while NOOP is open (and catches up on launch); iOS fires it when the system next wakes the app near your time, not to the exact minute. Android already had this. (#510, thanks @maddognik)
+- **New: a daily auto-export of your strap log.** Settings → Diagnostics, pick a time, and Pulse saves a timestamped copy once a day. Off by default, on-device. macOS runs it while Pulse is open (and catches up on launch); iOS fires it when the system next wakes the app near your time, not to the exact minute. Android already had this. (#510, thanks @maddognik)
 - The home-screen widgets and the Live Activity now read **Charge**, not Recovery, matching the rest of the app.
 
 **Android**
@@ -699,33 +699,33 @@ A big bundled update that clears out a stack of reported issues in one release i
 **Distribution**
 - AltStore updates no longer fail partway with "file doesn't exist." The iOS download is published under both filename forms so any source resolves it.
 
-Credit to @ujix for the `.noopbak` backup-export fix.
+Credit to @ujix for the `.pulsebak` backup-export fix.
 
 ## 5.2.6 — updates check GitHub again (all platforms)
 
-NOOP's repo is back on **GitHub** (it's the canonical home again; noop.fans stays as a mirror). This points the app back at it.
+Pulse's repo is back on **GitHub** (it's the canonical home again; github.com/kosherite/pulse stays as a mirror). This points the app back at it.
 
-- **"Check for updates" reads from GitHub again.** During the GitHub outage the in-app update check was temporarily pointed at the self-hosted home; it now reads `api.github.com/repos/NoopApp/noop/releases/latest` again — where releases live. Still on-device, still only when you tap, nothing about you is sent.
-- **Settings → About "project home & source"** links to github.com/NoopApp/noop again. (AltStore and Homebrew already pull updates from GitHub releases.)
+- **"Check for updates" reads from GitHub again.** During the GitHub outage the in-app update check was temporarily pointed at the self-hosted home; it now reads `api.github.com/repos/kosherite/pulse/releases/latest` again — where releases live. Still on-device, still only when you tap, nothing about you is sent.
+- **Settings → About "project home & source"** links to github.com/kosherite/pulse again. (AltStore and Homebrew already pull updates from GitHub releases.)
 
 ## 5.2.5 — WHOOP 5/MG re-pairing fix (iPhone & Mac)
 
-Diagnosed from a community strap log (#78): a 5/MG that's bonded to the official WHOOP app refuses NOOP's encrypted bond, and NOOP was holding the strap connected so it could never enter pairing mode to be re-paired — a deadlock.
+Diagnosed from a community strap log (#78): a 5/MG that's bonded to the official WHOOP app refuses Pulse's encrypted bond, and Pulse was holding the strap connected so it could never enter pairing mode to be re-paired — a deadlock.
 
-- **Fixed: "Remove device" now actually releases the strap.** Previously removing a WHOOP only archived the registry row — NOOP kept re-grabbing it (the reconnect timer, the targeted-connect pin, and iOS state restoration all still pointed at it), holding the link so the strap could never show its blue pairing LEDs. Remove now stops auto-reconnect, drops the BLE link, and clears the targeting/restoration references, freeing the strap to re-pair. (iPhone & Mac.)
-- **Clearer guidance on a persistent 5/MG bond refusal.** When the strap keeps refusing the secure pairing (held by the WHOOP app or a stale iOS pairing), NOOP now surfaces the real fix — close the WHOOP app, pairing mode (blue LEDs), Forget This Device in iOS Bluetooth — instead of a misleading "transient reconnect race" message (a 5.2.3 regression). Apple-only build.
+- **Fixed: "Remove device" now actually releases the strap.** Previously removing a WHOOP only archived the registry row — Pulse kept re-grabbing it (the reconnect timer, the targeted-connect pin, and iOS state restoration all still pointed at it), holding the link so the strap could never show its blue pairing LEDs. Remove now stops auto-reconnect, drops the BLE link, and clears the targeting/restoration references, freeing the strap to re-pair. (iPhone & Mac.)
+- **Clearer guidance on a persistent 5/MG bond refusal.** When the strap keeps refusing the secure pairing (held by the WHOOP app or a stale iOS pairing), Pulse now surfaces the real fix — close the WHOOP app, pairing mode (blue LEDs), Forget This Device in iOS Bluetooth — instead of a misleading "transient reconnect race" message (a 5.2.3 regression). Apple-only build.
 
 ## 5.2.4 — Today-card tidy-up + OnePlus pairing fix
 
 - **Fixed (iPhone & Mac):** the greeting and status word on the Today "Synthesis" card could crowd together on smaller iPhones — "Good evening" and the recovery/calibration pill now sit cleanly in the corner without colliding with the card's headline. (#69)
-- **Fixed (Android):** WHOOP 4.0 pairing could loop forever on some OnePlus phones (Android 13). Their Bluetooth stack fires the MTU/connection-setup callback twice with the same value, which wedged the CCCD subscription so the secure handshake never finished. NOOP now ignores the duplicate callback and gives the stack a brief settle before subscribing, so pairing completes. (#50 — thanks @aldomurph for the rigorous logs.)
+- **Fixed (Android):** WHOOP 4.0 pairing could loop forever on some OnePlus phones (Android 13). Their Bluetooth stack fires the MTU/connection-setup callback twice with the same value, which wedged the CCCD subscription so the secure handshake never finished. Pulse now ignores the duplicate callback and gives the stack a brief settle before subscribing, so pairing completes. (#50 — thanks @aldomurph for the rigorous logs.)
 
 ## 5.2.3 — WHOOP 5/MG connection fix (iPhone & Mac)
 
 A focused fix for a WHOOP 5.0/MG connection loop, diagnosed from a community strap log (#74).
 
-- **Fixed (WHOOP 5/MG):** opening **Add a WHOOP** while a 5/MG was connected and streaming tore down the live connection (`prepareForModelSwitch` → intentional disconnect), and the strap could then loop on "connecting" instead of re-bonding — also silencing haptics. NOOP now **keeps a live same-family connection** while presenting the scan; a genuine family switch (or nothing connected) still idles the engine first. (iPhone & Mac — shared Swift BLE engine.)
-- **Fixed:** the "bond refused — likely still paired to the WHOOP app" hint no longer fires when NOOP **already bonded to that exact strap this session** (a transient reconnect race) — it recovers quietly via the #52 stale-pin handoff instead of showing misleading pairing-mode guidance.
+- **Fixed (WHOOP 5/MG):** opening **Add a WHOOP** while a 5/MG was connected and streaming tore down the live connection (`prepareForModelSwitch` → intentional disconnect), and the strap could then loop on "connecting" instead of re-bonding — also silencing haptics. Pulse now **keeps a live same-family connection** while presenting the scan; a genuine family switch (or nothing connected) still idles the engine first. (iPhone & Mac — shared Swift BLE engine.)
+- **Fixed:** the "bond refused — likely still paired to the WHOOP app" hint no longer fires when Pulse **already bonded to that exact strap this session** (a transient reconnect race) — it recovers quietly via the #52 stale-pin handoff instead of showing misleading pairing-mode guidance.
 - Note: this is an Apple-only build; the Android BLE path is separate and is being checked for the same pattern.
 
 ## 5.2.2 — security & reliability hardening (all platforms)
@@ -745,7 +745,7 @@ A security-focused patch. No behaviour changes for normal use; these harden the 
 
 A focused fix release from the board, verified against source on all three platforms.
 
-- **Fixed (WHOOP 5/MG):** pairing could get stuck and haptics go silent when a strap had been re-paired/reset and NOOP clung to a stale Bluetooth identity. NOOP now detects a strap that is bonding correctly and adopts it (iPhone, Mac & Android).
+- **Fixed (WHOOP 5/MG):** pairing could get stuck and haptics go silent when a strap had been re-paired/reset and Pulse clung to a stale Bluetooth identity. Pulse now detects a strap that is bonding correctly and adopts it (iPhone, Mac & Android).
 - **Fixed (WHOOP 4.0, some Androids):** "finishing the secure handshake" could wedge forever on phones whose Bluetooth double-fires connection setup (e.g. OnePlus) — a watchdog now bounces and retries automatically.
 - **Fixed (Android):** the Sleep tab could get stuck on a single night; the date arrows now step by calendar day (parity with iPhone/Mac).
 - **Fixed (Mac):** the Breathe session opened from Stress had no close button — added a **Done** control.
@@ -773,11 +773,11 @@ An Android-only polish release that brings the Android app up to the iPhone/Mac 
 
 ## 5.1.0 — a cleaner home: refreshed design, a new inbox, your photo (all platforms)
 
-A design-refresh release. Same NOOP underneath — a tidier, crisper home, somewhere for everything new to land, and a touch of you on the screen.
+A design-refresh release. Same Pulse underneath — a tidier, crisper home, somewhere for everything new to land, and a touch of you on the screen.
 
 - **A cleaner home.** The bottom bar is now four tidy tabs — **Today · Trends · Sleep · More** — and the quick-action **+** has moved up to the top-right of your home screen, balancing your profile on the left. Same actions (start a workout, log your journal, breathe), much less clutter.
 - **A new Updates inbox.** Tap the **bell** in the top-right to see what's new — fresh readings and history that landed, what's-new notes, and any home cards you've tucked away. A small gold badge shows when there's something unread. Hit the **×** on a home card to send it to the inbox, and pull it back any time with **Restore to Today**.
-- **Make it yours — a profile photo.** Tap your profile (top-left) → **Settings → Profile photo** and choose a picture. It shows on your home screen and stays **only on your device** — NOOP is offline, so it's never uploaded.
+- **Make it yours — a profile photo.** Tap your profile (top-left) → **Settings → Profile photo** and choose a picture. It shows on your home screen and stays **only on your device** — Pulse is offline, so it's never uploaded.
 - **Cleaner, crisper design.** We blended the glass-and-material look, dialled back the glow across the whole app for sharper lines, evened up the spacing around the little pill toggles, and onboarding now shows up front that you can switch **Light · Dark · System** whenever you like (**Settings → Appearance**).
 - **Same look on every device.** The refreshed layout and approach land on Mac, iPhone and Android together.
 
@@ -792,9 +792,9 @@ A refinement release that hardens the big v5 update — no behaviour changes, ju
 
 ## 5.0.0 — v5: the raw-signal release (all platforms)
 
-**The biggest release in NOOP's history.** Everyone else shows you a score their cloud computed, behind a
-subscription. NOOP reads your strap's *raw signals* — beat-to-beat R-R timing, red/IR PPG, 3-axis motion,
-skin temperature — and does all the maths **on your own device, free and offline**. v5 turns NOOP into a
+**The biggest release in Pulse's history.** Everyone else shows you a score their cloud computed, behind a
+subscription. Pulse reads your strap's *raw signals* — beat-to-beat R-R timing, red/IR PPG, 3-axis motion,
+skin temperature — and does all the maths **on your own device, free and offline**. v5 turns Pulse into a
 raw-signal platform: it reasons from those signals, computes everything locally, and is the only one of
 these apps that can *act on your body* through the strap's haptic motor. Seven new pillars, plus a tidier
 home — every screen now lives under **five places: Today · What Moves You (Insights) · Health · Devices &
@@ -802,37 +802,37 @@ Sources · Settings**, so nothing is buried. Nothing about your data or your his
 coherent home and a lot more to show you. Everything below is on-device, opt-in, and honest about its
 limits.
 
-- **Haptic biofeedback — "the strap that breathes you down."** The flagship. NOOP can now *act* on your
+- **Haptic biofeedback — "the strap that breathes you down."** The flagship. Pulse can now *act* on your
   nervous system, not just measure it. Your wrist motor paces your breathing with the screen off, and you
   get a measured outcome.
   - **Resonance breathing.** Find your personal calm pace (the breathing rate, roughly 4.5–7 breaths/min,
     that gives your heart its biggest healthy swing): **Breathe → Resonance → "Find your resonance pace"**,
-    then pick the **Full sweep (~13 min)** or **Quick sweep (~7 min)**. NOOP paces you through candidate
+    then pick the **Full sweep (~13 min)** or **Quick sweep (~7 min)**. Pulse paces you through candidate
     paces, reads which one your body responds to most, and locks it. After that, the Breathe session uses
     your locked pace, and you get the usual "+X% vs start · peak Y ms" outcome.
   - **"Calm me · 3 min."** On a stressed moment (the Stress screen / the check-in card), tap **Calm me ·
     3 min** for a felt metronome that buzzes a few beats below your live heart rate so your heart can drift
     down toward it. Honest about it: if your HR doesn't fall, it says so — no fake win.
   - **Passive stress check-ins (haptic).** Optional, **off by default**: **Settings → Automations → "Stress
-    check-ins (haptic)"**. When your HRV dips while you're *still* (not exercising), NOOP offers a one-minute
+    check-ins (haptic)"**. When your HRV dips while you're *still* (not exercising), Pulse offers a one-minute
     breathing cue with a single confirming buzz and a dismissible card — never an alarm, never a diagnosis.
     All three layers are PPG-derived estimates, relaxation guidance, not a medical treatment.
 - **What Moves You — your personal n-of-1 insights.** Competitors show population averages ("alcohol
-  typically lowers recovery"). NOOP computes the effect **on your own data**. A ranked, **lag-aware** feed
+  typically lowers recovery"). Pulse computes the effect **on your own data**. A ranked, **lag-aware** feed
   ("what actually moves *your* Charge", with a "next morning / same day" chip and a confidence pill — Solid
   / Building / Calibrating) replaces the old behaviour list. Log **alcohol** or **late caffeine** with an
-  *amount* and NOOP fits a personal **dose-response** curve (shrinking toward typical patterns until you've
+  *amount* and Pulse fits a personal **dose-response** curve (shrinking toward typical patterns until you've
   logged enough nights, then becoming truly yours). In the evening, the **damage forecast** on Today tells
   you what one more drink tends to cost tomorrow's Charge, with an honest range. Everything is framed as
   "patterns in your own data" — association, never cause. Open **What Moves You** (the wand entry in the
   sidebar / Insights).
 - **Skin-temperature suite — three features off one underused signal.** WHOOP already streams skin
-  temperature every night; NOOP already banks it. v5 reasons from it three ways, **all on-device, free**:
+  temperature every night; Pulse already banks it. v5 reasons from it three ways, **all on-device, free**:
   - **Cycle awareness (opt-in).** A coarse menstrual-cycle phase (Follicular / Peri-ovulatory / Luteal) read
     from your nightly skin temperature, corroborated by your resting-HR and HRV pattern. Turn it on in
     **Health → Skin temperature → "Turn on cycle awareness"**. It is **awareness only — not contraception,
     not a fertility predictor, not a medical service** — and a period estimate is always a *window*, never a
-    hard date. This is the kind of data a cloud product can't promise stays private; NOOP's can, because it
+    hard date. This is the kind of data a cloud product can't promise stays private; Pulse's can, because it
     physically never leaves your device.
   - **Body clock.** A jet-lag / shift-work helper that estimates your body-clock phase from your nightly
     temperature low and your rest-activity rhythm ("about 25 min later than your schedule") and gives a
@@ -844,7 +844,7 @@ limits.
     "On-device estimate — not a diagnosis." Toggle under **Settings → Automations → "Illness
     early-warning"**.
 - **Your Data, Fused — one honest record across your bands.** If you wear more than one device — a WHOOP
-  plus a Mi Band, plus Apple Health / Health Connect — NOOP now fuses them into one record **on your
+  plus a Mi Band, plus Apple Health / Health Connect — Pulse now fuses them into one record **on your
   device**, picking the best source per metric (the band that *counts* steps beats the strap's estimate; the
   better stager wins for sleep), naming the source on every number, and **flagging disagreement instead of
   silently averaging it** ("Sleep 7h 12m · from WHOOP · ⚠ Apple Health says 6h 40m — tap to compare"). It
@@ -856,13 +856,13 @@ limits.
   CSV, and lined up against your wearable signals. Each marker shows its trend; **"Compare with a signal"**
   lines a marker (say LDL) up against resting HR, HRV, sleep or Charge over a 7/14/30-day window, with the
   same restrained "tends to" language used elsewhere. The framing is load-bearing and non-negotiable: **Lab
-  Book is a private notebook, not a medical service.** NOOP *stores and lines up the numbers you enter
+  Book is a private notebook, not a medical service.** Pulse *stores and lines up the numbers you enter
   yourself* — it does **not** test you, read your results, decide whether a value is "normal/high/low", or
   diagnose anything; any reference range shown is exactly what you typed from your own report. Your records
-  **never leave your device**; because NOOP is an independent app you run yourself (not a healthcare
+  **never leave your device**; because Pulse is an independent app you run yourself (not a healthcare
   provider) it is **not "HIPAA-covered"** — the protection is that the data is local-only and yours. Always
   rely on your doctor or pharmacist to interpret results. Open **Health → Lab Book**.
-- **Rhythm (experimental) — a picture of your beat-to-beat timing.** On *every* strap (4.0 and 5/MG), NOOP
+- **Rhythm (experimental) — a picture of your beat-to-beat timing.** On *every* strap (4.0 and 5/MG), Pulse
   can draw a **Poincaré scatter** of your beat-to-beat intervals with plain descriptive stats (SD1, SD2,
   the SD1:SD2 ratio) and a calm categorical read — *Rhythm — steady* / *Some occasional extra or skipped
   beats* / *Your rhythm varied more than usual*. **It is a visualisation, not a verdict: not an ECG, not a
@@ -876,7 +876,7 @@ limits.
   until you've added your own key, switched consent on, and asked a question; only a **compact text summary**
   of computed values is sent to the provider *you* chose — never your raw R-R, PPG or motion. Turn the
   deeper context on with **"Also share my patterns & Lab Book"** in Coach (off by default). As always, the
-  Coach is the only place NOOP touches AI, it's your key and your choice of provider, and the app stays
+  Coach is the only place Pulse touches AI, it's your key and your choice of provider, and the app stays
   offline everywhere else.
 
 **Honest, as ever.** WHOOP 4.0 is the supported path; deeper 5/MG metrics are still being figured out.
@@ -900,7 +900,7 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
 - **Honest Smart-alarm wording (iPhone/Mac).** The Smart-alarm card now states up front that a
   strap-driven wake is experimental and unverified on WHOOP 4.0 / 5/MG — keep a backup alarm.
 - **iPhone sideload fix.** The AltStore/SideStore source no longer fails with "given data not valid
-  JSON" — the install docs and source pointed at the dead GitHub host; they now use noop.fans.
+  JSON" — the install docs and source pointed at the dead GitHub host; they now use github.com/kosherite/pulse.
 
 ---
 
@@ -916,9 +916,9 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
   from both Apple Health and Health Connect imports — previously it read the wrong store and could miss
   them entirely, leaving you stuck on "Not calibrated". (Thanks @pikapik487 and @bringiton321 — #37.)
 - **Homebrew install fixed (macOS).** `brew install` works again — the tap command now points at the
-  project's self-hosted home. The old `brew install --cask noopapp/noop/noop` shorthand resolved to a
-  host that no longer serves the tap; use `brew tap noopapp/noop https://noop.fans/NoopApp/homebrew-noop
-  && brew trust noopapp/noop && brew install --cask noop`. (Thanks @tonyjacked — #44.)
+  project's self-hosted home. The old `brew install --cask pulseapp/pulse/pulse` shorthand resolved to a
+  host that no longer serves the tap; use `brew tap pulseapp/pulse https://github.com/kosherite/pulse/homebrew-pulse
+  && brew trust pulseapp/pulse && brew install --cask pulse`. (Thanks @tonyjacked — #44.)
 
 ---
 
@@ -960,7 +960,7 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
 - **Faster overnight catch-up** — after the phone's been off, a strap that drip-feeds its history drains
   back-to-back instead of stalling between chunks. (#25.)
 - **Bounded local storage** — experimental raw-capture buffers are now size-capped. (#27.)
-- **Apple Health body composition** — NOOP reads weight, body-fat %, lean mass and BMI on iPhone. (#20.)
+- **Apple Health body composition** — Pulse reads weight, body-fat %, lean mass and BMI on iPhone. (#20.)
 - Fixed the misleading "turn on 5/MG raw capture" message a WHOOP 4.0 user could get stuck on. (Thanks
   @ryanbr — #32.)
 
@@ -989,14 +989,14 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
 - **Fixed:** the **Releases** links in the README and docs pointed at a path that 404'd on the new
   home — they now go straight to the downloads page. (#26)
 
-## 4.6.1 — NOOP has a new home (all platforms)
+## 4.6.1 — Pulse has a new home (all platforms)
 
-- **NOOP now lives at [noop.fans](https://noop.fans/NoopApp/noop).** After the project's GitHub was
-  taken offline, NOOP moved to its own independent home — code, releases, the wiki and issues.
+- **Pulse now lives at [github.com/kosherite/pulse](https://github.com/kosherite/pulse).** After the project's GitHub was
+  taken offline, Pulse moved to its own independent home — code, releases, the wiki and issues.
   **Settings → About** now links straight there, and **Check for updates** reads from the new home (if
   GitHub ever comes back it will be kept as a mirror). Nothing on your device changed and everything
   keeps working — this just points the app at where the project lives now. Keeping it online costs
-  real money, so if NOOP is useful to you, please consider a donation. #KeepNOOPAlive
+  real money, so if Pulse is useful to you, please consider a donation. #KeepPulseAlive
 
 ## 4.6.0 — Editable naps, richer Trends report, better debug export (all platforms)
 
@@ -1016,7 +1016,7 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
 ## 4.5.3 — Sleep fix for WHOOP 4.0 + accurate WHOOP 5/MG steps (all platforms)
 
 - **#507 REGRESSION FIX — the off-wrist guard no longer drops real WHOOP 4.0 nights.** The v4.5.0 off-wrist guard treats a long heart-rate gap as a proxy for the strap being off the wrist. But a WHOOP 4.0's *synced* night is reconstructed mostly from motion with sparse, derived heart-rate — so a real 4.0 night is naturally full of >20-min HR gaps, which the guard read as ~100% off-wrist and dropped the whole night. The HR-gap proxy is now gated on **HR density**: it only fires when the stream averages at least one sample per `hrDenseSpacingS` (10 min), measured over the whole window so a genuine off-wrist *hole* in an otherwise dense, worn day (#500) is still caught. Self-consistent — a night sparse enough to be falsely >50%-covered is, by definition, below the density floor, so it's spared. Explicit `WRIST_OFF` events remain authoritative regardless of density. Swift + Android, with a "sparse-HR real night is kept" test on both. Thanks @Mindfulpaths (#507).
-- **WHOOP 5/MG steps are now accurate (#276 / #316).** The firmware's motion/step field at byte `@57` is the LOW byte of a **cumulative 16-bit counter** at `[57:59]` — reading the byte alone and summing it across records over-counted steps many times over (~24×). NOOP now reads the full little-endian `u16` and sums only the **wrap-aware increments** (`(cur − prev) & 0xFFFF`, dropping deltas ≥ 512 as sync-gap boundaries), so the daily total is sane. It also decodes the per-record **activity class** at `@63` (0 = still / 1 = walk / 2 = run) — a lightweight, no-cloud activity signal. Swift + Android, with over-count / wrap-around / jump-guard tests. Thanks @j0b-dev for the frame analysis.
+- **WHOOP 5/MG steps are now accurate (#276 / #316).** The firmware's motion/step field at byte `@57` is the LOW byte of a **cumulative 16-bit counter** at `[57:59]` — reading the byte alone and summing it across records over-counted steps many times over (~24×). Pulse now reads the full little-endian `u16` and sums only the **wrap-aware increments** (`(cur − prev) & 0xFFFF`, dropping deltas ≥ 512 as sync-gap boundaries), so the daily total is sane. It also decodes the per-record **activity class** at `@63` (0 = still / 1 = walk / 2 = run) — a lightweight, no-cloud activity signal. Swift + Android, with over-count / wrap-around / jump-guard tests. Thanks @j0b-dev for the frame analysis.
 
 ## 4.5.2 — Honest labelling for WHOOP 5/MG deep-data diagnostics (all platforms)
 
@@ -1028,7 +1028,7 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
 
 ## 4.5.0 — WHOOP 5/MG deep-sync decode + sleep & workout fixes (all platforms)
 
-- **WHOOP 5/MG historical decode — v20/v21 layouts + richer v18 fields (#344).** Newer 5/MG firmware banks some nights in record layouts NOOP didn't map yet (internally "v20" and "v21"); they were failing the unrecognised-layout path and surfacing as empty nights. Those now decode to timestamps + optical/motion channels, so more 5/MG history syncs through. We also extract additional fields from the existing v18 records (per-record index, higher-precision HR, step cadence, an auxiliary thermal channel, status/sleep-state bitfields) and corrected the skin-temperature scale from /128 to /100 (a worn strap now reads ~30.6 °C instead of an impossible ~22 °C). All offsets were validated against real captured frames and CRC32 integrity; the Swift WhoopProtocol suite is at 164 passing tests. Thanks to community contributor **j0b-dev** for the captured-frame analysis (reimplemented here as project work).
+- **WHOOP 5/MG historical decode — v20/v21 layouts + richer v18 fields (#344).** Newer 5/MG firmware banks some nights in record layouts Pulse didn't map yet (internally "v20" and "v21"); they were failing the unrecognised-layout path and surfacing as empty nights. Those now decode to timestamps + optical/motion channels, so more 5/MG history syncs through. We also extract additional fields from the existing v18 records (per-record index, higher-precision HR, step cadence, an auxiliary thermal channel, status/sleep-state bitfields) and corrected the skin-temperature scale from /128 to /100 (a worn strap now reads ~30.6 °C instead of an impossible ~22 °C). All offsets were validated against real captured frames and CRC32 integrity; the Swift WhoopProtocol suite is at 164 passing tests. Thanks to community contributor **j0b-dev** for the captured-frame analysis (reimplemented here as project work).
 - **Sleep: off-wrist daytime no longer logged as sleep (#500).** The daytime false-sleep guard now rejects any candidate sleep run that has a long contiguous heart-rate gap (>20 min — a strong off-wrist proxy that works even when the strap emits no explicit marker) or that overlaps a `WRIST_OFF` event. Time on the charger or sat still at a desk is no longer counted as a nap, day or night. The guard never trips on a worn, gap-free night (verified by the existing real-night test suites staying green).
 - **Sleep: wake time no longer clamped to 6 PM (#500).** Past nights whose real wake was later than the read-window edge were truncated to exactly 18:00. Past days now read through to the next local midnight so the stager sees the whole night and reports your true wake.
 - **Workouts: Average HR always matches the recorded trace (#499).** A strap-tracked workout's Average (and Max) HR is now always derived at display time from the exact per-second samples that drive the graph, the zones, and the effort score — they can no longer diverge from a stale or hand-edited value. Imported workouts (Apple Health / Health Connect / CSV) keep their own averages.
@@ -1040,32 +1040,32 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
 
 ## 4.3.2 — Light theme tuning (all platforms)
 
-- **Light got dialled in, from early feedback that it leaned too gold.** The *chrome* — links, the selected range pill, header accents — now uses the deep brand **blue** on Light, with **gold reserved for what it means** (the Charge/recovery rings and the action button). Cards sit on a slightly **deeper warm canvas with a stronger drop shadow**, so they stand out more clearly. On **macOS**, a sidebar glitch where the NOOP lockup overlapped the navigation list is fixed (it's now a proper fixed header above the list). **Dark is unchanged.**
+- **Light got dialled in, from early feedback that it leaned too gold.** The *chrome* — links, the selected range pill, header accents — now uses the deep brand **blue** on Light, with **gold reserved for what it means** (the Charge/recovery rings and the action button). Cards sit on a slightly **deeper warm canvas with a stronger drop shadow**, so they stand out more clearly. On **macOS**, a sidebar glitch where the Pulse lockup overlapped the navigation list is fixed (it's now a proper fixed header above the list). **Dark is unchanged.**
 
 ## 4.3.1 — Light theme polish (all platforms)
 
 - **A theme audit caught a handful of details that were tuned for dark and read faintly (or invisibly) on the new Light theme** — a few chart/gauge end-cap dots (the white core vanished against the white card), a secondary-button outline, and a tooltip shadow. They now flip to the right ink/shadow on Light via the same dynamic tokens. **Dark is unaffected.** If you tried Light in 4.3.0 and saw a missing dot at the end of a graph line, this fixes it.
 
-## 4.3.0 — Light theme: NOOP in warm paper & gold (all platforms)
+## 4.3.0 — Light theme: Pulse in warm paper & gold (all platforms)
 
-- **NOOP now has a full Light theme, switchable any time.** Settings → Appearance offers **System** (follow your phone/Mac), **Light**, or **Dark**. The new Light look is "warm paper & gold" — a soft warm-white canvas with crisp navy-ink text and the brand gold deepened so it stays legible on white. Every surface was re-done for it rather than inverted: the ring gauges, the frosted cards (lifted with a soft drop shadow instead of a glow), the charts, the scenic hero, the home-screen / Dynamic Island widgets and the status bar all adapt. **Dark is unchanged.** Architecture note for the curious: on Apple every palette token became a dynamic `Color(light:dark:)`, and on Android a snapshot-state token set behind the `Palette` facade — so the whole UI re-resolves from one toggle with no per-screen rework.
+- **Pulse now has a full Light theme, switchable any time.** Settings → Appearance offers **System** (follow your phone/Mac), **Light**, or **Dark**. The new Light look is "warm paper & gold" — a soft warm-white canvas with crisp navy-ink text and the brand gold deepened so it stays legible on white. Every surface was re-done for it rather than inverted: the ring gauges, the frosted cards (lifted with a soft drop shadow instead of a glow), the charts, the scenic hero, the home-screen / Dynamic Island widgets and the status bar all adapt. **Dark is unchanged.** Architecture note for the curious: on Apple every palette token became a dynamic `Color(light:dark:)`, and on Android a snapshot-state token set behind the `Palette` facade — so the whole UI re-resolves from one toggle with no per-screen rework.
 
 ## 4.2.13 — Effort explains a calm-day zero — and scores on the 5.0/MG (all platforms)
 
 - **Effort now explains a calm-day zero instead of just showing "0.0".** Effort is *cardiovascular* load — it only builds while your heart rate is up in your effort zone (roughly the top half of your heart-rate reserve, often ~120 bpm and above). On a genuinely easy day your heart rate never gets there, so the honest answer really is near zero — the same way a WHOOP low-strain day reads low. The number was right, but a bare "0.0" looked broken, so Today now adds a short line explaining it. We also fixed the **WHOOP 5.0/MG** case where Effort could sit un-scored for hours: the 5.0/MG sends live heart rate far less often than a 4.0, and the gauge needed a fixed *number* of readings before it would score — now it scores once it has enough *time* of heart-rate coverage, so a steady 5.0/MG stream counts and the gauge stops falling back to a stale value. Effort still only rewards real exertion — nothing is invented. Thanks **@darylbleach** and **@phsycology** (#482, #480).
-- **History from a long-drained strap lands on the right day again.** When a WHOOP's internal clock had fully reset — it sat uncharged so long its clock fell back to around 1970 — syncing its stored history could date every night decades into the future, silently wiping sleep and recovery from your timeline. NOOP now keeps the real timestamps in that case. Thanks **@cataboysbusiness-debug** (#471).
+- **History from a long-drained strap lands on the right day again.** When a WHOOP's internal clock had fully reset — it sat uncharged so long its clock fell back to around 1970 — syncing its stored history could date every night decades into the future, silently wiping sleep and recovery from your timeline. Pulse now keeps the real timestamps in that case. Thanks **@cataboysbusiness-debug** (#471).
 
 ## 4.2.12 — Fix: app crashing / won't open when Bluetooth is on (Android)
 
-- **Fixed NOOP crashing — or refusing to open at all — whenever Bluetooth was on**, which hit some phones hard (notably WHOOP 5.0 / MG on Android 16). When Bluetooth came on, NOOP's background service reconnected to your saved strap and logged the first frame it received; a bug in the privacy log-redaction code (it masks Bluetooth addresses) threw an error on that line and **crashed the entire app — even while it was closed**, and the bug was in earlier builds too, so downgrading didn't help. Two fixes: the redaction bug itself is gone, and the **logging path is now hardened so a diagnostic line can never crash the app again** (belt-and-suspenders, with a regression test). Your data and history were never at risk. Huge thanks to **@frazzle28** and **@pawan0305** for the reports and the crash trace (#453). *(Android — macOS/iOS use a different, unaffected redaction path.)*
+- **Fixed Pulse crashing — or refusing to open at all — whenever Bluetooth was on**, which hit some phones hard (notably WHOOP 5.0 / MG on Android 16). When Bluetooth came on, Pulse's background service reconnected to your saved strap and logged the first frame it received; a bug in the privacy log-redaction code (it masks Bluetooth addresses) threw an error on that line and **crashed the entire app — even while it was closed**, and the bug was in earlier builds too, so downgrading didn't help. Two fixes: the redaction bug itself is gone, and the **logging path is now hardened so a diagnostic line can never crash the app again** (belt-and-suspenders, with a regression test). Your data and history were never at risk. Huge thanks to **@frazzle28** and **@pawan0305** for the reports and the crash trace (#453). *(Android — macOS/iOS use a different, unaffected redaction path.)*
 
 ## 4.2.11 — Polar H10 & other heart-rate straps connect again (Android fix)
 
-- **Fixed a crash that stopped Polar H10 and other standard Bluetooth heart-rate straps from connecting on Android.** When NOOP went to activate a generic HR strap, an internal log-redaction bug threw an error the instant it wrote the strap's Bluetooth address into the strap log — and that thrown error quietly aborted the connection, so the strap paired but never streamed live data. The strap now connects and streams as intended. **WHOOP straps were never affected** (they only ever log a `<serial>`, never a raw address, so the bug stayed hidden until a generic strap was used). Added a unit test so it can't regress. Thanks **@pilleuspulcher-blip** for the strap log that pinned it (#421). *(Android only — macOS/iOS were never affected; they stay on 4.2.10.)*
+- **Fixed a crash that stopped Polar H10 and other standard Bluetooth heart-rate straps from connecting on Android.** When Pulse went to activate a generic HR strap, an internal log-redaction bug threw an error the instant it wrote the strap's Bluetooth address into the strap log — and that thrown error quietly aborted the connection, so the strap paired but never streamed live data. The strap now connects and streams as intended. **WHOOP straps were never affected** (they only ever log a `<serial>`, never a raw address, so the bug stayed hidden until a generic strap was used). Added a unit test so it can't regress. Thanks **@pilleuspulcher-blip** for the strap log that pinned it (#421). *(Android only — macOS/iOS were never affected; they stay on 4.2.10.)*
 
 ## 4.2.10 — Week in Review is honest about a half-finished week (all platforms)
 
-- The **Week in Review** summary no longer says "a steady week — nothing moved" when you're only **a day or two into the week**. Early on, NOOP genuinely can't call a week-over-week trend — but the summary used to claim a steady week while the change chips right above it showed big percentage swings off those same one or two days, which read as a contradiction. Now a sparse current week says something like *"Only 2 days into this week so far — too early to call a week-over-week trend yet,"* matching what the chips can and can't tell you. A full week with genuinely flat metrics still reads as steady. Thanks **@pikapik487** (#463).
+- The **Week in Review** summary no longer says "a steady week — nothing moved" when you're only **a day or two into the week**. Early on, Pulse genuinely can't call a week-over-week trend — but the summary used to claim a steady week while the change chips right above it showed big percentage swings off those same one or two days, which read as a contradiction. Now a sparse current week says something like *"Only 2 days into this week so far — too early to call a week-over-week trend yet,"* matching what the chips can and can't tell you. A full week with genuinely flat metrics still reads as steady. Thanks **@pikapik487** (#463).
 
 ## 4.2.9 — Respiratory rate & skin temperature in the Trends report (all platforms)
 
@@ -1085,15 +1085,15 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
 
 ## 4.2.5 — Trends report explains its scores (all platforms)
 
-- The shareable Trends report now carries a **"How to read this"** legend, so it's clearer when you hand the PDF to a doctor, coach or friend: HRV, Resting HR and Sleep duration are flagged as **measured** from the strap, while **Recovery and Strain are spelled out as NOOP's own on-device scores (not clinical measures)** — Recovery as a daily readiness composite, Strain as cardiovascular load from heart rate. The numbers stay (they're still useful as your own trend); now nobody reading it has to guess which are measured vs. computed, or how. Thanks @subscriptiondestroyer (#457). *(Adding workouts, stress and extra vitals like respiratory rate and skin temp to the report is tracked as a follow-up.)*
+- The shareable Trends report now carries a **"How to read this"** legend, so it's clearer when you hand the PDF to a doctor, coach or friend: HRV, Resting HR and Sleep duration are flagged as **measured** from the strap, while **Recovery and Strain are spelled out as Pulse's own on-device scores (not clinical measures)** — Recovery as a daily readiness composite, Strain as cardiovascular load from heart rate. The numbers stay (they're still useful as your own trend); now nobody reading it has to guess which are measured vs. computed, or how. Thanks @subscriptiondestroyer (#457). *(Adding workouts, stress and extra vitals like respiratory rate and skin temp to the report is tracked as a follow-up.)*
 
 ## 4.2.4 — Trends report export now opens the share sheet on iPhone (iOS fix)
 
-- Fixed the **Export PDF** button on the Trends report doing nothing on iPhone. The report opens in a sheet, but the share sheet was being presented from the wrong place (behind the report that was already on screen), so iOS silently dropped it and the export appeared to fail. NOOP now presents the share sheet from the top-most screen, so it slides up correctly and you can save the PDF to Files, AirDrop it, or send it on. Thanks @subscriptiondestroyer (#455). *(iOS-only fix — the macOS and Android exports were unaffected; they're functionally unchanged in this release.)*
+- Fixed the **Export PDF** button on the Trends report doing nothing on iPhone. The report opens in a sheet, but the share sheet was being presented from the wrong place (behind the report that was already on screen), so iOS silently dropped it and the export appeared to fail. Pulse now presents the share sheet from the top-most screen, so it slides up correctly and you can save the PDF to Files, AirDrop it, or send it on. Thanks @subscriptiondestroyer (#455). *(iOS-only fix — the macOS and Android exports were unaffected; they're functionally unchanged in this release.)*
 
 ## 4.2.3 — Deep history backlog drains without manual strap taps (all platforms)
 
-- Fixed a sync stall where a strap that had been fully discharged (or carried a previous owner's history) would offload only one night per connection and then sit idle until you physically tapped the strap to force the next chunk. The cause: such a strap banks records across multiple clock epochs, and the "newest record" the strap reports can latch a stale value (e.g. a 2024 timestamp when your real newest is 2026) — which read as *behind* what NOOP had already saved, so the auto-continue logic wrongly concluded "caught up" and stopped. NOOP now also checks whether the just-finished pass actually handed over real sensor rows: if it did and the strap's trim cursor advanced, the backlog keeps draining in back-to-back passes regardless of a stale "newest" reading. A genuinely caught-up strap still stops (it persists zero new rows), and the per-connection cap still bounds it. Thanks @claypilat for the precise diagnosis (#451) — this also removes the "have to keep re-triggering it" half of #364.
+- Fixed a sync stall where a strap that had been fully discharged (or carried a previous owner's history) would offload only one night per connection and then sit idle until you physically tapped the strap to force the next chunk. The cause: such a strap banks records across multiple clock epochs, and the "newest record" the strap reports can latch a stale value (e.g. a 2024 timestamp when your real newest is 2026) — which read as *behind* what Pulse had already saved, so the auto-continue logic wrongly concluded "caught up" and stopped. Pulse now also checks whether the just-finished pass actually handed over real sensor rows: if it did and the strap's trim cursor advanced, the backlog keeps draining in back-to-back passes regardless of a stale "newest" reading. A genuinely caught-up strap still stops (it persists zero new rows), and the per-connection cap still bounds it. Thanks @claypilat for the precise diagnosis (#451) — this also removes the "have to keep re-triggering it" half of #364.
 - Sync diagnostics now log the strap's full banked-history span (oldest → newest, with an approximate day count) so a deep multi-epoch backlog is visible at a glance in the strap log.
 
 ## 4.2.2 — Sleep stages heal themselves after a sync (all platforms)
@@ -1102,7 +1102,7 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
 
 ## 4.2.1 — Optional inactivity nudge
 
-- An opt-in move reminder: NOOP can buzz your strap after you've been sitting still too long (your threshold, default 45 min), within active hours you choose, with a re-nudge cooldown. Off by default, runs from the motion already on your strap, respects quiet hours and only-when-worn. Settings → Automations. Thanks @cbarrado (#419).
+- An opt-in move reminder: Pulse can buzz your strap after you've been sitting still too long (your threshold, default 45 min), within active hours you choose, with a re-nudge cooldown. Off by default, runs from the motion already on your strap, respects quiet hours and only-when-worn. Settings → Automations. Thanks @cbarrado (#419).
 
 ## 4.2.0 — Open a workout, see what it costs you, and share your trends
 
@@ -1111,7 +1111,7 @@ unit-tested with Swift↔Kotlin parity locked across macOS, iOS and Android.
 - Shareable trends report: export a one-page PDF of recovery, sleep, HRV, resting HR and strain over a chosen range, entirely on-device via the system share sheet (#436).
 - Last night syncs sooner — a deep backlog now keeps draining while you're connected instead of waiting 15 minutes between bursts, plus a "Sync now" button to backfill on demand (#364).
 - Weight imported from Health Connect now resolves in Compare (Android), where a HC-only weight history was previously invisible (#443).
-- Docs: recorded the FORCE_TRIM / REBOOT_STRAP destructive-command payload forms as known-and-avoidable (NOOP never sends them) (#444). The published Android **demo** APK is retired — the demo flavour stays build-from-source only.
+- Docs: recorded the FORCE_TRIM / REBOOT_STRAP destructive-command payload forms as known-and-avoidable (Pulse never sends them) (#444). The published Android **demo** APK is retired — the demo flavour stays build-from-source only.
 
 ## 4.1.1 — Android hotfix
 
@@ -1164,18 +1164,18 @@ A fix release following a full code review of the v4 line.
 
 - **Today's Effort now updates live through the day.** The Effort ring recomputes over today's heart rate
   as it happens (midnight → now), instead of showing yesterday's completed-day value — or a stale 0.0 early
-  in the morning — until the next full re-score. Thanks @rad182 ([#402](https://github.com/NoopApp/noop/issues/402)).
+  in the morning — until the next full re-score. Thanks @rad182 ([#402](https://github.com/kosherite/pulse/issues/402)).
 - **Editing a sleep time can't scramble the night any more.** The wake picker keeps the night on its own
   day, so correcting a bed/wake time re-derives that night's stages cleanly instead of splitting the
   corrected block and its totals across two days. Resting-HR + HRV day-bucketing was also aligned across
-  Mac, iPhone and Android. Thanks @ujix ([#406](https://github.com/NoopApp/noop/issues/406)).
+  Mac, iPhone and Android. Thanks @ujix ([#406](https://github.com/kosherite/pulse/issues/406)).
 - **Late nights and long lie-ins are captured** — the sleep-detection window was widened so a wake after
-  noon isn't cut short. Thanks @ujix ([#425](https://github.com/NoopApp/noop/pull/425)).
+  noon isn't cut short. Thanks @ujix ([#425](https://github.com/kosherite/pulse/pull/425)).
 - **Smart alarm is now honestly flagged experimental.** The strap acknowledges the alarm, but a
   strap-driven wake hasn't been verified firing yet — on WHOOP 4.0 *or* 5/MG — so the app asks you to keep
-  a backup alarm while we confirm the exact firmware buzz pattern. Thanks Kaliarti ([#428](https://github.com/NoopApp/noop/issues/428)).
+  a backup alarm while we confirm the exact firmware buzz pattern. Thanks Kaliarti ([#428](https://github.com/kosherite/pulse/issues/428)).
 - **Android: rename your WHOOP's Bluetooth name** — brings Android up to the iPhone/Mac feature. Thanks
-  @cbarrado ([#422](https://github.com/NoopApp/noop/pull/422)).
+  @cbarrado ([#422](https://github.com/kosherite/pulse/pull/422)).
 - **Polish from the review:** your Vitality breakdown now reconciles exactly with the Body Age number it
   explains; the new Age cards always compute on Android (the age control is bounded like iPhone/Mac);
   renaming no longer spins forever if your strap doesn't answer; live workout detection now covers the
@@ -1185,7 +1185,7 @@ A fix release following a full code review of the v4 line.
 
 ## 4.0.0 — Your Fitness Age, Vitality and Body Age
 
-NOOP's new **Age & Longevity engine** — the headline of v4. Three new on-device numbers, all computed
+Pulse's new **Age & Longevity engine** — the headline of v4. Three new on-device numbers, all computed
 from data you already have, all framed honestly as wellness estimates rather than clinical/biological ages.
 
 - **Fitness Age.** A weekly estimate of how fit your heart is versus your calendar age, from your resting
@@ -1210,26 +1210,26 @@ from data you already have, all framed honestly as wellness estimates rather tha
 ## 3.9.1 — A round of fixes: reconnect, exports and Health setup
 
 - **Mac & iPhone reconnect on their own.** If your strap briefly dropped out of range, or a connection attempt failed mid-handshake (a weak-signal encrypted handshake on a 5/MG at the edge of range), the app used to sit idle until you reconnected by hand — the disconnect path rescheduled a rescan, but the failed-connect path never did. It now retries on its own with a capped exponential back-off (3s → 6s → 12s … up to 60s) and stops the instant it reconnects. macOS/iOS. Thanks @phsycology (#414).
-- **Android: GPS workouts write back to Health Connect.** Workouts tracked in NOOP weren't being saved to Health Connect — the `WRITE_EXERCISE` / `WRITE_DISTANCE` permissions were never declared in the manifest, so the runtime request was silently dropped and nothing was written. Declared them and broadened the writeback gate; existing vitals-only writeback users are re-prompted once for exercise + distance. Thanks @andreasc1 (#412).
+- **Android: GPS workouts write back to Health Connect.** Workouts tracked in Pulse weren't being saved to Health Connect — the `WRITE_EXERCISE` / `WRITE_DISTANCE` permissions were never declared in the manifest, so the runtime request was silently dropped and nothing was written. Declared them and broadened the writeback gate; existing vitals-only writeback users are re-prompted once for exercise + distance. Thanks @andreasc1 (#412).
 - **Raw sensor export no longer runs out of memory.** The experimental raw-sensor CSV export built the entire file in memory (and then a second full copy) before writing, which could OOM on a busy 24-hour window. Both the Android and Mac/iOS exporters now stream rows straight to the file through a buffer, holding only the data itself. Thanks @maddognik (#406).
 - **Android: sleep stage breakdown reads cleanly.** Stage-breakdown values under the sleep chart no longer wrap onto a second line and clip against the card edge (#406).
 - **WHOOP 4.0: no phantom deep-data counter.** The experimental deep-data (R22) packet counter is a WHOOP 5/MG concept; it no longer increments on a WHOOP 4.0, where a type-0x2F frame means something else (#346).
-- **Protocol reference: 5-class (MAVERICK) command numbers** documented in `docs/PROTOCOL.md` and the protocol schema (`SEND_EVENT_PACKETS`, `SET_AFE_PARAMETERS`, `GET_AFE_PARAMETERS`, plus the MAVERICK clock renumbering). Reference only — NOOP does not send these. Thanks @j0b-dev (#418).
+- **Protocol reference: 5-class (MAVERICK) command numbers** documented in `docs/PROTOCOL.md` and the protocol schema (`SEND_EVENT_PACKETS`, `SET_AFE_PARAMETERS`, `GET_AFE_PARAMETERS`, plus the MAVERICK clock renumbering). Reference only — Pulse does not send these. Thanks @j0b-dev (#418).
 
 ---
 
 ## 3.9.0 — Manage several WHOOP straps, and see what each band does
 
-- **Manage several WHOOP straps.** If you own more than one WHOOP — a couple of 4.0s, a 5.0, or a mix — NOOP now tells them apart and lets you **pair, switch, rename and remove** each one from the **Devices** screen. Each strap is identified by its own Bluetooth identity, only one is ever active at a time, and your history is never mixed between devices. Cross-platform (iPhone, Mac, Android); the Android device database migrates cleanly from 3.8.0 (emulator-verified).
+- **Manage several WHOOP straps.** If you own more than one WHOOP — a couple of 4.0s, a 5.0, or a mix — Pulse now tells them apart and lets you **pair, switch, rename and remove** each one from the **Devices** screen. Each strap is identified by its own Bluetooth identity, only one is ever active at a time, and your history is never mixed between devices. Cross-platform (iPhone, Mac, Android); the Android device database migrates cleanly from 3.8.0 (emulator-verified).
 - **A guided "Add a device" wizard.** Adding a device now **asks what you're adding** — WHOOP 5.0/MG, WHOOP 4.0, or a heart-rate strap — and gives the right pairing steps for that band (a 5/MG pairs differently from a 4.0), then scans the right transport. Coming-soon device types (Garmin, Amazfit/Zepp, Oura/Fitbit import) are shown on the roadmap.
 - **The Live screen links to Devices.** The live console now names the **active band** and has a **Manage devices** shortcut, so it's obvious where to pair or switch straps.
-- **Honest per-device capabilities.** Each device card now shows **what that band captures and what NOOP uses it for**, per model — so it's clear a 5/MG reports steps while a 4.0 doesn't, and a heart-rate strap drives live HR + Effort only. We also corrected misleading labels: no "Blood oxygen" where NOOP can't read an SpO₂ percentage off the strap (it never can — that only comes from a WHOOP CSV import), and skin temp / respiration are marked as the on-device estimates they are.
+- **Honest per-device capabilities.** Each device card now shows **what that band captures and what Pulse uses it for**, per model — so it's clear a 5/MG reports steps while a 4.0 doesn't, and a heart-rate strap drives live HR + Effort only. We also corrected misleading labels: no "Blood oxygen" where Pulse can't read an SpO₂ percentage off the strap (it never can — that only comes from a WHOOP CSV import), and skin temp / respiration are marked as the on-device estimates they are.
 
 ---
 
 ## 3.8.0 — Connect a heart-rate strap (early access)
 
-- **A new Devices screen — NOOP reads more than just WHOOP now.** Pair a **standard Bluetooth heart-rate strap** (Polar, Wahoo, Coospo, a Garmin HRM, or the Amazfit Helio's HR broadcast) for **live heart rate + HRV**. The new **Devices** screen (System group) lists what's paired, lets you switch which strap is active, rename, or remove one (with a separate, deliberate "delete this device's data" path). Built on a device registry + a per-day source-ownership rule so **only one strap is ever active at a time and NOOP never mixes or double-counts data from two devices**.
+- **A new Devices screen — Pulse reads more than just WHOOP now.** Pair a **standard Bluetooth heart-rate strap** (Polar, Wahoo, Coospo, a Garmin HRM, or the Amazfit Helio's HR broadcast) for **live heart rate + HRV**. The new **Devices** screen (System group) lists what's paired, lets you switch which strap is active, rename, or remove one (with a separate, deliberate "delete this device's data" path). Built on a device registry + a per-day source-ownership rule so **only one strap is ever active at a time and Pulse never mixes or double-counts data from two devices**.
 - **WHOOP stays the priority.** It remains the primary, fully-supported band; other straps are an early, opt-in addition that stream live HR + HRV only (not WHOOP's deeper sleep/recovery/strain). The generic-strap path is fully isolated from the WHOOP BLE path — with no strap paired, behaviour is byte-identical to before, so WHOOP users are completely unaffected.
 - **Early and experimental.** This is the first build that talks to non-WHOOP straps; the live connection is still being proven on real hardware. The Devices screen, pairing flow and data isolation are verified (and the iPhone/Mac screen is render-checked), but the live radio handshake needs real straps to confirm — pair one and let us know. Cross-platform (iPhone, Mac, Android).
 
@@ -1246,7 +1246,7 @@ from data you already have, all framed honestly as wellness estimates rather tha
 
 - **Step calibration goes further (#132):** on a WHOOP 5/MG the strap's motion counter can over-report steps by 20× or more, and the per-user calibration divider used to stop at 4×. It now goes all the way to **30×**, and the +/− control uses a variable increment (fine around the 1.0 default, coarser up in the 20s) so a large correction takes a few taps instead of dozens. Floor stays 0.5×; same on iPhone, Mac and Android. Thanks @exzanimo.
 - **Insights “By Day” stays smooth with a large history (#345):** tapping **All** with a big imported history used to build every day card up-front, which could freeze the app (and trip Android's "close the app?" prompt). The day list now renders lazily — only what's on screen — so it scrolls smoothly regardless of how many days you've imported. Small histories are byte-for-byte unchanged. (No data was ever at risk during the old freeze — that screen only reads already-stored days.) Thanks @maddognik. While here, the Stress maths were re-checked end to end: the daily monitor (today vs your 30-day baseline) and the intraday timeline (each hour vs that day's calm hours) are deliberately different references, so they read differently — no calculation bug.
-- **Honest Apple Health guidance on free sideloads (iPhone, #348):** a build installed with a free Apple ID (AltStore / Sideloadly) is re-signed without Apple's HealthKit entitlement, so it can never appear under Settings › Health › Data Access & Devices. NOOP now detects that and stops giving the impossible instruction — it explains the limitation plainly and routes you to the file-import / Shortcuts path instead. Properly-signed installs behave exactly as before. Thanks @exzanimo.
+- **Honest Apple Health guidance on free sideloads (iPhone, #348):** a build installed with a free Apple ID (AltStore / Sideloadly) is re-signed without Apple's HealthKit entitlement, so it can never appear under Settings › Health › Data Access & Devices. Pulse now detects that and stops giving the impossible instruction — it explains the limitation plainly and routes you to the file-import / Shortcuts path instead. Properly-signed installs behave exactly as before. Thanks @exzanimo.
 - **Better odds of unlocking newer straps (#344):** the on-device archive that collects undecoded history frames (the raw material for reverse-engineering new firmware layouts) had a size cap that, once full, dropped new frames indiscriminately — so a rare never-seen layout could be evicted by common ones. It now keeps a guaranteed floor of samples **per distinct layout version**, so a brand-new version (WHOOP 4.0 v19, 5/MG v20/v21) survives until we can study it. Thanks @airtonzanon and everyone sending strap logs.
 
 ---
@@ -1261,14 +1261,14 @@ from data you already have, all framed honestly as wellness estimates rather tha
 ## 3.5.0 — Hand-correct your sleep times + smaller backups
 
 - **Sleep bed/wake editing (iPhone/Mac, #395):** the Sleep tab gains a pencil to hand-correct a night's Asleep/Woke times. The night is **re-staged from the raw sensor data** over the corrected window (real `SleepStager` for strap nights; stage-reclip for imported ones), and the edit is **durable** — a `userEdited` flag + a recompute guard drop any re-detected session that overlaps an edited night, so a later strap sync can't revert the correction. Two additive migrations (`userEdited`, `startTsAdjusted`); `startTs` stays the immutable detected key so editing the bedtime can't spawn a duplicate row. Imported WHOOP-export nights update the displayed session but keep verbatim export recovery/performance. Thanks @claypilat.
-- **Compressed `.noopbak` backups (#396):** exports are now a single-entry deflate ZIP (`noop-backup.sqlite` inside), typically 80–90% smaller — small enough to AirDrop/email. Both platforms produce and consume the same container; import sniffs ZIP-vs-raw magic bytes so older uncompressed backups still restore, and the failed-import rollback is preserved. Thanks @ujix.
+- **Compressed `.pulsebak` backups (#396):** exports are now a single-entry deflate ZIP (`pulse-backup.sqlite` inside), typically 80–90% smaller — small enough to AirDrop/email. Both platforms produce and consume the same container; import sniffs ZIP-vs-raw magic bytes so older uncompressed backups still restore, and the failed-import rollback is preserved. Thanks @ujix.
 
 ---
 
 ## 3.4.0 — Tidier Today hero, strap renaming, smarter journal
 
 - **Today hero (#394):** the three daily scores — Charge / Effort / Rest — now sit in one equal three-up row of rings, instead of the old adaptive grid that fit only two per phone width and orphaned Rest beside an empty cell. Rings shrink to fit and drop the micro wordmark so the number stays legible. Thanks @vulnix0x4.
-- **WHOOP 4.0 strap renaming (iPhone/Mac, #393):** rename your strap's BLE advertising name from **Settings → Strap** while it's connected — useful for a second-hand band stuck on a previous owner's name. Uses the documented `SET_ADVERTISING_NAME_HARVARD` (cmd 77, paired with the `GET` NOOP already reads on connect); the strap reboots to apply, reversible any time, WHOOP-4-only. Thanks @rad182.
+- **WHOOP 4.0 strap renaming (iPhone/Mac, #393):** rename your strap's BLE advertising name from **Settings → Strap** while it's connected — useful for a second-hand band stuck on a previous owner's name. Uses the documented `SET_ADVERTISING_NAME_HARVARD` (cmd 77, paired with the `GET` Pulse already reads on connect); the strap reboots to apply, reversible any time, WHOOP-4-only. Thanks @rad182.
 - **Android journal pre-fill (#372):** opening today's journal with no entries yet pre-fills last night's answers — **upserting real rows** so the effects engine counts the day and a tap genuinely confirms (or clears) — with a disclosing banner and bigger Yes/No tap targets. Thanks @ujix.
 
 ---
@@ -1315,14 +1315,14 @@ A large wave of community-contributed fixes, each independently verified and rei
 
 ## 3.0.2 — Bluetooth stream + Apple Health sync fixes
 
-- **Fixed:** a corrupt/misaligned Bluetooth frame could wedge the live data stream until a reconnect — NOOP now resyncs to the next real frame. Thanks @vulnix0x4 (#374). *(Android already carried this guard.)*
-- **Fixed (iPhone):** the two-way Apple Health sync read its own write-backs (your strap + Apple Health could plot the same line; a failed sync could falsely report success) — it now excludes NOOP's own samples on read. Thanks @vulnix0x4 (#375).
+- **Fixed:** a corrupt/misaligned Bluetooth frame could wedge the live data stream until a reconnect — Pulse now resyncs to the next real frame. Thanks @vulnix0x4 (#374). *(Android already carried this guard.)*
+- **Fixed (iPhone):** the two-way Apple Health sync read its own write-backs (your strap + Apple Health could plot the same line; a failed sync could falsely report success) — it now excludes Pulse's own samples on read. Thanks @vulnix0x4 (#375).
 
 ---
 
 ## 3.0.1 — Cleaner score rings + a few fixes
 
-- **Changed:** removed the small gold dot in the centre of the Charge / Recovery rings (behind the number) — launch feedback was that it crowded the read-out. The clean ring + number + micro-NOOP wordmark stay; the dot now lives only in the standalone logo.
+- **Changed:** removed the small gold dot in the centre of the Charge / Recovery rings (behind the number) — launch feedback was that it crowded the read-out. The clean ring + number + micro-Pulse wordmark stay; the dot now lives only in the standalone logo.
 - **Fixed:** Steps on Today prefer your strap's own on-device count (WHOOP 5/MG) over Apple Health, matching Android (#276).
 - **Fixed:** a real overnight sleep that runs late (or has a brief morning stir) no longer truncates your wake time to late morning — your true wake time is kept. Thanks @vulnix0x4 (#353).
 - **Fixed (Android):** HR-zone coaching now persists and buzzes your strap entering your top zone / on recovery — closing the gap with Mac/iPhone. Thanks @cbarrado (#350).
@@ -1373,7 +1373,7 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 
 ## 2.18.0 — Export your raw sensor data (CSV)
 
-- **New (experimental):** a Settings **Export raw sensor data (CSV)** button dumps the decoded per-sample streams NOOP stores (heart rate, R-R, accelerometer, motion/step counter, SpO2/PPG, events) for the last 24h as a plain CSV — for prototyping your own sleep / activity / VBT algorithms on real data, no BLE coding. On-device only. Thanks @maddognik / @alacore (#322/#276).
+- **New (experimental):** a Settings **Export raw sensor data (CSV)** button dumps the decoded per-sample streams Pulse stores (heart rate, R-R, accelerometer, motion/step counter, SpO2/PPG, events) for the last 24h as a plain CSV — for prototyping your own sleep / activity / VBT algorithms on real data, no BLE coding. On-device only. Thanks @maddognik / @alacore (#322/#276).
 
 ---
 
@@ -1431,17 +1431,17 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 
 ## 2.15.0 — The new look everywhere, plus sleep, Effort & Bluetooth fixes
 
-- **The new look, everywhere.** Every screen now wears NOOP's premium dark design — scenic
+- **The new look, everywhere.** Every screen now wears Pulse's premium dark design — scenic
   backdrops, glowing ring gauges for Charge/Effort/Rest, and frosted per-domain cards — across
   Sleep, Recovery, Stress, Workouts, Live, Health, Trends, Insights, Breathe, Coach and Settings,
   on Mac, iPhone and Android. Same data, same on-device privacy.
 - **Fixed (sleep day):** if you fall asleep before midnight and wake before ~4am in a timezone
   other than UTC, Today now shows last night's sleep instead of the night before. Thanks @maddognik (#304).
 - **Fixed (sleep detection):** on WHOOP 5.0 a full night is no longer chopped into tiny fragments
-  and dropped — NOOP holds the night together from your heart rate when motion data is sparse. Thanks @umarXBT (#308).
+  and dropped — Pulse holds the night together from your heart rate when motion data is sparse. Thanks @umarXBT (#308).
 - **Fixed (Effort scale):** the Effort gauge on Today, Live and Workouts now follows your 0–100 /
   0–21 preference instead of always showing 0–21, and older imported days are re-scored onto the 0–100 axis. Thanks @maddognik (#313).
-- **Fixed (Android Bluetooth):** turning Bluetooth off — or flight mode — no longer leaves NOOP
+- **Fixed (Android Bluetooth):** turning Bluetooth off — or flight mode — no longer leaves Pulse
   showing a phantom "connected" or crashing on the next buzz; it cleanly shows disconnected and reconnects when Bluetooth returns. Thanks @pilleuspulcher-blip (#314).
 
 ---
@@ -1458,7 +1458,7 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 
 ## 2.14.0 — A beautiful new look
 
-- **New design.** NOOP has a gorgeous new look — deeper, calmer, more premium. A dark blue-black canvas,
+- **New design.** Pulse has a gorgeous new look — deeper, calmer, more premium. A dark blue-black canvas,
   **layered ring gauges** for your Charge, Effort and Rest scores with glowing accents, **frosted tinted
   cards**, and a refreshed Today, across Mac, iPhone and Android. Same data and the same on-device
   privacy — it just looks the way it always should have. More screens get the full treatment over the
@@ -1487,7 +1487,7 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 - **New (opt-in):** **Continuous HRV capture.** Your strap streams dense beat-to-beat heart-rate
   variability in the clear, but apps usually only listen while a live screen is open — so overnight,
   when HRV, recovery and sleep need it most, the data goes quiet. Turn this on (**Settings → Strap**,
-  with background connection enabled on Android) and NOOP keeps the stream open in the background,
+  with background connection enabled on Android) and Pulse keeps the stream open in the background,
   banking roughly an interval a second all night for much sharper overnight HRV, recovery and sleep —
   especially on WHOOP 5.0/MG. It uses more battery, so it's off by default and entirely your call.
   Big thanks to @Extazian, whose reverse-engineering proved this is reachable without touching
@@ -1499,15 +1499,15 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 
 - **Fixed:** on phones away from UTC (most of the world), the dashboard could appear to **freeze partway
   through the day** — new steps and readings stopped showing even though the strap was syncing perfectly.
-  NOOP was filing each day by UTC midnight instead of *your* local midnight, so once your clock crossed
-  the UTC boundary, fresh data landed in the next day's bucket where the screen wasn't looking. NOOP now
+  Pulse was filing each day by UTC midnight instead of *your* local midnight, so once your clock crossed
+  the UTC boundary, fresh data landed in the next day's bucket where the screen wasn't looking. Pulse now
   buckets every day by your local day, everywhere. Thanks @Meriquium (#277).
 
 ---
 
 ## 2.11.0 — A smart wake alarm, live workout mode, an editable Today, and lifting imports
 
-- **New (Android):** a **smart wake alarm** — set a wake window and NOOP wakes you on a lighter sleep
+- **New (Android):** a **smart wake alarm** — set a wake window and Pulse wakes you on a lighter sleep
   phase inside it, with a guaranteed alarm at the end of the window. The guaranteed wake is a real OS
   alarm that fires even if Bluetooth drops or the app is closed. Thanks @subscriptiondestroyer (#207).
 - **New:** an evening **wind-down nudge** on every platform — a gentle reminder, timed from your usual
@@ -1517,7 +1517,7 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
   current HR zone, elapsed time and live effort. Thanks @subscriptiondestroyer (#238).
 - **New:** **editable Key Metrics** — choose which tiles appear on Today and reorder them to taste.
   Thanks @umarXBT (#251).
-- **New:** an **Effort scale toggle** — show Effort on NOOP's 0–100 axis or WHOOP's familiar 0–21
+- **New:** an **Effort scale toggle** — show Effort on Pulse's 0–100 axis or WHOOP's familiar 0–21
   Day-Strain axis, everywhere it appears. Display-only; your stored data is unchanged. Thanks @umarXBT (#268).
 - **Improved:** the **sleep hypnogram is smoother** — brief sub-3-minute stage flecks merge into their
   neighbours so the graph reads cleanly, biased toward the lighter stage so it never inflates Deep or
@@ -1564,12 +1564,12 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
   inform tomorrow's recovery. Thanks @Eph00n. (#237)
 - **Fixed (iPhone):** the Explore list could appear empty even though the data was there — it now
   renders immediately with a brief "scanning" hint instead of a blank list. Thanks @sebastianwoo. (#199)
-- **Improved:** body vitals now show which source each reading came from (your WHOOP, NOOP's own
+- **Improved:** body vitals now show which source each reading came from (your WHOOP, Pulse's own
   computation, or Apple Health) and merge them field-by-field. Thanks @khalilkm01.
 - **New (Android):** tap-and-drag to inspect the Stress chart, and a cleaner Explore metric picker.
   Thanks @ujix.
 - **New:** an optional, read-only local-access package (MCP) for power users who want to query their
-  own on-device NOOP data from local tools — opt-in, nothing leaves the device. Thanks @khalilkm01.
+  own on-device Pulse data from local tools — opt-in, nothing leaves the device. Thanks @khalilkm01.
 - Also fixed a heart-rate-ingest startup crash that a community ADB log surfaced. Thanks @maddognik. (#224)
 
 ---
@@ -1579,9 +1579,9 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 - **Fixed (Android):** the Insights tab crashed for anyone with journal entries — a text-matching pattern
   used a flag that works on a computer but not on Android's regex engine, so it threw the moment you opened
   Insights. Fixed, with a regression test. Thanks @pilleuspulcher-blip and @maddognik. (#224/#267)
-- **New (Android):** if NOOP ever crashes, the details are now captured into the strap log you share — so a
+- **New (Android):** if Pulse ever crashes, the details are now captured into the strap log you share — so a
   crash that only reproduces on your device can actually be diagnosed. (#33)
-- **More accurate HRV:** the heart-rate variability NOOP computes from a session now discards stray, irregular
+- **More accurate HRV:** the heart-rate variability Pulse computes from a session now discards stray, irregular
   beats before averaging — the same cleaning the rest of its HRV maths already does — so a noisy WHOOP 5/MG
   optical reading no longer comes out inflated. Thanks @frazzle28. (#262/#235)
 - **Fixed (Mac):** the sidebar and the Settings strap card could disagree about your connection — one saying
@@ -1614,7 +1614,7 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
   the label. Thanks @khalilkm01.
 - **Fixed (Android):** a workout imported from Health Connect could show no distance even when it was
   recorded — a relay app (e.g. Suunto via Health Sync) often writes the distance with timestamps slightly
-  offset from the workout, which NOOP's exact-window match missed. It now matches with a tolerance. Thanks
+  offset from the workout, which Pulse's exact-window match missed. It now matches with a tolerance. Thanks
   @pilleuspulcher-blip. (#215)
 - **Fixed (iPhone):** on the Explore screen, tapping a metric could bounce you back to the More tab instead
   of opening it — a nested-navigation bug. Drilling into a metric now works. Thanks @sebastianwoo. (#199)
@@ -1623,7 +1623,7 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 
 ## 2.8.6 — iPhone diagnostics & expectations, clearer labels, a journal fix
 
-- **New (iPhone):** a *Using NOOP on iPhone* note in Settings sets honest expectations (sideloading,
+- **New (iPhone):** a *Using Pulse on iPhone* note in Settings sets honest expectations (sideloading,
   re-signing, unlocking after a reboot so history can sync) and shows how many days until your
   sideloaded build expires. Shared strap logs now carry the iPhone details (iOS version, lock state,
   background-refresh, low-power) that make iPhone-only issues quick to diagnose, with a one-tap
@@ -1631,7 +1631,7 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 - **Fixed:** copy that said "this Mac" now reads correctly on iPhone. Thanks @robin-liquidium. (#225)
 - **Fixed:** the journal could show the same prompt (e.g. magnesium) twice after importing — duplicates
   are now merged, on every platform. Thanks @maddognik. (#224)
-- **Improved (WHOOP 5/MG):** the heart rate NOOP derives from the optical sensor on sleeping (sub-60 bpm)
+- **Improved (WHOOP 5/MG):** the heart rate Pulse derives from the optical sensor on sleeping (sub-60 bpm)
   stretches no longer risks snapping to ~60 bpm from a recording artifact, while a genuine 60 bpm is
   preserved. Thanks @ryanbr. (#194)
 
@@ -1640,11 +1640,11 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 ## 2.8.5 — Fixed: iPhone import, and a stuck store now self-heals
 
 - **Fixed (iPhone):** importing a WHOOP or Apple Health export could silently do nothing — iOS handed the
-  app an iCloud file that hadn't downloaded yet. NOOP now downloads a local copy first (through the system
+  app an iCloud file that hadn't downloaded yet. Pulse now downloads a local copy first (through the system
   Files picker), so imports actually go through. Thanks @adrnxq and @Chopin85. (#179)
-- **Fixed (iPhone):** if a NOOP backup from another platform had been restored (e.g. an Android backup onto
+- **Fixed (iPhone):** if a Pulse backup from another platform had been restored (e.g. an Android backup onto
   an iPhone), the app could get permanently stuck on "store not ready" — the imported database held the data
-  but not the bookkeeping NOOP's database engine needs, so it crashed on every open. NOOP now recovers
+  but not the bookkeeping Pulse's database engine needs, so it crashed on every open. Pulse now recovers
   automatically on the next launch, and declines such a backup at import time with a clear explanation (use
   the WHOOP-format CSV export to move history across platforms instead). Thanks @NoahMcE. (#222)
 
@@ -1652,11 +1652,11 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 
 ## 2.8.4 — New: a guide to how your Charge, Effort and Rest scores work
 
-- **New:** a clear in-app guide to how NOOP's three daily scores — **Charge**, **Effort** and **Rest** —
+- **New:** a clear in-app guide to how Pulse's three daily scores — **Charge**, **Effort** and **Rest** —
   are calculated, and how they differ from WHOOP's Recovery, Strain and Sleep. Tap the ⓘ on any score on
   the Today screen, or open it any time from **Settings → About → How your scores work**. New users get a
   one-time card pointing to it.
-- **New:** each score now explains how sure NOOP is of it (**Solid / Building / Calibrating**) and carries
+- **New:** each score now explains how sure Pulse is of it (**Solid / Building / Calibrating**) and carries
   a one-line description of what it measures. The wiki's *The Science* and *Charge, Effort & Rest* pages
   were refreshed to match.
 
@@ -1667,7 +1667,7 @@ A complete, ground-up redesign of all three apps. Deep-navy surfaces, a warm gol
 - **Fixed (iOS):** after importing your data, the strap could get stuck on "store not ready" and never
   sync — imported history wouldn't appear and backfill never started. On iOS the local database was
   sealed behind the device's data protection while the phone was locked, so a background reconnect
-  couldn't open it (macOS and Android were never affected). NOOP now stores its database at the right
+  couldn't open it (macOS and Android were never affected). Pulse now stores its database at the right
   protection level — readable after you first unlock since boot, still encrypted at rest — and retries
   automatically, so sync proceeds. Thanks @NoahMcE. (#222)
 - **Improved:** store-open failures are now written to the strap log with the real reason instead of
@@ -1682,7 +1682,7 @@ No new features — these bring Android's numbers into exact agreement with macO
 
 - **Fixed (Android):** Charge could read slightly low because the skin-temperature term was weighted
   twice as hard as on macOS/iOS. All three apps now compute Charge identically. (#219)
-- **Fixed (Android, WHOOP 5/MG):** the HR NOOP derives from the optical (PPG) sensor on stretches with
+- **Fixed (Android, WHOOP 5/MG):** the HR Pulse derives from the optical (PPG) sensor on stretches with
   no measured HR now uses the same harmonic-rejecting estimator as macOS/iOS (it could previously lock
   onto half or double the true rate) and recovers HR from short data runs the way the other apps do. (#219)
 - **Fixed (Android):** the respiratory-rate early-illness signal in Readiness now uses the same
@@ -1695,7 +1695,7 @@ No new features — these bring Android's numbers into exact agreement with macO
 
 ## 2.8.1 — Battery + responsiveness: smarter sync, lighter notification
 
-- **Improved (battery):** NOOP backs off history-sync polling when the strap keeps handing over nothing
+- **Improved (battery):** Pulse backs off history-sync polling when the strap keeps handing over nothing
   (off-wrist / not banking) instead of re-trying every 90s; a manual or reconnect sync still runs
   instantly. Thanks @ryanbr. (#217)
 - **Improved:** a just-synced night's Charge / Effort / Rest appear the moment the sync finishes, not up
@@ -1714,7 +1714,7 @@ A wave of new features and community contributions, reimplemented under the proj
   live connection/signal state. Thanks @khalilkm01.
 - **New — live HR time axis (#198):** the live heart-rate chart now shows the time window. Thanks @sebastianwoo.
 - **Improved — freshest-source resolver:** charts/metrics resolve the freshest value per metric
-  (imported WHOOP → NOOP-computed → compatible Apple Health). Thanks @khalilkm01.
+  (imported WHOOP → Pulse-computed → compatible Apple Health). Thanks @khalilkm01.
 - **New — personal experiments (Insights):** an n-of-1 section correlating a logged behaviour against
   recovery, gated to behaviours you have data for. Thanks @khalilkm01.
 - **Improved — AI Coach:** surfaces context-window truncation and caps history sent to local servers.
@@ -1726,8 +1726,8 @@ A wave of new features and community contributions, reimplemented under the proj
 A large batch of fixes from reported issues and community contributions.
 
 - **Fixed (WHOOP 4.0):** straps on firmware 41.17.x silently failed to set their clock → no history,
-  no sleep/recovery. NOOP now sends both clock-command formats. Thanks @rad182. (#120)
-- **Fixed:** strap sometimes wouldn't reconnect after an app update — NOOP rotates the scan between
+  no sleep/recovery. Pulse now sends both clock-command formats. Thanks @rad182. (#120)
+- **Fixed:** strap sometimes wouldn't reconnect after an app update — Pulse rotates the scan between
   WHOOP 4 and 5/MG. Thanks @khalilkm01.
 - **Fixed (AI Coach):** the Custom provider can now reach a local LLM on your LAN (e.g. Ollama at
   `http://192.168.x.x:11434`), not just `localhost`, on Android and iPhone — cloud providers stay
@@ -1767,7 +1767,7 @@ A large batch of fixes from reported issues and community contributions.
 ## 2.6.8 — iPhone import: handle iCloud and large export files
 
 - **Fixed (iPhone):** importing a WHOOP or Apple Health export could still fail right after you picked
-  the file (the v2.6.3 fix only un-greyed the `.zip` in the picker). NOOP now copies the picked file
+  the file (the v2.6.3 fix only un-greyed the `.zip` in the picker). Pulse now copies the picked file
   out of iCloud Drive / Files into local storage first — coordinating the read so a **not-yet-downloaded
   iCloud file** or a **very large export** actually opens — and then streams the import. macOS is
   unchanged. Thanks @adrnxq and @Chopin85. (#179)
@@ -1813,7 +1813,7 @@ A large batch of fixes from reported issues and community contributions.
   affordance, blocked file selection in the iOS Files picker). iOS now offers only the file types it can
   actually open, so the `.zip` is selectable again. Thanks @adrnxq. (#179)
 - **New (iPhone):** an **AltStore / SideStore source** for one-tap updates on sideloaded installs — add
-  `https://raw.githubusercontent.com/NoopApp/noop/main/altstore-source.json` as a source. Reimplemented
+  `https://raw.githubusercontent.com/kosherite/pulse/main/altstore-source.json` as a source. Reimplemented
   from @RazvanRex. (#178)
 
 ## 2.6.2 — iPhone button-label polish
@@ -1824,14 +1824,14 @@ A large batch of fixes from reported issues and community contributions.
 
 ## 2.6.1 — Effort scale fix for imported data
 
-- **Fixed:** imported WHOOP **Day Strain** and **workout strain** now correctly land on NOOP's 0–100
+- **Fixed:** imported WHOOP **Day Strain** and **workout strain** now correctly land on Pulse's 0–100
   **Effort** axis (the 0–21 → 0–100 rescale was defined in v2.6.0 but never wired up), so imported and
-  on-device Effort finally share one scale. NOOP's own CSV export now writes Effort on WHOOP's 0–21 scale,
+  on-device Effort finally share one scale. Pulse's own CSV export now writes Effort on WHOOP's 0–21 scale,
   so re-importing your own export round-trips losslessly.
 
-## 2.6.0 — Charge, Effort & Rest: NOOP's own scores, out of 100
+## 2.6.0 — Charge, Effort & Rest: Pulse's own scores, out of 100
 
-- **New (Mac, iOS and Android):** NOOP now has its **own daily scores, all out of 100** — **Charge** (how
+- **New (Mac, iOS and Android):** Pulse now has its **own daily scores, all out of 100** — **Charge** (how
   recovered and ready you are), **Effort** (the day's cardiovascular + movement load), and **Rest** (last
   night's sleep quality). Computed on-device across WHOOP 4.0 and 5.0/MG from published sports-science
   methods, no WHOOP cloud. **Charge** folds HRV, resting heart rate, respiration, your **skin-temperature
@@ -1845,11 +1845,11 @@ A large batch of fixes from reported issues and community contributions.
 - **New (Mac, iOS and Android — experimental, opt-in):** a **WHOOP 5.0/MG "deep data" unlock** under
   **Settings → Experimental**. 5/MG straps give a fresh third-party app only live heart rate; the official
   app switches on the deeper streams (high-rate HR + motion + history) by writing a set of **feature
-  flags**. NOOP can now send that exact, [documented](docs/WHOOP5_DEEP_DATA.md) sequence to your strap —
+  flags**. Pulse can now send that exact, [documented](docs/WHOOP5_DEEP_DATA.md) sequence to your strap —
   one button, only when the strap is **worn and bonded**. It does write to the strap, but it's
   **reversible** (it only changes which data the strap emits) and is the same thing the official app does.
   Experimental: it may do nothing on your firmware yet. If you own a 5/MG, turning it on and sharing your
-  strap log on [#174](https://github.com/NoopApp/noop/issues/174) is exactly what we need to finish 5.0/MG
+  strap log on [#174](https://github.com/kosherite/pulse/issues/174) is exactly what we need to finish 5.0/MG
   support. **iPhone/Android only** — a Mac can't write to a 5/MG. Built on the public protocol work of
   **judes.club**, **Asherlc/dofek** and **b-nnett/goose**.
 
@@ -1858,8 +1858,8 @@ A large batch of fixes from reported issues and community contributions.
 ## 2.4.0 — A small, honest ask
 
 - **New (Mac, iOS and Android):** a small card on the Today screen — at most **once every 12 hours** —
-  asking whether NOOP is proving useful, with the honest numbers: a WHOOP membership runs **$300–480 a
-  year**, NOOP is free and built by one person, and **5,000+ downloads in, 7 people have donated**.
+  asking whether Pulse is proving useful, with the honest numbers: a WHOOP membership runs **$300–480 a
+  year**, Pulse is free and built by one person, and **5,000+ downloads in, 7 people have donated**.
   **"Later"** snoozes it 12 hours; **"Don't ask again"** turns it off permanently. It's a card in the
   flow, never a pop-over — and the stats are **baked in at release time** (`Tools/update-donation-stats.sh`),
   so the app still never touches the network.
@@ -1872,7 +1872,7 @@ A large batch of fixes from reported issues and community contributions.
   blocks showed only one — the rest were silently hidden. All blocks are now read from **both** sources,
   and a split day reads as **one night**: totals summed, the real gap between blocks preserved in the
   hypnogram, the "N nights ago" label counting days (not blocks), and a cross-midnight night showing its
-  span ("Fri 13 → Sat 14 Jun"). Implemented from [PR #173](https://github.com/NoopApp/noop/pull/173) —
+  span ("Fri 13 → Sat 14 Jun"). Implemented from [PR #173](https://github.com/kosherite/pulse/pull/173) —
   thanks **@FrostDev7**. (Android's day totals were already correct; its per-day grouping follows.)
 
 ---
@@ -1887,7 +1887,7 @@ than it got) and @sudden-break's logs on #156:
   so the nightly skin-temp deviation never appeared from strap data. Real nights now read correctly
   (matching Android), and your deviation builds after a few nights of wear. (#166)
 - **Fixed (Mac and iOS):** the strap log no longer prints a stale **"layout v25/v26 … doesn't decode yet"**
-  warning for layouts NOOP decodes. (#156)
+  warning for layouts Pulse decodes. (#156)
 - **Fixed (all platforms):** CSV export wrote the **disturbance count into "Awake duration (min)"** — the
   cell is now empty rather than a wrong unit; **duplicate workouts** (imported + detected) are exported
   once; free-text fields are guarded against **spreadsheet formula injection**; and a failed export on
@@ -1897,7 +1897,7 @@ than it got) and @sudden-break's logs on #156:
 
 ## 2.3.0 — HR from the optical waveform, an early-morning day rollover, and clearer terms
 
-- **New (Mac, iOS and Android):** on **WHOOP 5.0/MG**, NOOP now derives a **per-second heart rate from the
+- **New (Mac, iOS and Android):** on **WHOOP 5.0/MG**, Pulse now derives a **per-second heart rate from the
   strap's optical (PPG) waveform** to fill gaps where a stored HR isn't available. It's **heart-rate
   continuity only — it does not reconstruct HRV** — and a measured HR always takes priority over a derived
   one. (#156, thanks @j0b-dev)
@@ -1945,10 +1945,10 @@ than it got) and @sudden-break's logs on #156:
 
 - **New (Mac, iOS and Android):** the **Sleep** screen now lets you **browse past nights** — tap ◀/▶ on
   the hypnogram to step back through every recorded night, not just last night. (#160, thanks @FrostDev7)
-- **Fixed (Android):** the **AI Coach** now sees the recovery, strain, sleep and HRV that NOOP computes
+- **Fixed (Android):** the **AI Coach** now sees the recovery, strain, sleep and HRV that Pulse computes
   **on-device** for live-strap users — it had only been reading imported rows, so a Bluetooth-only user's
   Coach wrongly claimed it had no data. (#124)
-- **Fixed (Android):** your imported **step count now updates for *today***, not just past days — NOOP
+- **Fixed (Android):** your imported **step count now updates for *today***, not just past days — Pulse
   refreshes today's Health Connect steps when you open the app. (#150)
 - **New (Mac, iOS and Android):** workouts now show their **start–end time** (e.g. 13:00–13:30), and the
   Today screen shows your **strap's battery level**. (#157, #159)
@@ -1970,11 +1970,11 @@ than it got) and @sudden-break's logs on #156:
 
 - **Improved (Mac, iOS and Android):** your strap log now records what a sync **saved**, not only what
   failed — a `persisted N rows (M with motion) across K night(s)` line on every successful offload.
-  NOOP previously logged only failures, so a shared log couldn't actually show whether history was
+  Pulse previously logged only failures, so a shared log couldn't actually show whether history was
   banking; now it can. (#150)
 - **Improved (Mac, iOS and Android):** when the strap reports it has no stored history to hand over (its
-  "no flash cursor" state, `trim=0xFFFFFFFF`), NOOP now names the real cause plainly — the strap's clock
-  has lost sync and it isn't saving to flash, a **charge/clock state on the strap, not a NOOP decode
+  "no flash cursor" state, `trim=0xFFFFFFFF`), Pulse now names the real cause plainly — the strap's clock
+  has lost sync and it isn't saving to flash, a **charge/clock state on the strap, not a Pulse decode
   bug**. The Troubleshooting and FAQ guides now lead with this — the most common reason recovery and
   sleep don't appear — with the fix: fully charge to 100% and reconnect. (#150)
 
@@ -1983,10 +1983,10 @@ than it got) and @sudden-break's logs on #156:
 ## 1.99 — Your imported steps now show on the Today screen (Android)
 
 - **New (Android):** the Today screen's **Steps** tile now shows the steps from your Apple Health /
-  Health Connect import when the strap didn't bank an on-device count — so a **WHOOP 4.0**, which NOOP
+  Health Connect import when the strap didn't bank an on-device count — so a **WHOOP 4.0**, which Pulse
   can't yet read steps off over Bluetooth, shows your imported steps instead of "No Data" (Mac and iOS
   already did this). Worth saying plainly: the WHOOP 4.0 **does** count steps in the official WHOOP app
-  — the only gap was that NOOP couldn't surface them yet. (#150)
+  — the only gap was that Pulse couldn't surface them yet. (#150)
 
 ---
 
@@ -1994,7 +1994,7 @@ than it got) and @sudden-break's logs on #156:
 
 - **Recovered (Android):** the reject-archive retro-decode that landed on Mac & iOS in v1.97 now runs
   on **Android** as well. If your WHOOP 4.0 on Android synced "v25" firmware records before v1.95 — when
-  NOOP couldn't read that layout — that sleep and recovery were saved but left dark; on update NOOP
+  Pulse couldn't read that layout — that sleep and recovery were saved but left dark; on update Pulse
   re-runs them through the current decoder and backfills those nights. (#151)
 
 ---
@@ -2002,8 +2002,8 @@ than it got) and @sudden-break's logs on #156:
 ## 1.97 — Sleep that was stuck in the archive comes back
 
 - **Recovered (Mac, iOS & Android):** if your WHOOP 4.0 synced "v25" firmware records *before* v1.95 —
-  when NOOP couldn't decode that layout yet — those records were saved to NOOP's on-device archive but
-  left dark, and the strap had already freed them. NOOP now **re-runs that archive through the current
+  when Pulse couldn't decode that layout yet — those records were saved to Pulse's on-device archive but
+  left dark, and the strap had already freed them. Pulse now **re-runs that archive through the current
   decoder on update**, so your sleep and recovery from those nights backfill. Once per decoder upgrade,
   automatically. (#151)
 - **Fixed (Mac, iOS & Android):** the AI Coach now formats its replies — **bold**, bullet/numbered
@@ -2016,7 +2016,7 @@ than it got) and @sudden-break's logs on #156:
 - **New: iOS is a direct download.** You no longer need a Mac and Xcode — the iOS app ships as an
   **unsigned `.ipa`** you install with **AltStore** or **SideStore**, which signs it on your own
   iPhone with your own **free Apple ID**. No App Store, no Apple Developer account, no identity
-  attached to the project — NOOP stays anonymous, and you self-sign on-device. See
+  attached to the project — Pulse stays anonymous, and you self-sign on-device. See
   [`docs/IOS.md`](docs/IOS.md) for the 5-minute setup. Two honest notes: a free Apple ID re-signs
   the app **every 7 days** (AltStore automates this), and some Apple-only integrations (Apple Health,
   Live Activity widgets) can be limited under a free signing identity.
@@ -2024,15 +2024,15 @@ than it got) and @sudden-break's logs on #156:
   after a single quiet sync — it now waits for several empty syncs in a row, so a healthy strap with
   one nothing-to-hand-over cycle doesn't trigger a false alarm. (#126)
 - **Fixed (Android):** Health Connect import now respects **partial permissions** — switch off the
-  data types you don't want NOOP to read, and it imports the rest instead of refusing entirely. (#150)
+  data types you don't want Pulse to read, and it imports the rest instead of refusing entirely. (#150)
 
 ---
 
 ## 1.95 — Sleep and recovery for WHOOP 4.0 straps on the firmware we couldn't read
 
-- **New (Mac and Android):** some WHOOP 4.0 straps run a firmware whose offloaded history NOOP
+- **New (Mac and Android):** some WHOOP 4.0 straps run a firmware whose offloaded history Pulse
   couldn't decode for motion — so sleep and recovery never built from the strap, even though live
-  heart rate worked. NOOP now reads that firmware's motion (the accelerometer gravity vector) and
+  heart rate worked. Pulse now reads that firmware's motion (the accelerometer gravity vector) and
   per-second timestamps, which is exactly what the sleep engine needs. Once your strap banks a night,
   sleep staging and recovery can finally build from it. Heart rate in this layout is derived from the
   optical sensor rather than stored second-by-second, so this unlock is specifically the motion data.
@@ -2045,7 +2045,7 @@ than it got) and @sudden-break's logs on #156:
 - **Fixed (Mac and Android):** a workout you start yourself now fills in its calories, average heart
   rate and strain even on a WHOOP 5.0/MG. The live heart-rate stream on 5/MG is sparse, so a manual
   session was often saved showing ~1 kcal and no strain — now, once your strap offloads the heart rate
-  it banked during the session, NOOP re-scores that workout from the fuller data (conservatively:
+  it banked during the session, Pulse re-scores that workout from the fuller data (conservatively:
   well-scored workouts are left untouched, and a still-sparse window is a no-op). (#137)
 - **Developer (iOS):** the experimental iOS app target is now folded into `main` and builds against
   current code (app shell, WidgetKit + Live Activity, two-way HealthKit, App Intents), with a CI job
@@ -2065,7 +2065,7 @@ than it got) and @sudden-break's logs on #156:
 
 ## 1.92 — Better diagnostics for newer strap firmware — so we can decode it
 
-- **Improved (Mac and Android):** when your strap's historical records use a firmware layout NOOP
+- **Improved (Mac and Android):** when your strap's historical records use a firmware layout Pulse
   can't decode yet — newer WHOOP 5.0/MG units, and some WHOOP 4.0 straps, which is why sleep, recovery
   and steps can be missing (see #30, #136) — the strap log now includes the **full record bytes** (it
   previously cut them off after 64) plus a few more sample records. That's exactly what we need to map
@@ -2084,11 +2084,11 @@ than it got) and @sudden-break's logs on #156:
 
 ---
 
-## 1.90 — NOOP now tells you when your strap isn't saving history — and how to fix it
+## 1.90 — Pulse now tells you when your strap isn't saving history — and how to fix it
 
 - **Improved (Mac and Android):** when a sync **completes** but your strap handed over only its
   diagnostic output and **no stored history** — which means its clock has lost sync and it isn't saving
-  data to flash — NOOP now says so, with the fix (**fully charge the strap to 100%, then reconnect**),
+  data to flash — Pulse now says so, with the fix (**fully charge the strap to 100%, then reconnect**),
   instead of silently reporting "synced." This is the single most common reason recovery, sleep and
   strain stop appearing on a WHOOP 4.0, and it now distinguishes that from a normal caught-up sync.
   (#77, #91, #120)
@@ -2120,7 +2120,7 @@ than it got) and @sudden-break's logs on #156:
 
 ## 1.87 — Deep sleep that happens later in the night no longer reads 0 minutes
 
-- **Fixed (Mac and Android):** follow-on to the deep-sleep fix. NOOP assumes deep sleep is
+- **Fixed (Mac and Android):** follow-on to the deep-sleep fix. Pulse assumes deep sleep is
   front-loaded (it usually is) and re-imposes that — but it was zeroing out **all** deep detected
   after the first third of the night, so nights where the deepest stretch lands later showed 0 m of
   deep despite a clear signature. It now only applies that rule when there's deep early in the night
@@ -2170,20 +2170,20 @@ than it got) and @sudden-break's logs on #156:
 ## 1.83 — Workout calories (manual sessions + Health Connect imports)
 
 - **Fixed (Mac and Android):** a workout you **start yourself** now estimates its calories from your
-  heart rate — the same model NOOP uses for auto-detected workouts — instead of leaving the field
+  heart rate — the same model Pulse uses for auto-detected workouts — instead of leaving the field
   blank. (#117)
 - **Fixed (Android):** workouts imported from **Health Connect** (e.g. Garmin) now show their
-  calories. NOOP credits each session with the active calories burned inside its time window (a
+  calories. Pulse credits each session with the active calories burned inside its time window (a
   Health Connect exercise record carries no energy of its own, so this stitches them together). (#117)
 
 ---
 
 ## 1.82 — Stop losing strap history we can't yet decode + a board of fixes
 
-- **Fixed (Mac and Android):** NOOP no longer **destroys strap history it can't yet decode**. If a
-  history chunk arrived with a bad checksum or a firmware record layout we haven't mapped, NOOP used
+- **Fixed (Mac and Android):** Pulse no longer **destroys strap history it can't yet decode**. If a
+  history chunk arrived with a bad checksum or a firmware record layout we haven't mapped, Pulse used
   to acknowledge it anyway — and the strap then **freed (erased)** that data while the screen said
-  "synced". NOOP now archives those raw records **on-device before acknowledging**, and if it can't
+  "synced". Pulse now archives those raw records **on-device before acknowledging**, and if it can't
   save them it leaves them on the strap to retry. An unrecognised firmware can no longer cost you
   your data. (#77, #91)
 - **Fixed (Android):** a **Health Connect sync no longer blanks a strap-only day**. With no WHOOP
@@ -2224,11 +2224,11 @@ than it got) and @sudden-break's logs on #156:
 
 ## 1.79 — Manual workouts, edit/dismiss auto-detected ones, and CSV export
 
-- **New (Mac and Android):** add a workout by hand, and edit, re-label, or **dismiss** the ones NOOP
+- **New (Mac and Android):** add a workout by hand, and edit, re-label, or **dismiss** the ones Pulse
   auto-detects — so a misread or duplicate bout no longer sticks around with no way to remove it.
   Dismissals are remembered, so a re-detected session stays hidden.
 - **New (Mac and Android):** export all your data as a WHOOP-format CSV bundle (cycles, sleeps,
-  workouts, journal) from Settings — yours to keep, and it imports straight back into NOOP.
+  workouts, journal) from Settings — yours to keep, and it imports straight back into Pulse.
 
 ---
 
@@ -2246,7 +2246,7 @@ than it got) and @sudden-break's logs on #156:
 ## 1.77 — First-run terms acknowledgment + an Explore chart fix
 
 - **New (Mac and Android):** a one-time, plain-English terms acknowledgment on first launch — what
-  NOOP is, that it's independent of WHOOP and that using it may breach WHOOP's Terms of Service, that
+  Pulse is, that it's independent of WHOOP and that using it may breach WHOOP's Terms of Service, that
   it's not a medical device, and that you use it at your own risk. You accept once; full terms in
   `TERMS.md`.
 - **Fixed (Mac):** the Explore metric charts no longer flicker to a straight line when the cursor
@@ -2257,10 +2257,10 @@ than it got) and @sudden-break's logs on #156:
 ## 1.76 — Robust Apple Health import, marginal-radio HR mode, live HR graph
 
 - **Improved (Mac and Android):** a very large Apple Health export no longer fails to import because
-  of a single malformed byte — NOOP skips the bad spans and imports everything else, reporting how
+  of a single malformed byte — Pulse skips the bad spans and imports everything else, reporting how
   many it skipped. Multi-year exports that errored out before should come in fine now.
 - **New (Mac):** if your Bluetooth radio can't sustain WHOOP 4's full realtime stream (older Macs /
-  OpenCore), NOOP now falls back to a low-bandwidth standard heart-rate mode, so live HR keeps working
+  OpenCore), Pulse now falls back to a low-bandwidth standard heart-rate mode, so live HR keeps working
   instead of looping on a dropped connection.
 - **Fixed (Mac):** the Health tab's live heart-rate graph now builds a continuous trace over time
   instead of getting stuck on two points.
@@ -2283,7 +2283,7 @@ than it got) and @sudden-break's logs on #156:
 ## 1.74 — Android reconnect guide + a startup-crash fix
 
 - **Android reconnect guide (parity with Mac 1.73):** if your WHOOP 5.0 / MG can't connect after a
-  firmware update (a Bluetooth pairing reset), NOOP now detects it and shows the forget-and-re-pair
+  firmware update (a Bluetooth pairing reset), Pulse now detects it and shows the forget-and-re-pair
   steps right in the app, instead of silently retrying.
 - **Fixed (Android):** a rare startup crash on some fast devices (e.g. Galaxy S24+) — the app could
   crash once on launch when a strap was already connected, then open fine on the second try. Mac was
@@ -2294,9 +2294,9 @@ than it got) and @sudden-break's logs on #156:
 ## 1.73 — Reconnect help for WHOOP 5.0 / MG after a firmware update
 
 - **If your WHOOP 5.0 / MG stopped connecting after a WHOOP firmware update**, that's a Bluetooth
-  pairing reset — not a lockout, and NOOP works fine on the new firmware. To reconnect: quit the
+  pairing reset — not a lockout, and Pulse works fine on the new firmware. To reconnect: quit the
   official WHOOP app, forget the strap in your Bluetooth settings, put it in pairing mode (tap the
-  band until the LEDs flash blue), then reconnect. On Mac, NOOP now detects this automatically and
+  band until the LEDs flash blue), then reconnect. On Mac, Pulse now detects this automatically and
   shows you these exact steps in-app instead of silently retrying. WHOOP 4.0 is unaffected.
 
 ---
@@ -2304,8 +2304,8 @@ than it got) and @sudden-break's logs on #156:
 ## 1.72 — GPS workout crash fix (Android)
 
 - **Fixed (Android):** starting a GPS-tracked workout could crash the app on Android 12 and newer.
-  GPS needs location permission, which NOOP never requested — and it was capped to older Android
-  versions — so route tracking failed the instant it began. NOOP now asks for location permission
+  GPS needs location permission, which Pulse never requested — and it was capped to older Android
+  versions — so route tracking failed the instant it began. Pulse now asks for location permission
   right before a GPS workout and fails safe if it's unavailable: the workout still records heart rate
   and strain, just without a route. If you don't use GPS workouts, nothing changes. (Mac: version
   bump only.)
@@ -2435,7 +2435,7 @@ full build-verify (Android suite green, both Swift packages + the macOS app targ
 
 ## 1.64 — Android: MTU 247, skin-temp, sync status, recovery UI, alarm groundwork (thanks iHateSubscriptions, #85)
 
-Reimplemented (NoopApp-authored, per our external-contribution policy) from PR #85, rebased on v1.62.
+Reimplemented (PulseApp-authored, per our external-contribution policy) from PR #85, rebased on v1.62.
 Reviewed part-by-part against current main + the objectivity discipline. **Adopted 4, modified 1, held 1.**
 
 - **MTU 247 (adopt):** negotiate a larger ATT MTU on connect *before* service discovery — the default
@@ -2489,7 +2489,7 @@ killed standard-0x2A37 live HR).
 
 - **THE unblock — clock before history (Mac + Android):** an un-clocked WHOOP 5 does NOT save sensor
   data to flash (firmware console: "RTC timestamp … is invalid; not saving data to flash"), so offloads
-  "succeeded" with metadata only. NOOP now sends SET_CLOCK/GET_CLOCK (WHOOP4's 8-byte payload over
+  "succeeded" with metadata only. Pulse now sends SET_CLOCK/GET_CLOCK (WHOOP4's 8-byte payload over
   puffin framing — strap-acked on hardware) after the puffin CCCD drain, before SEND_HISTORICAL_DATA.
   His hardware: 0 → 246 HISTORICAL_DATA frames. Android relocates the post-bond kick to the CCCD-drain
   completion; macOS clocks inside the once-per-connection `whoop5SessionStarted` gate.
@@ -2558,11 +2558,11 @@ killed standard-0x2A37 live HR).
 
 ## 1.59 — Android: share back to Health Connect (opt-in)
 
-- **New (Android): Health Connect writeback** — new `HealthConnectWriter` pushes NOOP's **computed**
+- **New (Android): Health Connect writeback** — new `HealthConnectWriter` pushes Pulse's **computed**
   nightly metrics (resting HR, HRV RMSSD, SpO₂, respiratory rate; last 60 days) into Health Connect.
   Two deliberate scope limits: **computed days only** (`repo.days(computedDeviceId)` — imported
   WHOOP-export/HC rows are never echoed back, which would duplicate another app's data or loop our own
-  import), and **idempotent by `clientRecordId`** (`noop-<metric>-<day>` + write-time
+  import), and **idempotent by `clientRecordId`** (`pulse-<metric>-<day>` + write-time
   `clientRecordVersion`, because HC does NOT auto-dedupe re-inserts the way HealthKit does — the
   latest computation always wins, no stacking). Four `WRITE_*` permissions added to the manifest,
   requested only when the user opts in; denial flips the toggle back off. **Default OFF** — "Share
@@ -2583,8 +2583,8 @@ killed standard-0x2A37 live HR).
 ## 1.57 — Android home-screen widget
 
 - **New (Android): home-screen widget** — today's recovery (band-coloured 67/34), live HR and strap
-  battery, tap-to-open. New `com.noop.widget` package on Glance (`glance-appwidget:1.1.0`, the last
-  line compatible with compileSdk 34): `NoopGlanceWidget` renders purely from a SharedPreferences
+  battery, tap-to-open. New `com.pulse.widget` package on Glance (`glance-appwidget:1.1.0`, the last
+  line compatible with compileSdk 34): `PulseGlanceWidget` renders purely from a SharedPreferences
   snapshot (no BLE/DB at compose time, survives process death), `WidgetSnapshotStore.push()` throttles
   (meaningful-change immediate, HR at most 1/min — Glance re-inflation is far heavier than a notify())
   and no-ops when no widget is placed. Two producers: `WhoopConnectionService`'s v1.56 combine (the
@@ -2596,11 +2596,11 @@ killed standard-0x2A37 live HR).
 ## 1.56 — Shortcuts on Mac, recovery in the Android notification
 
 - **New (macOS): App Intents / Shortcuts actions — "Buzz Strap" and "Mark a Moment."** New
-  `Strand/System/NOOPAppIntents.swift` exposes both as `AppIntent`s with an `AppShortcutsProvider`, so
+  `Strand/System/PulseAppIntents.swift` exposes both as `AppIntent`s with an `AppShortcutsProvider`, so
   they're available from Shortcuts.app, Spotlight, and menu-bar/keyboard triggers without opening the
   window. They reach the live bonded strap via a new `static weak var AppModel.shared` (published in
   `AppModel.init`) — constructing a fresh `AppModel` from an intent would spin up a second BLEManager +
-  analysis loop and could never buzz. Guarded: a fired intent with NOOP closed throws "open NOOP first";
+  analysis loop and could never buzz. Guarded: a fired intent with Pulse closed throws "open Pulse first";
   with the strap unbonded, "connect your strap." macOS 13+, **no new entitlement or Info.plist key**.
   The inbound counterpart to the existing outbound double-tap→Shortcut path (#42 idea-mining).
 - **New (Android): today's recovery % in the foreground-service notification.**
@@ -2631,7 +2631,7 @@ killed standard-0x2A37 live HR).
   (#76). A French export translates **both** the column headers (`Score de récupération %`,
   `Variabilité de la fréquence cardiaque (ms)`, `Durée du sommeil paradoxal (min)`, …) **and** the
   sleep/workout filenames (`sommeil.csv`, `entrainements.csv`) — so nothing matched.
-- NOOP now maps the **full** French column set, including the complete **workouts** file (HR zones,
+- Pulse now maps the **full** French column set, including the complete **workouts** file (HR zones,
   activity name/strain) — the reporter supplied all three header rows, so French is more complete than
   Spanish out of the gate. Two French quirks handled by the normaliser (both fold to `_`): the
   apostrophe in `Niveau d'oxygène` / `Temps d'éveil` (straight `'` **and** curly `’`), and the
@@ -2657,7 +2657,7 @@ killed standard-0x2A37 live HR).
     byte-for-byte against Room's generated schema** before shipping.
   - The WHOOP5 `step_motion_counter@57` (decoded but previously dropped) now persists; `AnalyticsEngine`
     derives a daily step total + an APPROXIMATE whole-day HR→energy estimate; detected workouts persist
-    under the `-noop` id (deduped against imported workouts). All clearly APPROXIMATE; **the steps tile
+    under the `-pulse` id (deduped against imported workouts). All clearly APPROXIMATE; **the steps tile
     stays dark** until @57's semantics are validated against the official app.
   - **Fixed a respiratory-rate band mismatch:** `SleepStager.respRateFromRR` could emit 6–8 bpm, but every
     consumer (`ReadinessEngine` illness/readiness) only acts on 8–25 — so a sub-8 estimate was
@@ -2679,7 +2679,7 @@ killed standard-0x2A37 live HR).
   4.0, and its HISTORY_END/COMPLETE marker is **`PUFFIN_METADATA` (type 56)**, not 49. Android's
   offload-frame check read `frame[4]` with `{47,48,49,50}` — so on a real strap **every** history-closing
   frame was dropped as live-flood, no chunk ever committed, the strap never trimmed, and the offload
-  idle-watchdog timed out: zero history. NOOP now reads the type at `frame[8]` for 5/MG and accepts
+  idle-watchdog timed out: zero history. Pulse now reads the type at `frame[8]` for 5/MG and accepts
   `{47,48,49,50,56}` — matching the hardware-proven Swift path (`BLEManager.isOffloadFrame`,
   `BLEManager.swift:500`). Ported pieces: family-aware `isOffloadFrame`, `decodeMetadataWhoop5`
   (meta_type@10 / unix@11 / trim_cursor@21), `Backfiller.begin(family)` + `endData` (+4 → `frame[21:29]`),
@@ -2697,7 +2697,7 @@ killed standard-0x2A37 live HR).
 
 - **Fixed: battery flashing 100% then correcting (or reverting to 100%).** The WHOOP 4.0 exposes the
   standard Battery Level characteristic (0x2A19) but it's a **stub that always reports 100** — the real
-  charge only comes from the proprietary `GET_BATTERY_LEVEL` response (u16/10). NOOP read **both** into
+  charge only comes from the proprietary `GET_BATTERY_LEVEL` response (u16/10). Pulse read **both** into
   the same display with no priority, so 0x2A19 landed first (100%) and the real value corrected it a
   beat later — and since 0x2A19 is also *subscribed*, a stray stub notification could revert a true 94%
   back to 100%. Battery now comes **only from the real source per family**: WHOOP 4 = the proprietary
@@ -2731,7 +2731,7 @@ killed standard-0x2A37 live HR).
     once per quiet spell and re-arms when data next arrives — a dropped CCCD is still recovered, the churn
     is gone.
 - Context (from #77): the "no overnight scores" reports are usually an **empty strap buffer** — the
-  official WHOOP app, bonded overnight, trims the strap's history as it syncs, so NOOP finds little to
+  official WHOOP app, bonded overnight, trims the strap's history as it syncs, so Pulse finds little to
   offload. The reliable history path is the WHOOP CSV import. This release fixes the *separate* congestion
   bug those logs surfaced.
 - macOS: **version bump only** (CoreBluetooth queues GATT ops internally).
@@ -2740,7 +2740,7 @@ killed standard-0x2A37 live HR).
   column headers (`Puntuación de recuperación (%)`, `Variabilidad de la frecuencia cardíaca (ms)`, …)
   **and** some filenames (`sueño.csv`, `entrenamientos.csv`) — so the filename match missed the sleep/
   workout files and the column match missed every translated header, giving "Imported 0 items."
-- NOOP now maps the full set of Spanish column headers (supplied from a real export, #76) onto the
+- Pulse now maps the full set of Spanish column headers (supplied from a real export, #76) onto the
   canonical fields, and recognises the Spanish filenames — so recovery, RHR, HRV, skin temp, blood
   oxygen, day strain, every sleep stage, nap, etc. all import. `physiological_cycles.csv` keeps its
   English filename in the Spanish export but its columns are Spanish; both cases are handled. The
@@ -2750,10 +2750,10 @@ killed standard-0x2A37 live HR).
   parse test pins the values. Verified with `swift test`.
 
 - **Fixed (Android): dropped Bluetooth commands on stricter stacks (Android 13+, worst on Android 16).**
-  When the phone's GATT stack was momentarily busy it would reject a command write, and NOOP **dropped**
+  When the phone's GATT stack was momentarily busy it would reject a command write, and Pulse **dropped**
   it instead of retrying. The dropped frame was often the one that **starts live HR**, **sets the strap
   clock**, or **acks a history chunk** — so live HR sometimes never started and overnight data never
-  landed, even with a healthy strap and pairing. NOOP now **retries a rejected write** (bounded backoff,
+  landed, even with a healthy strap and pairing. Pulse now **retries a rejected write** (bounded backoff,
   preserving command order) and **paces** without-response writes so the stack keeps up.
 - Diagnosed from a detailed strap log: a Pixel 7 on Android 16 whose offload completed cleanly but whose
   `TOGGLE_REALTIME_HR` / `SET_CLOCK` writes were being rejected and dropped.
@@ -2761,7 +2761,7 @@ killed standard-0x2A37 live HR).
 
 ## 1.47 — Auto-sync Health Connect (Android)
 
-- **Opt-in Health Connect auto-sync (Android).** Turn it on under Data Sources → Health Connect and NOOP
+- **Opt-in Health Connect auto-sync (Android).** Turn it on under Data Sources → Health Connect and Pulse
   re-pulls new Health Connect data (e.g. a Samsung Galaxy Watch → Samsung Health → Health Connect) each
   time you open the app, if the last sync is older than your chosen **6 / 12 / 24h** interval. Read-only,
   idempotent, **never overwrites richer strap data**, **default OFF**. Adopted from a community PR.
@@ -2779,7 +2779,7 @@ killed standard-0x2A37 live HR).
   is deterministic across re-syncs (rows dedupe by timestamp). No-op for a normal strap. Both platforms.
 - **Live gestures during a history sync (#69).** `isOffloadFrame` classed EVENT(48) as bulk-sync
   traffic, so during a backfill a real-time double-tap / wrist event was routed to the sync handler and
-  never fired — for minutes at a time on a 5.0/MG. NOOP now fires live gestures even mid-sync, gated on
+  never fired — for minutes at a time on a 5.0/MG. Pulse now fires live gestures even mid-sync, gated on
   the event being recent **in the strap's own clock domain** (macOS) so a *replayed historical* gesture
   from the offload doesn't fire; Android fires live gestures ungated and gates only during a backfill.
 - **"Encrypted bond" vs "live HR" indicator (#69).** On a 5.0/MG, live HR streams over the open
@@ -2795,7 +2795,7 @@ killed standard-0x2A37 live HR).
 ## 1.45 — Clearer pairing guidance for WHOOP 5.0/MG (Mac, #69)
 
 - **A 5.0/MG streams live heart rate before it's fully (encrypted-)paired** — and buzz, alarms,
-  double-tap and full history sync all need that real pairing. NOOP now keeps the "free the strap
+  double-tap and full history sync all need that real pairing. Pulse now keeps the "free the strap
   from the WHOOP app" guidance visible (in clearer wording) whenever the strap isn't fully paired,
   instead of hiding it once live HR appears — so it's obvious what to do to unlock the rest (#69).
 - This **reverts v1.44's over-eager hint-clearing**: on a 5/MG, `bonded` is also set by the live-HR
@@ -2827,12 +2827,12 @@ killed standard-0x2A37 live HR).
 
 ## 1.42 — Auto-reconnect to your strap on launch (Android, #67)
 
-- **NOOP reconnects to your strap automatically when the app starts** (issue #67 — jamartif: after an
+- **Pulse reconnects to your strap automatically when the app starts** (issue #67 — jamartif: after an
   APK update the band stayed disconnected until you tapped Connect). The process restart on an update
   (or any cold launch) left the app disconnected because there was **no auto-connect on launch** and
   **no persisted strap** — every `connect()` was user-tapped, and the v1.36 reconnect used an
   in-memory device that's gone after a restart.
-  - **Persist the bonded strap**: `NoopPrefs.setLastDevice(address, model)` on the bonded transition
+  - **Persist the bonded strap**: `PulsePrefs.setLastDevice(address, model)` on the bonded transition
     (on-device only, never sent); cleared on a model switch.
   - **Reconnect on launch**: `AppViewModel.autoReconnectOnLaunch()` (called from `init`) →
     `WhoopBleClient.reconnectToAddress()` does a direct `connectGatt(autoConnect=true)` to the saved
@@ -2856,7 +2856,7 @@ killed standard-0x2A37 live HR).
 ## 1.40 — Check for updates (both platforms)
 
 - **New: a manual "Check for updates" button** in Settings → About. One user-initiated GET to the
-  PUBLIC GitHub releases API (`api.github.com/repos/NoopApp/noop/releases/latest`) — compares the
+  PUBLIC GitHub releases API (`api.github.com/repos/kosherite/pulse/releases/latest`) — compares the
   `tag_name` to the installed version and, if newer, shows a Download button that opens the release
   page; otherwise "You're on the latest." Graceful failure on offline/rate-limit. **No background
   polling, no auto-update, nothing about the user is sent** — it only runs on tap, and only reads a
@@ -2872,7 +2872,7 @@ killed standard-0x2A37 live HR).
 
 ## 1.39 — Wrist alerts for incoming calls (Android, #66)
 
-- **Buzz on incoming calls** (community PR #66 by DieserLiton; reimplemented as NoopApp). A dedicated
+- **Buzz on incoming calls** (community PR #66 by DieserLiton; reimplemented as PulseApp). A dedicated
   **Calls** section in Notifications settings, separate from per-app alerts:
   - **Native phone calls** via a `PhoneCallReceiver` (READ_PHONE_STATE), and **best-effort VoIP** via the
     existing notification listener (`VoipCallClassifier`, an 8-app allowlist). One coordinator
@@ -3078,12 +3078,12 @@ killed standard-0x2A37 live HR).
 
 ## 1.27 — Wrist alerts work on Android
 
-- **Fixed (Android): wrist alerts couldn't be enabled — NOOP didn't appear in Notification Access**
+- **Fixed (Android): wrist alerts couldn't be enabled — Pulse didn't appear in Notification Access**
   (issue #52). The Notifications screen had the full wrist-alerts UI (master toggle, per-app filters,
   quiet hours — all already persisted in `NotifPrefs`) and an "Open Notification Access" button, but the
-  manifest declared **no `NotificationListenerService`**, so NOOP could never appear in the system's
+  manifest declared **no `NotificationListenerService`**, so Pulse could never appear in the system's
   Notification Access list (and nothing acted on notifications even if it could). Added
-  `com.noop.notif.NoopNotificationListener` + its manifest `<service>` (guarded by
+  `com.pulse.notif.PulseNotificationListener` + its manifest `<service>` (guarded by
   `BIND_NOTIFICATION_LISTENER_SERVICE`). Once the user grants access and enables wrist alerts, it buzzes
   the strap via the existing `RUN_HAPTICS_PATTERN` path on a posted notification, gated by the persisted
   settings (master, per-app opt-in, the app's buzz pattern → loops, quiet hours with midnight-wrap,
@@ -3098,11 +3098,11 @@ killed standard-0x2A37 live HR).
   screen's toggles were ephemeral `remember { mutableStateOf(false) }` with no persistence and no backend,
   and the wake time was hardcoded static `Text("07:00")` (not tappable) — so the toggle reset on navigation
   and the time couldn't be changed. The smart alarm is now a **real, persisted feature** mirroring macOS:
-  `NoopPrefs` stores `smartAlarmEnabled` + `smartAlarmMinutes`; the time uses the reusable `TimeChip`
+  `PulsePrefs` stores `smartAlarmEnabled` + `smartAlarmMinutes`; the time uses the reusable `TimeChip`
   picker (now `internal`, shared with the quiet-hours chip); and `AppViewModel.applySmartAlarm()` arms the
   strap's **firmware alarm** via `WhoopBleClient.armStrapAlarm()` (`SET_CLOCK` → `SET_ALARM_TIME(66)` with
   `[0x01]+u32 LE epoch+[0,0]`) / `disableStrapAlarm()` (`DISABLE_ALARM(69)`) — so on **WHOOP 4.0** it buzzes
-  at the wake time even if the phone is asleep or NOOP is closed. Needs the strap connected to arm. (On
+  at the wake time even if the phone is asleep or Pulse is closed. Needs the strap connected to arm. (On
   5.0/MG the alarm command is dropped by the `send()` guard, same as the buzz, until verified.) The other
   Automations toggles (zone coaching / stress nudge / auto-lock) remain preview-only — a separate follow-up.
 
@@ -3176,11 +3176,11 @@ killed standard-0x2A37 live HR).
   a **cumulative motion/step counter@57**, and **wrist-contact/motion quality@63** (enum 0/1/2). Fields
   the source report listed but that did **not** decode consistently on this device's firmware
   (cardiac_flags@33, sleep-state@81, perfusion@69/71) are deliberately left in the raw region pending
-  more captures — so NOOP never ships a guessed offset. These are building blocks toward on-device 5.0
+  more captures — so Pulse never ships a guessed offset. These are building blocks toward on-device 5.0
   sleep/recovery (decode layer only; not yet surfaced in the UI).
 
 - **Fixed (macOS): the WHOOP 5.0 v26 PPG channel index was read from the wrong byte.** A community
-  reverse-engineering report (validated against a 22 h overnight corpus) and NOOP's own two real test
+  reverse-engineering report (validated against a 22 h overnight corpus) and Pulse's own two real test
   fixtures both show the channel is **`frame[21]` (values 1–26, a time-multiplexed sweep)**, not
   `frame[12]` — the `0x41`/`0x46` that the merged v1.19 decode reported were a high-entropy counter byte
   caught during a short 2-burst capture. Corrected and gated to 1…26 so a wrong offset stores nothing.
@@ -3194,7 +3194,7 @@ killed standard-0x2A37 live HR).
   It was always written to Android's system log via `Log.d` — even in release builds — so a normal user
   emitted the device's BLE control flow to the device-wide log with no way to turn it off. It's now
   **opt-in**: a new **Settings → Strap → "Debug logging"** toggle (default **off**, persisted as
-  `NoopPrefs.KEY_DEBUG_LOGGING`) gates the single `Log.d` call, applied to the process-wide BLE client at
+  `PulsePrefs.KEY_DEBUG_LOGGING`) gates the single `Log.d` call, applied to the process-wide BLE client at
   the composition root so the low-level client never depends on the UI/prefs layer. The in-app ring
   buffer still records unconditionally, so **"Share strap log" keeps working for everyone** (the bug-report
   path from #17/#18) — only the adb-visible mirror is gated. Developers flip it on to watch a session over
@@ -3238,7 +3238,7 @@ killed standard-0x2A37 live HR).
 
 ## 1.17 — Sleep from WHOOP 4 on unmapped firmware (Mac)
 
-- **Fixed (macOS): a WHOOP 4 on firmware whose historical record version NOOP hadn't mapped recorded no
+- **Fixed (macOS): a WHOOP 4 on firmware whose historical record version Pulse hadn't mapped recorded no
   sleep.** Root cause: sleep is staged from the strap's overnight **gravity/motion** stream
   (`SleepStager.detectSleep` requires gravity — empty gravity → 0 sleeps). The WHOOP 4 historical
   (type-47) post-hook **bailed out entirely on any version outside the schema's `{12, 24}`** —
@@ -3274,7 +3274,7 @@ killed standard-0x2A37 live HR).
 ## 1.15 — WHOOP 5/MG: the wrist buzz works
 
 - **The haptic buzz now fires on WHOOP 5.0/MG (experimental), both platforms.** @jamartif confirming live
-  HR on v1.13 proved a 5/MG strap acts on NOOP's puffin-framed commands — so the buzz
+  HR on v1.13 proved a 5/MG strap acts on Pulse's puffin-framed commands — so the buzz
   (`RUN_HAPTICS_PATTERN`) is now allowlisted through the same `puffinCommandFrame` transport that the
   realtime-HR toggle uses, in `send()` on both `BLEManager.swift` and `WhoopBleClient.kt`. That powers
   Test buzz, the smart alarm, and any haptic feedback on 5/MG. Still experimental — whether the strap
@@ -3294,7 +3294,7 @@ killed standard-0x2A37 live HR).
   counts, so imported history is clearly labelled as history. No change for a user who has today's data —
   values render normally; only genuinely-absent values show "No Data." Brings Android to parity with the
   Mac Today screen and completes the stale-import work from v1.11/v1.12. Android-only (TodayScreen,
-  TrendsScreen comment); reimplemented as NOOP from @Brechard's PR #31 (refs #23).
+  TrendsScreen comment); reimplemented as Pulse from @Brechard's PR #31 (refs #23).
 
 ---
 
@@ -3303,7 +3303,7 @@ killed standard-0x2A37 live HR).
 - **Fixed (Android, WHOOP 5/MG): bonded but no heart rate.** Android brought the strap to "Bonded —
   Streaming" (v1.10) but then listened for HR only on the standard `0x2A37` profile — which a 5/MG
   strap doesn't stream. Realtime HR rides the puffin notify chars (`fd4b0003/4/5/7`) as `REALTIME_DATA`,
-  exactly as on macOS. NOOP now, on the `.whoop5` path only: (1) subscribes those puffin notify chars
+  exactly as on macOS. Pulse now, on the `.whoop5` path only: (1) subscribes those puffin notify chars
   **after** the `CLIENT_HELLO` bond (they're rejected on an unauthenticated link); (2) makes the frame
   reassembler **family-aware** (5/MG framing is `declLen @[2..4]` / total `+8`, vs WHOOP4 `length @[1..3]`
   / `+4` — the WHOOP4 rule decoded a bogus ~6 KB length and never emitted a frame); (3) decodes `REALTIME_DATA`
@@ -3323,7 +3323,7 @@ killed standard-0x2A37 live HR).
   bonded but still failed on real 5/MG hardware because it subscribed the protected puffin notify chars
   (`fd4b0003/4/5/7`) at *discovery*, before the link was encrypted — the strap rejected them with
   *"Authentication is insufficient"* and the bond write itself failed *"Encryption is insufficient."*
-  NOOP now (1) retains those chars but defers the subscribe until the `CLIENT_HELLO` `.withResponse`
+  Pulse now (1) retains those chars but defers the subscribe until the `CLIENT_HELLO` `.withResponse`
   write confirms in `didWriteValueFor`; (2) arms realtime HR post-bond with **puffin command framing**
   (`puffinCommandFrame(TOGGLE_REALTIME_HR)`) — the `send()` guard previously dropped every 5/MG command,
   so even a bonded strap never started streaming; and (3) surfaces actionable pairing-mode guidance when
@@ -3375,7 +3375,7 @@ killed standard-0x2A37 live HR).
   worn and events all blank (it reproduces reliably on newer Android). A GATT callback-threading race
   let the bond's with-response write fire before the notification subscriptions and starve them as
   BUSY, so the strap looked bonded (commands like buzz worked) but not one notification was ever
-  enabled. NOOP now pins all GATT callbacks to the main looper (API 28+) and retries a transiently-BUSY
+  enabled. Pulse now pins all GATT callbacks to the main looper (API 28+) and retries a transiently-BUSY
   subscribe. Reported, diagnosed and hardware-verified (Pixel 8 / Android 16) by a community
   contributor (PR #22); reviewed for no regression to the verified WHOOP 4.0 path.
 
@@ -3426,7 +3426,7 @@ killed standard-0x2A37 live HR).
 - **Fixed (experimental): WHOOP 5.0/MG stuck at "Finishing the secure pairing handshake."** The 5/MG
   strap requires an encrypted (bonded) Bluetooth link before it will let the app subscribe to its
   characteristics — it was rejecting them with "Authentication is insufficient," so the handshake
-  waited forever and live heart rate never arrived. NOOP now writes the `CLIENT_HELLO` with-response
+  waited forever and live heart rate never arrived. Pulse now writes the `CLIENT_HELLO` with-response
   to trigger just-works bonding, then subscribes once the link is authenticated. Diagnosed from a
   shared strap log by a contributor on issue #17. **Still experimental on 5/MG** — if you have one,
   please try it and share your strap log so we can keep improving it. WHOOP 4.0 is unaffected.
@@ -3437,7 +3437,7 @@ killed standard-0x2A37 live HR).
 
 - **Fixed: live heart rate freezing mid-session.** The WHOOP firmware lets its realtime stream lapse
   if it isn't periodically re-armed, which left heart rate stuck on a stale number while the strap was
-  still "connected" — the only fix was a manual disconnect/reconnect. NOOP now runs a 30-second
+  still "connected" — the only fix was a manual disconnect/reconnect. Pulse now runs a 30-second
   keep-alive that re-arms the realtime stream, re-subscribes a dropped notification, and — if nothing
   has arrived for two minutes — reconnects on its own. This ports the macOS app's existing keep-alive
   to Android, so the two platforms behave the same.
@@ -3449,12 +3449,12 @@ killed standard-0x2A37 live HR).
 
 ## 1.3 — Stays connected in the background
 
-- **New: keeps your strap connected when the app is closed.** On Android, NOOP runs a quiet ongoing
+- **New: keeps your strap connected when the app is closed.** On Android, Pulse runs a quiet ongoing
   foreground-service notification that holds the Bluetooth link open, so your heart rate keeps
   streaming and offloads keep landing even after you swipe the app away. On macOS this already came
-  for free — close the window and NOOP keeps running from the menu bar.
+  for free — close the window and Pulse keeps running from the menu bar.
 - **New: "Keep connected in the background" toggle** in Settings → Strap, on by default. Turn it off
-  and NOOP disconnects whenever you close the app (and drops the notification with it).
+  and Pulse disconnects whenever you close the app (and drops the notification with it).
 - **Fixed:** the strap dropping the instant you closed the app (the connection used to be torn down
   with the screen). The BLE client is now owned by the app process, not the UI.
 - **Fixed:** the Android notification permission is now actually declared and requested, so the

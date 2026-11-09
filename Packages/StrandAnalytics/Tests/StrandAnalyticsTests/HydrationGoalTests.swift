@@ -3,7 +3,7 @@ import XCTest
 
 /// Locks the hydration goal formula: `roundToNearest(sexBaseline + effortBump, 50)` with
 /// effortBump = clamp(round(effort/100 · 700), 0…700). BYTE-PARITY with the Android twin
-/// (com.noop.analytics.HydrationGoal) — same Int constants, same round-then-clamp, same integer rounding.
+/// (com.pulse.analytics.HydrationGoal) — same Int constants, same round-then-clamp, same integer rounding.
 final class HydrationGoalTests: XCTestCase {
 
     // MARK: - Sex baseline

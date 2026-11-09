@@ -43,7 +43,7 @@ func ouraAdvertisedLabel(_ advertisedName: String, fallback: String) -> String {
 ///
 /// This is a real transport (it replaced an earlier honest dead-end probe): it decodes the ring's OWN
 /// raw signals + open event tags (HR / IBI / HRV / SpO2 / temp / sleep-phase / battery), persists them
-/// under the ring's `deviceId`, and lets NOOP compute its own Charge/Rest from those streams exactly like
+/// under the ring's `deviceId`, and lets Pulse compute its own Charge/Rest from those streams exactly like
 /// a WHOOP day. It NEVER reads or surfaces Oura's encrypted readiness/sleep scores (honest-data
 /// invariant), and when a signal can't be read it stays at "-", never a fabricated value (Huami precedent).
 ///
@@ -106,7 +106,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
     @Published public private(set) var discovered: [DiscoveredRing] = []
     @Published public private(set) var scanning: Bool = false
     @Published public private(set) var batteryPct: Int? = nil
-    /// Set to an HONEST explanation string when the ring needs a pairing/key handshake NOOP can't complete
+    /// Set to an HONEST explanation string when the ring needs a pairing/key handshake Pulse can't complete
     /// (no install key, or the ring is in factory reset, or the key was rejected). nil otherwise. The UI
     /// surfaces this instead of a fake reading. Cleared on stop/disconnect.
     @Published public private(set) var needsPairing: String? = nil
@@ -251,7 +251,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
     private let persist: (Streams) -> Void
     /// Upsert the ring-PROVIDED reconstructed hypnogram as a `CachedSleepSession` (banked under the ring's
     /// own `deviceId`, the imported/measured side, so `SleepMerge`'s imported-over-computed rule makes
-    /// Oura's own SleepNet staging win over NOOP's sparse-motion computed night — "richer record wins").
+    /// Oura's own SleepNet staging win over Pulse's sparse-motion computed night — "richer record wins").
     /// Wired at the composition root to `store.upsertSleepSessions([_], deviceId:)`; default no-op so the
     /// discovery-only scanner and tests take the byte-identical inert path.
     private let persistSleepSession: (CachedSleepSession) -> Void
@@ -434,7 +434,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
     /// [oura-rs] unpack formula, never scored/persisted to SQLite). See OuraRealStepsDump.
     private let realStepsDump: OuraRealStepsDump?
     /// Append-only JSONL capture of the RAW, undecoded history-drain notification bytes (`oura-raw-<id>.jsonl`).
-    /// Complement to the decoded sidecars above: those show what NOOP interpreted, this shows exactly what the
+    /// Complement to the decoded sidecars above: those show what Pulse interpreted, this shows exactly what the
     /// ring sent, so after a full connect a hole in a decoded file can be pinned as a decode drop vs ring-side.
     /// No dedup (a re-serve is still evidence the ring re-sent it); the offline reframer collapses duplicates.
     private let rawDump: OuraRawDump?
@@ -674,7 +674,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
     /// `nextEventToSync`), loaded from `OuraHistoryCursorStore` on connect and COMMITTED only when a
     /// drain completes (from `maxStoredRingTime`). 0 = fetch everything the ring has banked.
     ///
-    /// #91: the `0x11` response carries NO cursor — only `bytes_left` (a remaining-byte count). NOOP
+    /// #91: the `0x11` response carries NO cursor — only `bytes_left` (a remaining-byte count). Pulse
     /// previously persisted that byte-count as a "cursor" and compared it across sessions as a clock,
     /// minting a phantom "ring-time regression" → reset-to-0 → full re-dump on every connect.
     private var historyCursor: UInt32 = 0
@@ -1283,7 +1283,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
     /// ALSO SEEDED AT INIT (`seedScreenOffFromLaunchState`), which is not a nicety: the notification is an
     /// EDGE, and a process launched *into* the background never posts it — it was never in the foreground
     /// to leave it. That is exactly the overnight path this build runs, since #1215's CoreBluetooth
-    /// state-restoration identifier has iOS relaunch NOOP for BLE while the phone is locked. Left nil,
+    /// state-restoration identifier has iOS relaunch Pulse for BLE while the phone is locked. Left nil,
     /// such a process reads "the user is present" forever and re-engages all night, which is
     /// indistinguishable from the build that has no suspend at all — the 2026-08-15/16 night was voided
     /// for exactly that reason.
@@ -1293,7 +1293,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
     ///
     /// WHY THIS EXISTS. Re-engaging every 15 s does not merely read the ring — it HOLDS it in daytime-HR
     /// mode. Across 10 nights the correlation between our overnight re-engage count and the ring running
-    /// its own night suite is r = -0.91: on the nights NOOP re-engaged all night the ring's `0x43` log
+    /// its own night suite is r = -0.91: on the nights Pulse re-engaged all night the ring's `0x43` log
     /// shows `check_sleep -> not needed` every 300 s and `DHR_mode:3` throughout, so it never produced
     /// SpO2, a hypnogram, or `0x6A` sleep_period. The one night our LINK BROKE is the night the ring
     /// worked; 2026-08-13/14 (phone deliberately far, same 300 s build) restored the suite x23. Both of
@@ -1384,7 +1384,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
     /// than academic: the voided night's `report.txt` holds FOUR separate app sessions, so a fresh grace
     /// per launch is a relaunch storm resetting the clock forever and never suspending at all.
     ///
-    /// A background launch while the phone is merely unlocked-and-elsewhere costs nothing: opening NOOP
+    /// A background launch while the phone is merely unlocked-and-elsewhere costs nothing: opening Pulse
     /// posts `didBecomeActive`, which clears this and re-engages immediately (`handleScreenCameBack`).
     ///
     /// - Returns: nil when the user is present (the ordinary foreground launch — `handleScreenWentDark`
@@ -1507,7 +1507,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
     /// The two platforms ask different questions on purpose. On iOS, backgrounding IS the signal — locking
     /// the phone backgrounds the app, and so does switching away, and both mean the same thing here (nobody
     /// is looking at the live HR). On macOS, app-resign would be wrong: switching to another window leaves
-    /// NOOP visible on screen, so the Mac waits for the DISPLAYS to sleep instead. Same rule either way —
+    /// Pulse visible on screen, so the Mac waits for the DISPLAYS to sleep instead. Same rule either way —
     /// suspend when the screen the user would have to be looking at has gone dark.
     private func installScreenStateObservers() {
         guard feedsLive else { return }
@@ -1921,7 +1921,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
                 // Read-only diagnostic: ask the ring its SpO2 / real-steps feature status once, so a capture
                 // sees the ring's own gate state. NOT reliably "off" for an offline ring — on-device
                 // 2026-08-25 real_steps read back status=1 (enabled) here, matching the real Oura app's read
-                // of the same ring byte-for-byte (worklog analysis/2026-08-25-noop-ring-hci-realsteps-
+                // of the same ring byte-for-byte (worklog analysis/2026-08-25-pulse-ring-hci-realsteps-
                 // confirmation.txt). NEVER an enable/set-mode write - purely the 0x20 read verb.
                 write([OuraCommands.spo2ReadStatus(), OuraCommands.realStepsReadStatus()])
                 // Read-only capture (#771/#772): the ring's GetProductInfo serial + hardware pages are
@@ -2484,7 +2484,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
     }
 
     /// Log a feature-status read reply once per feature (read-only diagnostic). Confirms, from the ring
-    /// itself, whether a server-flag feature (SpO2 0x04 / real_steps 0x0b) is subscribed/emitting — NOOP
+    /// itself, whether a server-flag feature (SpO2 0x04 / real_steps 0x0b) is subscribed/emitting — Pulse
     /// cannot enable these offline (server ClientConfiguration gate), so a `subscription == 0` here is the
     /// honest "not a bug, it's a gate" reading. Never scored, never stored.
     private func logFeatureStatus(_ st: OuraFeatureStatus) {
@@ -2798,7 +2798,7 @@ public final class OuraLiveSource: NSObject, ObservableObject {
         case installFailed(String)
     }
 
-    /// Record + log the honest "this ring needs a pairing handshake NOOP can't complete" outcome (once),
+    /// Record + log the honest "this ring needs a pairing handshake Pulse can't complete" outcome (once),
     /// and drop the link so no half-authenticated session lingers. We never fabricate a reading. Also marks
     /// `adoptPhase = .failed` so an in-flight adopt's Adopting step lands on a REACHABLE honest Failed state
     /// (file-import + Advanced-key fallbacks), and clears any in-flight install key WITHOUT persisting it (a
@@ -3457,7 +3457,7 @@ extension OuraLiveSource: @preconcurrency CBPeripheralDelegate {
 /// adopt key-install handshake (on an OK `0x25` ack, `OuraLiveSource.handleKeyInstallAck`) and the wizard's
 /// Advanced "I already have my ring's key" path. This accessor only stores/reads/clears it.
 public enum OuraKeyStore {
-    private static let service = "com.noop.oura.installkey"
+    private static let service = "com.pulse.oura.installkey"
     /// The fixed key length per OURA_PROTOCOL.md s3 (16-byte application auth key).
     public static let keyLength = 16
 
@@ -3506,7 +3506,7 @@ public enum OuraKeyStore {
 /// on every single connect. Unlike `OuraKeyStore` this is NOT sensitive - it's an opaque ring-clock tick
 /// counter, not a credential - so plain `UserDefaults` is the right (and simplest) store.
 enum OuraHistoryCursorStore {
-    private static func key(deviceId: String) -> String { "com.noop.oura.historyCursor.\(deviceId)" }
+    private static func key(deviceId: String) -> String { "com.pulse.oura.historyCursor.\(deviceId)" }
 
     /// The persisted cursor for `deviceId`, or 0 (fetch everything) if none is stored yet.
     static func read(deviceId: String) -> UInt32 {
@@ -3530,8 +3530,8 @@ enum OuraHistoryCursorStore {
 /// inputs). Not sensitive — an opaque clock pairing, not a credential — so plain `UserDefaults`, same
 /// reasoning as `OuraHistoryCursorStore`.
 enum OuraSyncAnchorStore {
-    private static func ticksKey(deviceId: String) -> String { "com.noop.oura.syncAnchorTicks.\(deviceId)" }
-    private static func secondsKey(deviceId: String) -> String { "com.noop.oura.syncAnchorSeconds.\(deviceId)" }
+    private static func ticksKey(deviceId: String) -> String { "com.pulse.oura.syncAnchorTicks.\(deviceId)" }
+    private static func secondsKey(deviceId: String) -> String { "com.pulse.oura.syncAnchorSeconds.\(deviceId)" }
 
     /// The persisted anchor for `deviceId`, or nil if none is stored yet (a ring never anchored before,
     /// or an install that predates this feature).

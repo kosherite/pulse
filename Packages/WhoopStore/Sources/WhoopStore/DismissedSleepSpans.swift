@@ -8,7 +8,7 @@ import Foundation
 /// layer must not extend with a new table; the same reason the dismissed-WORKOUT spans live in
 /// UserDefaults, not the DB). This enum owns everything about those strings that has no I/O, so it is
 /// unit-tested directly and stays in lockstep with the Kotlin `dismissedSleep` Room table's read/guard
-/// semantics (`com.noop.data.DismissedSleepGuard`).
+/// semantics (`com.pulse.data.DismissedSleepGuard`).
 ///
 /// The Swift side has NO deviceId split (one UserDefaults list, id-free), so unlike Android there is no
 /// namespace-mismatch hazard on the read: the tombstone is found whatever namespace owned the row. The

@@ -24,16 +24,16 @@ import parity_ratchet  # noqa: E402
 
 class IssueReferenceTests(unittest.TestCase):
     def test_current_metadata_requires_repository_qualified_references(self) -> None:
-        reference = issue_ref.parse_current("bhelm/noop#17")
-        self.assertEqual(("bhelm/noop", 17), (reference.repo, reference.number))
-        for invalid in (17, True, "#17", " bhelm/noop#17", "bhelm/noop#0"):
+        reference = issue_ref.parse_current("bhelm/pulse#17")
+        self.assertEqual(("bhelm/pulse", 17), (reference.repo, reference.number))
+        for invalid in (17, True, "#17", " bhelm/pulse#17", "bhelm/pulse#0"):
             with self.subTest(invalid=invalid), self.assertRaises(issue_ref.IssueRefError):
                 issue_ref.parse_current(invalid)
 
     def test_repository_is_part_of_issue_identity(self) -> None:
         self.assertNotEqual(
-            issue_ref.parse_current("bhelm/noop#17"),
-            issue_ref.parse_current("other/noop#17"),
+            issue_ref.parse_current("bhelm/pulse#17"),
+            issue_ref.parse_current("other/pulse#17"),
         )
 
 
@@ -302,11 +302,11 @@ class RepositoryBaselineTests(unittest.TestCase):
         }
         wrong = (
             "Packages/StrandAnalytics/Sources/StrandAnalytics/HRVAnalyzer.swift::collapseOverCount/4#1",
-            "android/app/src/main/java/com/noop/analytics/HrvAnalyzer.kt::collapsedCoverage/3#1",
+            "android/app/src/main/java/com/pulse/analytics/HrvAnalyzer.kt::collapsedCoverage/3#1",
         )
         correct = (
             "Packages/StrandAnalytics/Sources/StrandAnalytics/HRVAnalyzer.swift::collapseOverCount/4#1",
-            "android/app/src/main/java/com/noop/analytics/HrvAnalyzer.kt::collapseOverCount/4#1",
+            "android/app/src/main/java/com/pulse/analytics/HrvAnalyzer.kt::collapseOverCount/4#1",
         )
         self.assertNotIn(wrong, pairs)
         self.assertIn(correct, pairs)
@@ -356,7 +356,7 @@ class GovernanceRatchetTests(unittest.TestCase):
         subprocess.run(["git", "commit", "-qm", "base"], cwd=self.root, check=True)
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.root, text=True).strip()
 
-    def experimental_registry(self, identity: str, issue: str = "bhelm/noop#78") -> dict:
+    def experimental_registry(self, identity: str, issue: str = "bhelm/pulse#78") -> dict:
         return {"schema_version": 1, "dispositions": [{
             "type": "experimental", "kind": "add-unpaired-function",
             "identity": identity, "platform": identity.split("\0", 1)[0],
@@ -367,7 +367,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def stale_base_repair_fixture(self) -> tuple[Path, str]:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         test = self.root / "Packages/StrandAnalytics/Tests/StrandAnalyticsTests/EngineTests.swift"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
@@ -401,7 +401,7 @@ class GovernanceRatchetTests(unittest.TestCase):
                 "type": "experimental", "kind": "add-unpaired-function",
                 "identity": "swift\0Engine.swift::trial/0#1", "platform": "swift",
                 "identity_sha256": parity_ledger._canonical_sha256("swift\0Engine.swift::trial/0#1"),
-                "issue": "bhelm/noop#78", "reason": "Time-boxed experiment awaiting parity decision.",
+                "issue": "bhelm/pulse#78", "reason": "Time-boxed experiment awaiting parity decision.",
                 "expires_on": "2026-12-31",
             }],
         }
@@ -494,7 +494,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_refresh_restores_snapshots_when_new_debt_is_undisposed(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text("enum Engine {}\n", encoding="utf-8")
@@ -799,7 +799,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_regenerating_compact_map_and_baseline_cannot_accept_new_unpaired_source(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text("enum Engine {}\n", encoding="utf-8")
@@ -825,7 +825,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_regenerating_compact_metadata_cannot_accept_one_sided_constant(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text("enum Engine {}\n", encoding="utf-8")
@@ -850,7 +850,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_exact_compact_exemption_allows_only_its_current_delta(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text("enum Engine {}\n", encoding="utf-8")
@@ -899,7 +899,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_platform_specific_disposition_allows_only_exact_one_sided_identity(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text("enum Engine {}\n", encoding="utf-8")
@@ -923,7 +923,7 @@ class GovernanceRatchetTests(unittest.TestCase):
         self.assertEqual([], parity_ratchet.compare_metadata(self.root, base, offline=True))
 
     def test_inherited_disposition_can_name_excluded_twin_without_changing_authority(self) -> None:
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift = self.root / "Strand/Data/Engine.swift"
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.parent.mkdir(parents=True, exist_ok=True)
@@ -951,7 +951,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_debt_decrease_needs_no_metadata_rewrite_and_warns(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text("enum Engine { static func oldDebt() {} }\n", encoding="utf-8")
@@ -974,7 +974,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_obsolete_inherited_exemption_cannot_authorize_reintroduction(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text("enum Engine {}\n", encoding="utf-8")
@@ -999,7 +999,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_removing_a_real_twin_claim_is_not_treated_as_debt_reduction(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text(
@@ -1032,7 +1032,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_lower_debt_count_cannot_mask_replacement_identity_in_ratchet(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text(
@@ -1063,7 +1063,7 @@ class GovernanceRatchetTests(unittest.TestCase):
 
     def test_unchanged_inherited_exemption_stays_valid_without_refresh(self) -> None:
         swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         swift.parent.mkdir(parents=True, exist_ok=True)
         kotlin.parent.mkdir(parents=True, exist_ok=True)
         swift.write_text("enum Engine { static func inheritedDebt() {} }\n", encoding="utf-8")
@@ -1082,8 +1082,8 @@ class GovernanceRatchetTests(unittest.TestCase):
         self.assertEqual([], parity_ratchet.compare_metadata(self.root, base, offline=True))
         payload = {
             "number": 78,
-            "repository_url": "https://api.github.com/repos/bhelm/noop",
-            "html_url": "https://github.com/bhelm/noop/issues/78",
+            "repository_url": "https://api.github.com/repos/bhelm/pulse",
+            "html_url": "https://github.com/bhelm/pulse/issues/78",
             "state": "open",
         }
         with mock.patch.object(parity_ratchet, "_fetch_issue", return_value=payload) as fetched:
@@ -1105,7 +1105,7 @@ class GovernanceRatchetTests(unittest.TestCase):
         base = self.commit()
         compact = parity_ledger.build_compact_twin_map(self.root)
         identity = "swift\0Example.swift::invented/0#1"
-        self.write("Tools/parity_dispositions.json", self.experimental_registry(identity, "bhelm/noop#18"))
+        self.write("Tools/parity_dispositions.json", self.experimental_registry(identity, "bhelm/pulse#18"))
         self.write("Tools/parity_twin_map.json", compact)
         self.write(
             "Tools/parity_ledger_baseline.json",
@@ -1117,13 +1117,13 @@ class GovernanceRatchetTests(unittest.TestCase):
         self.assertTrue(any("bootstrap cannot introduce dispositions" in error for error in errors), errors)
 
     def test_same_issue_number_in_wrong_repository_fails_closed(self) -> None:
-        ref = issue_ref.parse_current("bhelm/noop#77")
+        ref = issue_ref.parse_current("bhelm/pulse#77")
         response = subprocess.CompletedProcess(
             [], 0,
             json.dumps({
                 "number": 77,
-                "repository_url": "https://api.github.com/repos/other/noop",
-                "html_url": "https://github.com/other/noop/issues/77",
+                "repository_url": "https://api.github.com/repos/other/pulse",
+                "html_url": "https://github.com/other/pulse/issues/77",
             }),
             "",
         )
@@ -1131,11 +1131,11 @@ class GovernanceRatchetTests(unittest.TestCase):
             self.assertFalse(parity_ratchet.issue_exists(ref))
 
     def test_pull_request_and_ambiguous_response_fail_closed(self) -> None:
-        ref = issue_ref.parse_current("bhelm/noop#77")
+        ref = issue_ref.parse_current("bhelm/pulse#77")
         for payload in (
-            {"number": 77, "pull_request": {}, "html_url": "https://github.com/bhelm/noop/issues/77"},
+            {"number": 77, "pull_request": {}, "html_url": "https://github.com/bhelm/pulse/issues/77"},
             {"number": 77},
-            {"number": True, "repository_url": "https://api.github.com/repos/bhelm/noop"},
+            {"number": True, "repository_url": "https://api.github.com/repos/bhelm/pulse"},
         ):
             with self.subTest(payload=payload), mock.patch.object(
                 parity_ratchet.subprocess,
@@ -1145,11 +1145,11 @@ class GovernanceRatchetTests(unittest.TestCase):
                 self.assertFalse(parity_ratchet.issue_exists(ref))
 
     def test_exemption_issue_must_be_fresh_and_bind_exact_identity_hash(self) -> None:
-        ref = issue_ref.parse_current("bhelm/noop#78")
+        ref = issue_ref.parse_current("bhelm/pulse#78")
         payload = {
             "number": 78,
-            "repository_url": "https://api.github.com/repos/bhelm/noop",
-            "html_url": "https://github.com/bhelm/noop/issues/78",
+            "repository_url": "https://api.github.com/repos/bhelm/pulse",
+            "html_url": "https://github.com/bhelm/pulse/issues/78",
             "created_at": "2026-08-21T12:00:00Z",
             "state": "open",
             "body": "parity-governance-identity-sha256: " + "a" * 64,

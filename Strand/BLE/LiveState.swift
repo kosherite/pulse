@@ -625,9 +625,9 @@ public final class LiveState: ObservableObject {
     /// actionable forget-and-re-pair guide; cleared on the next successful connect. (5/MG firmware reset, 2026-06)
     @Published public var reconnectGuide: String? = nil
 
-    /// Set when NOOP detects a marginal Bluetooth radio that can't sustain the WHOOP 4 R10/R11 raw realtime
+    /// Set when Pulse detects a marginal Bluetooth radio that can't sustain the WHOOP 4 R10/R11 raw realtime
     /// stream (#80 — a 2016 Mac / OpenCore drops the link the instant that high-bandwidth burst is armed).
-    /// After repeated arm-then-timeout cycles NOOP stops arming the heavy stream and falls back to the
+    /// After repeated arm-then-timeout cycles Pulse stops arming the heavy stream and falls back to the
     /// low-bandwidth 0x2A37 standard Heart Rate profile, so live HR can still flow on a radio that otherwise
     /// looped forever. Informational note for the Live screen; cleared on a clean reconnect or Live re-open.
     @Published public var standardHRMode: String? = nil
@@ -1132,24 +1132,24 @@ public final class LiveState: ObservableObject {
         // an id. Neither rule above catches it — the MAC rule wants MAC shape and the serial rule wants the
         // literal "WHOOP " then a DIGIT, while an adopted id is `whoop-` + a serial commonly starting with
         // a letter. Keeps three characters, matching `WhoopSerialIdentity.logSafe`, so two straps stay
-        // distinguishable; PRESERVES the `-noop` computed-sibling suffix, which is not identifying and is
+        // distinguishable; PRESERVES the `-pulse` computed-sibling suffix, which is not identifying and is
         // what lets a reader tell derived rows from measured ones. Six-character minimum matches
-        // `minSerialLength`, so `my-whoop` and `my-whoop-noop` are untouched. Kotlin twin in
+        // `minSerialLength`, so `my-whoop` and `my-whoop-pulse` are untouched. Kotlin twin in
         // `redactStrapLogPii`.
         out = out.replacingOccurrences(
-            of: "whoop-([A-Za-z0-9]{3})[A-Za-z0-9-]{3,}(-noop)",
+            of: "whoop-([A-Za-z0-9]{3})[A-Za-z0-9-]{3,}(-pulse)",
             with: "whoop-$1…$2", options: .regularExpression)
         out = out.replacingOccurrences(
             of: "whoop-([A-Za-z0-9]{3})[A-Za-z0-9-]{3,}",
             with: "whoop-$1…", options: .regularExpression)
         // #2092: an Oura device id (`oura-<serial>`) is the same #1303 gap for the OTHER brand — neither
         // rule above catches it, since the prefix isn't "whoop-". Exact same shape (3-character prefix +
-        // `…`, matching `OuraSerialIdentity.logSafe`) and the same `-noop`-suffix-preserving pair, since
+        // `…`, matching `OuraSerialIdentity.logSafe`) and the same `-pulse`-suffix-preserving pair, since
         // `DeviceRegistryStore.computedSuffix` is brand-agnostic — an Oura device gets a `oura-<serial>
-        // -noop` sibling the same way a WHOOP strap does. Applied AFTER the WHOOP rules but that ordering
+        // -pulse` sibling the same way a WHOOP strap does. Applied AFTER the WHOOP rules but that ordering
         // is not load-bearing: the two prefixes never overlap. Kotlin twin in `redactStrapLogPii`.
         out = out.replacingOccurrences(
-            of: "oura-([A-Za-z0-9]{3})[A-Za-z0-9-]{3,}(-noop)",
+            of: "oura-([A-Za-z0-9]{3})[A-Za-z0-9-]{3,}(-pulse)",
             with: "oura-$1…$2", options: .regularExpression)
         out = out.replacingOccurrences(
             of: "oura-([A-Za-z0-9]{3})[A-Za-z0-9-]{3,}",

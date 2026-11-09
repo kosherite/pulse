@@ -12,7 +12,7 @@ final class RawHistoryArchiveEvictionTests: XCTestCase {
 
     private func tmpDir(_ tag: String) -> URL {
         let dir = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("noop-evict-\(tag)-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("pulse-evict-\(tag)-\(UUID().uuidString)", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }

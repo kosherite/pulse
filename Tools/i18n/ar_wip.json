@@ -266,8 +266,8 @@
    "ar": "غير مناسب لجلسات مكثفة ذاتية إن كان لديك تاريخ صدمة أو مشكلات قلبية وعائية أو حمل، دون إشراف مختص."
   },
   "breath_proto_holotropic_edu": {
-   "en": "Holotropic-style work is continuous, often rapid connected breathing in a supported setting. NOOP only offers a session timer and education — not an auto-pacer — because intensity varies widely and is normally facilitated.",
-   "ar": "العمل بأسلوب الهولوتروبيك تنفس متصل مستمر وسريع غالبًا في بيئة مدعومة. يقدّم NOOP مؤقّت جلسة وشرحًا فقط — لا ضابط إيقاع تلقائي — لأن الشدة تتفاوت كثيرًا وتُدار عادة بإشراف."
+   "en": "Holotropic-style work is continuous, often rapid connected breathing in a supported setting. Pulse only offers a session timer and education — not an auto-pacer — because intensity varies widely and is normally facilitated.",
+   "ar": "العمل بأسلوب الهولوتروبيك تنفس متصل مستمر وسريع غالبًا في بيئة مدعومة. يقدّم Pulse مؤقّت جلسة وشرحًا فقط — لا ضابط إيقاع تلقائي — لأن الشدة تتفاوت كثيرًا وتُدار عادة بإشراف."
   },
   "breath_proto_holotropic_session_hint": {
    "en": "Traditional sessions are long; use a short timer here as a check-in only.",
@@ -474,8 +474,8 @@
    "ar": "لا تمارسه أبدًا في الماء أو أثناء القيادة. توقف عند الدوار. ليس نصيحة طبية."
   },
   "breath_proto_wim_hof_edu": {
-   "en": "Wim Hof–style rounds typically use ~30 deeper breaths, then an empty hold, then a recovery inhale hold (~15s). Because holds and intensity are personal, this entry is guided: follow a trusted protocol you already know; NOOP times the session and shows reminders — it does not force breath holds.",
-   "ar": "جولات بأسلوب فيم هوف تستخدم عادة نحو 30 نفَسًا أعمق، ثم حبسًا فارغًا، ثم حبس شهيق للتعافي (~15 ث). ولأن الحبس والشدة أمران شخصيان، هذا المدخل موجّه: اتبع بروتوكولًا موثوقًا تعرفه؛ يوقّت NOOP الجلسة ويعرض التذكيرات — ولا يفرض حبس النفس."
+   "en": "Wim Hof–style rounds typically use ~30 deeper breaths, then an empty hold, then a recovery inhale hold (~15s). Because holds and intensity are personal, this entry is guided: follow a trusted protocol you already know; Pulse times the session and shows reminders — it does not force breath holds.",
+   "ar": "جولات بأسلوب فيم هوف تستخدم عادة نحو 30 نفَسًا أعمق، ثم حبسًا فارغًا، ثم حبس شهيق للتعافي (~15 ث). ولأن الحبس والشدة أمران شخصيان، هذا المدخل موجّه: اتبع بروتوكولًا موثوقًا تعرفه؛ يوقّت Pulse الجلسة ويعرض التذكيرات — ولا يفرض حبس النفس."
   },
   "breath_proto_wim_hof_session_hint": {
    "en": "About 15 minutes for a few rounds.",
@@ -530,16 +530,16 @@
    "ar": "يظهر آخر تعطل أدناه. يمكنك نسخه لتقرير خطأ، ثم محاولة فتح التطبيق مرة أخرى."
   },
   "crash_recovery_continue": {
-   "en": "Try opening NOOP",
-   "ar": "محاولة فتح NOOP"
+   "en": "Try opening Pulse",
+   "ar": "محاولة فتح Pulse"
   },
   "crash_recovery_copy": {
    "en": "Copy error",
    "ar": "نسخ الخطأ"
   },
   "crash_recovery_title": {
-   "en": "NOOP stopped unexpectedly",
-   "ar": "توقف NOOP بشكل غير متوقع"
+   "en": "Pulse stopped unexpectedly",
+   "ar": "توقف Pulse بشكل غير متوقع"
   },
   "cycle_day_range": {
    "en": "· ~day %1$d–%2$d",
@@ -850,8 +850,8 @@
    "ar": "قطع الاتصال"
   },
   "fgs_channel_desc": {
-   "en": "Shown while NOOP keeps your WHOOP connected in the background.",
-   "ar": "يظهر بينما يُبقي NOOP اتصال WHOOP في الخلفية."
+   "en": "Shown while Pulse keeps your WHOOP connected in the background.",
+   "ar": "يظهر بينما يُبقي Pulse اتصال WHOOP في الخلفية."
   },
   "fgs_channel_name": {
    "en": "Strap connection",
@@ -1126,8 +1126,8 @@
    "ar": "اختر فئات Health Connect المراد استيرادها. يمكنك تغيير ذلك لاحقًا."
   },
   "health_connect_categories_title": {
-   "en": "Choose what NOOP can read",
-   "ar": "اختر ما يمكن لـ NOOP قراءته"
+   "en": "Choose what Pulse can read",
+   "ar": "اختر ما يمكن لـ Pulse قراءته"
   },
   "health_connect_category_activity": {
    "en": "Activity",
@@ -1166,12 +1166,12 @@
    "ar": "%1$s – %2$s%3$s · خطوة %4$d"
   },
   "keep_alive_needed_vendor": {
-   "en": "Your phone (%1$s) can stop background apps to save battery, which can make NOOP miss overnight sleep and recovery data. Tap Allow to whitelist NOOP.\\n\\nAndroid will ask “Stop optimising battery usage?” and warn that NOOP may drain your battery — that\\'s its standard wording for any app allowed to run in the background. Tap Allow. The battery goes on the overnight sync you already switched on above; this only stops Android cutting it short.",
-   "ar": "قد يوقف هاتفك (%1$s) التطبيقات العاملة في الخلفية لتوفير البطارية، مما قد يجعل NOOP يفوّت بيانات النوم والتعافي الليلية. اضغط «سماح» لإضافة NOOP إلى الاستثناءات.\\n\\nسيسأل Android «إيقاف تحسين استخدام البطارية؟» وينبّه إلى أن NOOP قد يستنزف البطارية — وهذه صياغته المعتادة لأي تطبيق يُسمح له بالعمل في الخلفية. اضغط «سماح». تُستهلك البطارية في المزامنة الليلية التي فعّلتها بالفعل أعلاه؛ وهذا يمنع Android فقط من قطعها."
+   "en": "Your phone (%1$s) can stop background apps to save battery, which can make Pulse miss overnight sleep and recovery data. Tap Allow to whitelist Pulse.\\n\\nAndroid will ask “Stop optimising battery usage?” and warn that Pulse may drain your battery — that\\'s its standard wording for any app allowed to run in the background. Tap Allow. The battery goes on the overnight sync you already switched on above; this only stops Android cutting it short.",
+   "ar": "قد يوقف هاتفك (%1$s) التطبيقات العاملة في الخلفية لتوفير البطارية، مما قد يجعل Pulse يفوّت بيانات النوم والتعافي الليلية. اضغط «سماح» لإضافة Pulse إلى الاستثناءات.\\n\\nسيسأل Android «إيقاف تحسين استخدام البطارية؟» وينبّه إلى أن Pulse قد يستنزف البطارية — وهذه صياغته المعتادة لأي تطبيق يُسمح له بالعمل في الخلفية. اضغط «سماح». تُستهلك البطارية في المزامنة الليلية التي فعّلتها بالفعل أعلاه؛ وهذا يمنع Android فقط من قطعها."
   },
   "l10n_add_device_wizard_a_whoop_strap_bonds_to_a_d39bdf4a": {
-   "en": "A WHOOP strap bonds to a single device. While it\\'s connected to NOOP it won\\'t stream ",
-   "ar": "يقترن سوار WHOOP بجهاز واحد فقط. وأثناء اتصاله بـ NOOP لن يبثّ "
+   "en": "A WHOOP strap bonds to a single device. While it\\'s connected to Pulse it won\\'t stream ",
+   "ar": "يقترن سوار WHOOP بجهاز واحد فقط. وأثناء اتصاله بـ Pulse لن يبثّ "
   },
   "l10n_add_device_wizard_add_61cc55aa": {
    "en": "Add",
@@ -1189,9 +1189,9 @@
    "en": "Beta. * is an on-device estimate. Skin temp is a trend versus your own baseline, steps ",
    "ar": "إصدار تجريبي. * تقدير على الجهاز. حرارة الجلد اتجاه مقارنةً بخط الأساس الخاص بك، والخطوات "
   },
-  "l10n_add_device_wizard_both_noop_and_the_oura_app_4f219db3": {
-   "en": "Both NOOP and the Oura app can use a ring you own by key, but only one can hold the Bluetooth link at a time.",
-   "ar": "يمكن لكل من NOOP وتطبيق Oura استخدام خاتم تملكه عبر المفتاح، لكن واحدًا فقط يمكنه الاحتفاظ باتصال Bluetooth في كل مرة."
+  "l10n_add_device_wizard_both_pulse_and_the_oura_app_4f219db3": {
+   "en": "Both Pulse and the Oura app can use a ring you own by key, but only one can hold the Bluetooth link at a time.",
+   "ar": "يمكن لكل من Pulse وتطبيق Oura استخدام خاتم تملكه عبر المفتاح، لكن واحدًا فقط يمكنه الاحتفاظ باتصال Bluetooth في كل مرة."
   },
   "l10n_add_device_wizard_cancel_77dfd213": {
    "en": "Cancel",
@@ -1218,16 +1218,16 @@
    "ar": "دعم تجريبي بأفضل جهد ممكن. ما زلنا نختبرها، لذا قد لا تتصل على كل جهاز. لا تختلق البيانات أبدًا، وستخبرك بصدق حين يتعذّر البث المباشر."
   },
   "l10n_add_device_wizard_i_understand_this_disconnects_the_ring_66bbb125": {
-   "en": "I understand this disconnects the ring from Oura and that NOOP cannot undo it for me. To go back to Oura I would factory-reset the ring again and set it up in the Oura app.",
-   "ar": "أفهم أن هذا يفصل الخاتم عن Oura وأن NOOP لا يستطيع التراجع عن ذلك نيابةً عني. وللعودة إلى Oura سأعيد ضبط الخاتم لإعدادات المصنع وأعدّه في تطبيق Oura."
+   "en": "I understand this disconnects the ring from Oura and that Pulse cannot undo it for me. To go back to Oura I would factory-reset the ring again and set it up in the Oura app.",
+   "ar": "أفهم أن هذا يفصل الخاتم عن Oura وأن Pulse لا يستطيع التراجع عن ذلك نيابةً عني. وللعودة إلى Oura سأعيد ضبط الخاتم لإعدادات المصنع وأعدّه في تطبيق Oura."
   },
   "l10n_add_device_wizard_i_understand_this_disconnects_the_ring_ccbb3225": {
-   "en": "I understand this disconnects the ring from Oura and that NOOP cannot undo it for me.",
-   "ar": "أفهم أن هذا يفصل الخاتم عن Oura وأن NOOP لا يستطيع التراجع عن ذلك نيابةً عني."
+   "en": "I understand this disconnects the ring from Oura and that Pulse cannot undo it for me.",
+   "ar": "أفهم أن هذا يفصل الخاتم عن Oura وأن Pulse لا يستطيع التراجع عن ذلك نيابةً عني."
   },
-  "l10n_add_device_wizard_installing_noop_s_key_and_confirming_aab5cf61": {
-   "en": "Installing NOOP\\'s key and confirming the ring answers only to NOOP. Keep the ring close and do not open the Oura app.",
-   "ar": "جارٍ تثبيت مفتاح NOOP والتأكد من أن الخاتم يستجيب لـ NOOP وحده. أبقِ الخاتم قريبًا ولا تفتح تطبيق Oura."
+  "l10n_add_device_wizard_installing_pulse_s_key_and_confirming_aab5cf61": {
+   "en": "Installing Pulse\\'s key and confirming the ring answers only to Pulse. Keep the ring close and do not open the Oura app.",
+   "ar": "جارٍ تثبيت مفتاح Pulse والتأكد من أن الخاتم يستجيب لـ Pulse وحده. أبقِ الخاتم قريبًا ولا تفتح تطبيق Oura."
   },
   "l10n_add_device_wizard_keep_the_oura_app_instead_import_60d70411": {
    "en": "Keep the Oura app instead (import a file)",
@@ -1253,13 +1253,13 @@
    "en": "%1$s, signal %2$s of 4",
    "ar": "%1$s، الإشارة %2$s من 4"
   },
-  "l10n_add_device_wizard_noop_stores_this_key_only_on_eae4e63f": {
-   "en": "NOOP stores this key only on this device, in the same place it stores your paired bands.",
-   "ar": "يخزّن NOOP هذا المفتاح على هذا الجهاز فقط، في المكان نفسه الذي يخزّن فيه أساورك المقترنة."
+  "l10n_add_device_wizard_pulse_stores_this_key_only_on_eae4e63f": {
+   "en": "Pulse stores this key only on this device, in the same place it stores your paired bands.",
+   "ar": "يخزّن Pulse هذا المفتاح على هذا الجهاز فقط، في المكان نفسه الذي يخزّن فيه أساورك المقترنة."
   },
-  "l10n_add_device_wizard_noop_will_install_its_own_key_d3f6321e": {
-   "en": "NOOP will install its own key on the ring and become its owner. The Oura app will no longer control this ring. This is intended and it cannot be undone from NOOP.",
-   "ar": "سيثبّت NOOP مفتاحه الخاص على الخاتم ويصبح مالكه. لن يتحكم تطبيق Oura بهذا الخاتم بعد الآن. هذا مقصود ولا يمكن التراجع عنه من NOOP."
+  "l10n_add_device_wizard_pulse_will_install_its_own_key_d3f6321e": {
+   "en": "Pulse will install its own key on the ring and become its owner. The Oura app will no longer control this ring. This is intended and it cannot be undone from Pulse.",
+   "ar": "سيثبّت Pulse مفتاحه الخاص على الخاتم ويصبح مالكه. لن يتحكم تطبيق Oura بهذا الخاتم بعد الآن. هذا مقصود ولا يمكن التراجع عنه من Pulse."
   },
   "l10n_add_device_wizard_not_now_e4571490": {
    "en": "Not now",
@@ -1338,12 +1338,12 @@
    "ar": "تعذّر الاستحواذ على هذا الخاتم."
   },
   "l10n_add_device_wizard_whoop_5_0_mg_support_is_e452e686": {
-   "en": "WHOOP 5.0 / MG support is newer and still experimental in NOOP.",
-   "ar": "دعم WHOOP 5.0 / MG أحدث وما زال تجريبيًا في NOOP."
+   "en": "WHOOP 5.0 / MG support is newer and still experimental in Pulse.",
+   "ar": "دعم WHOOP 5.0 / MG أحدث وما زال تجريبيًا في Pulse."
   },
-  "l10n_add_device_wizard_whoop_is_noop_s_primary_fully_ac6fa33b": {
-   "en": "WHOOP is NOOP\\'s primary, fully-supported band. Other heart-rate straps stream live heart rate and HRV, but not WHOOP\\'s deeper sleep and recovery data.",
-   "ar": "‏WHOOP هو السوار الأساسي المدعوم بالكامل في NOOP. الأساور الأخرى تبثّ معدل النبض وتقلب النبض مباشرةً، لكن دون بيانات النوم والتعافي الأعمق الخاصة بـ WHOOP."
+  "l10n_add_device_wizard_whoop_is_pulse_s_primary_fully_ac6fa33b": {
+   "en": "WHOOP is Pulse\\'s primary, fully-supported band. Other heart-rate straps stream live heart rate and HRV, but not WHOOP\\'s deeper sleep and recovery data.",
+   "ar": "‏WHOOP هو السوار الأساسي المدعوم بالكامل في Pulse. الأساور الأخرى تبثّ معدل النبض وتقلب النبض مباشرةً، لكن دون بيانات النوم والتعافي الأعمق الخاصة بـ WHOOP."
   },
   "l10n_app_changelog_5_mg_bonding_on_android_health_c94c46ac": {
    "en": "5/MG bonding on Android + Health Monitor fix",
@@ -1553,9 +1553,9 @@
    "en": "Buzz WHOOP 4 in the Smart Alarm",
    "ar": "اهتزاز WHOOP 4 في المنبّه الذكي"
   },
-  "l10n_app_changelog_charge_effort_rest_noop_s_own_8c323656": {
-   "en": "Charge, Effort & Rest - NOOP\\'s own scores, out of 100",
-   "ar": "الشحن والجهد والراحة — درجات NOOP الخاصة من 100"
+  "l10n_app_changelog_charge_effort_rest_pulse_s_own_8c323656": {
+   "en": "Charge, Effort & Rest - Pulse\\'s own scores, out of 100",
+   "ar": "الشحن والجهد والراحة — درجات Pulse الخاصة من 100"
   },
   "l10n_app_changelog_charge_shows_calibrating_instead_of_no_51a000e9": {
    "en": "Charge shows \"Calibrating\" instead of \"No data\" for new straps",
@@ -1873,9 +1873,9 @@
    "en": "Last Workouts tile fix",
    "ar": "إصلاح بطاقة آخر التمارين"
   },
-  "l10n_app_changelog_light_theme_noop_in_warm_paper_d5b9f463": {
-   "en": "Light theme - NOOP in warm paper & gold",
-   "ar": "السمة الفاتحة — NOOP بورق دافئ وذهب"
+  "l10n_app_changelog_light_theme_pulse_in_warm_paper_d5b9f463": {
+   "en": "Light theme - Pulse in warm paper & gold",
+   "ar": "السمة الفاتحة — Pulse بورق دافئ وذهب"
   },
   "l10n_app_changelog_light_theme_polish_5add98b2": {
    "en": "Light theme polish",
@@ -1905,9 +1905,9 @@
    "en": "Mac: strap-computed nights show in Sleep",
    "ar": "‏Mac: الليالي المحتسبة من السوار تظهر في «النوم»"
   },
-  "l10n_app_changelog_make_noop_yours_theme_colours_and_6bdef2a7": {
-   "en": "Make NOOP yours — theme colours and custom backgrounds, forty more sports with GPS routes, and a calorie heatmap",
-   "ar": "اجعل NOOP لك — ألوان السمة والخلفيات المخصصة، وأربعون رياضة إضافية بمسارات GPS، وخريطة حرارية للسعرات"
+  "l10n_app_changelog_make_pulse_yours_theme_colours_and_6bdef2a7": {
+   "en": "Make Pulse yours — theme colours and custom backgrounds, forty more sports with GPS routes, and a calorie heatmap",
+   "ar": "اجعل Pulse لك — ألوان السمة والخلفيات المخصصة، وأربعون رياضة إضافية بمسارات GPS، وخريطة حرارية للسعرات"
   },
   "l10n_app_changelog_manage_several_whoop_straps_and_see_8d9b6a84": {
    "en": "Manage several WHOOP straps - and see what each band does",
@@ -1954,8 +1954,8 @@
    "ar": "تهيئة جديدة عند أول تشغيل (Mac + Android)"
   },
   "l10n_app_changelog_new_use_an_apple_watch_with_4c2c29a6": {
-   "en": "New: use an Apple Watch with NOOP",
-   "ar": "جديد: استخدام Apple Watch مع NOOP"
+   "en": "New: use an Apple Watch with Pulse",
+   "ar": "جديد: استخدام Apple Watch مع Pulse"
   },
   "l10n_app_changelog_new_week_in_review_a_live_c1457e40": {
    "en": "New: Week in review, a live body console, fresher charts and more",
@@ -1965,17 +1965,17 @@
    "en": "No more HR spike when you reopen the app",
    "ar": "لا مزيد من قفزة النبض عند إعادة فتح التطبيق"
   },
-  "l10n_app_changelog_noop_grows_up_it_s_not_823bf2e7": {
-   "en": "NOOP grows up: it\\'s not just for WHOOP anymore",
-   "ar": "‏NOOP يكبر: لم يعد لـ WHOOP فقط"
+  "l10n_app_changelog_pulse_grows_up_it_s_not_823bf2e7": {
+   "en": "Pulse grows up: it\\'s not just for WHOOP anymore",
+   "ar": "‏Pulse يكبر: لم يعد لـ WHOOP فقط"
   },
-  "l10n_app_changelog_noop_has_a_new_home_01b87522": {
-   "en": "NOOP has a new home",
-   "ar": "لـ NOOP بيت جديد"
+  "l10n_app_changelog_pulse_has_a_new_home_01b87522": {
+   "en": "Pulse has a new home",
+   "ar": "لـ Pulse بيت جديد"
   },
-  "l10n_app_changelog_noop_now_tells_you_when_your_af259fbb": {
-   "en": "NOOP now tells you when your strap isn\\'t saving history - and how to fix it",
-   "ar": "‏NOOP يخبرك الآن حين لا يحفظ سوارك السجل — وكيف تصلح ذلك"
+  "l10n_app_changelog_pulse_now_tells_you_when_your_af259fbb": {
+   "en": "Pulse now tells you when your strap isn\\'t saving history - and how to fix it",
+   "ar": "‏Pulse يخبرك الآن حين لا يحفظ سوارك السجل — وكيف تصلح ذلك"
   },
   "l10n_app_changelog_on_demand_hrv_a_haptic_clock_50376585": {
    "en": "On-demand HRV, a haptic clock, sleep marks & more",
@@ -2329,9 +2329,9 @@
    "en": "Updates check GitHub again",
    "ar": "التحديثات تتحقق من GitHub مجددًا"
   },
-  "l10n_app_changelog_v5_the_raw_signal_release_noop_c109e3f2": {
-   "en": "v5 - the raw-signal release: NOOP reads the signal, on your device, free",
-   "ar": "الإصدار 5 — إصدار الإشارة الخام: NOOP يقرأ الإشارة، على جهازك، مجانًا"
+  "l10n_app_changelog_v5_the_raw_signal_release_pulse_c109e3f2": {
+   "en": "v5 - the raw-signal release: Pulse reads the signal, on your device, free",
+   "ar": "الإصدار 5 — إصدار الإشارة الخام: Pulse يقرأ الإشارة، على جهازك، مجانًا"
   },
   "l10n_app_changelog_water_and_caffeine_from_apple_health_5123b6b0": {
    "en": "Water and caffeine from Apple Health, a sharper Effort score, and an Oura resting-heart-rate fix",
@@ -2966,8 +2966,8 @@
    "ar": "تنبيه الكافيين المتأخر"
   },
   "l10n_caffeine_log_log_a_coffee_tea_or_energy_982bde5b": {
-   "en": "Log a coffee, tea, or energy drink and NOOP shows a rough estimate of how much may still be active. It\\'s a guide based on a typical 5 to 6 hour half-life, not a measurement.",
-   "ar": "سجّل قهوة أو شايًا أو مشروب طاقة، ويعرض NOOP تقديرًا تقريبيًا لما قد يظل فعّالًا. إنه دليل مبني على عمر نصف نموذجي من 5 إلى 6 ساعات، وليس قياسًا."
+   "en": "Log a coffee, tea, or energy drink and Pulse shows a rough estimate of how much may still be active. It\\'s a guide based on a typical 5 to 6 hour half-life, not a measurement.",
+   "ar": "سجّل قهوة أو شايًا أو مشروب طاقة، ويعرض Pulse تقديرًا تقريبيًا لما قد يظل فعّالًا. إنه دليل مبني على عمر نصف نموذجي من 5 إلى 6 ساعات، وليس قياسًا."
   },
   "l10n_caffeine_log_logged_today_0071a46c": {
    "en": "Logged today",
@@ -3202,8 +3202,8 @@
    "ar": "أداء النوم"
   },
   "l10n_data_sources_screen_acts_as_a_standard_bluetooth_heart_f8d13439": {
-   "en": "Acts as a standard Bluetooth heart-rate strap. Pair NOOP from your treadmill, bike or app to see your strap\\'s heart rate there.",
-   "ar": "يعمل كسوار نبض Bluetooth قياسي. اقترن بـ NOOP من جهاز المشي أو الدراجة أو التطبيق لرؤية نبض سوارك هناك."
+   "en": "Acts as a standard Bluetooth heart-rate strap. Pair Pulse from your treadmill, bike or app to see your strap\\'s heart rate there.",
+   "ar": "يعمل كسوار نبض Bluetooth قياسي. اقترن بـ Pulse من جهاز المشي أو الدراجة أو التطبيق لرؤية نبض سوارك هناك."
   },
   "l10n_data_sources_screen_auto_sync_health_connect_periodically_6f3f4d92": {
    "en": "Auto-sync Health Connect periodically",
@@ -3273,9 +3273,9 @@
    "en": "Imported",
    "ar": "مستورد"
   },
-  "l10n_data_sources_screen_last_share_didn_t_finish_noop_0d6c27f0": {
-   "en": "Last share didn’t finish — NOOP will retry automatically.",
-   "ar": "لم تكتمل آخر مشاركة — سيعيد NOOP المحاولة تلقائيًا."
+  "l10n_data_sources_screen_last_share_didn_t_finish_pulse_0d6c27f0": {
+   "en": "Last share didn’t finish — Pulse will retry automatically.",
+   "ar": "لم تكتمل آخر مشاركة — سيعيد Pulse المحاولة تلقائيًا."
   },
   "l10n_data_sources_screen_last_shared_6bf8389c": {
    "en": "\"Last shared \"",
@@ -3345,9 +3345,9 @@
    "en": "Workout file (GPX / TCX / FIT)",
    "ar": "ملف تمرين (GPX / TCX / FIT)"
   },
-  "l10n_data_sources_screen_write_the_metrics_noop_computes_from_439940c2": {
-   "en": "Write the metrics NOOP computes from your strap (resting HR, HRV, SpO₂, ",
-   "ar": "كتابة المقاييس التي يحتسبها NOOP من سوارك (نبض الراحة، وتقلب النبض، وSpO₂، "
+  "l10n_data_sources_screen_write_the_metrics_pulse_computes_from_439940c2": {
+   "en": "Write the metrics Pulse computes from your strap (resting HR, HRV, SpO₂, ",
+   "ar": "كتابة المقاييس التي يحتسبها Pulse من سوارك (نبض الراحة، وتقلب النبض، وSpO₂، "
   },
   "l10n_devices_screen_add_a_device_f90866b8": {
    "en": "Add a device",
@@ -3481,17 +3481,17 @@
    "en": "Name",
    "ar": "الاسم"
   },
-  "l10n_devices_screen_noop_removes_this_device_503aff9e": {
-   "en": "NOOP removes this device from your list and deletes its recorded data here. You can re-pair the strap to pull its recent history back.",
-   "ar": "يزيل NOOP هذا الجهاز من قائمتك ويحذف بياناته المسجّلة هنا. يمكنك إعادة اقتران السوار لسحب سجله الأخير مرة أخرى."
+  "l10n_devices_screen_pulse_removes_this_device_503aff9e": {
+   "en": "Pulse removes this device from your list and deletes its recorded data here. You can re-pair the strap to pull its recent history back.",
+   "ar": "يزيل Pulse هذا الجهاز من قائمتك ويحذف بياناته المسجّلة هنا. يمكنك إعادة اقتران السوار لسحب سجله الأخير مرة أخرى."
   },
   "l10n_devices_screen_pack_voltage_9af3c3ff": {
    "en": "%1$.2f V",
    "ar": "%1$.2f فولت"
   },
-  "l10n_devices_screen_paired_locally_noop_owns_this_ring_30c16190": {
-   "en": "Paired locally. NOOP owns this ring while it holds the key. If you reset it again or set it up in the Oura app, NOOP no longer owns it and you would re-add it to take it over.",
-   "ar": "مقترن محليًا. يملك NOOP هذا الخاتم ما دام يحتفظ بالمفتاح. وإذا أعدت ضبطه أو أعددته في تطبيق Oura، فلن يعود NOOP مالكًا له وستحتاج إلى إعادة إضافته للاستحواذ عليه."
+  "l10n_devices_screen_paired_locally_pulse_owns_this_ring_30c16190": {
+   "en": "Paired locally. Pulse owns this ring while it holds the key. If you reset it again or set it up in the Oura app, Pulse no longer owns it and you would re-add it to take it over.",
+   "ar": "مقترن محليًا. يملك Pulse هذا الخاتم ما دام يحتفظ بالمفتاح. وإذا أعدت ضبطه أو أعددته في تطبيق Oura، فلن يعود Pulse مالكًا له وستحتاج إلى إعادة إضافته للاستحواذ عليه."
   },
   "l10n_devices_screen_pick_a_new_active_strap_edd73542": {
    "en": "Pick a new active strap",
@@ -3553,9 +3553,9 @@
    "en": "WHOOP 4.0 reboot probe",
    "ar": "فحص إعادة تشغيل WHOOP 4.0"
   },
-  "l10n_devices_screen_whoop_is_noop_s_primary_fully_1c9e67fd": {
-   "en": "WHOOP is NOOP\\'s primary, fully-supported band. Other heart-rate straps are an early, ",
-   "ar": "‏WHOOP هو السوار الأساسي المدعوم بالكامل في NOOP. أساور النبض الأخرى في مرحلة مبكرة، "
+  "l10n_devices_screen_whoop_is_pulse_s_primary_fully_1c9e67fd": {
+   "en": "WHOOP is Pulse\\'s primary, fully-supported band. Other heart-rate straps are an early, ",
+   "ar": "‏WHOOP هو السوار الأساسي المدعوم بالكامل في Pulse. أساور النبض الأخرى في مرحلة مبكرة، "
   },
   "l10n_devices_screen_you_removed_your_active_strap_choose_2ac91d48": {
    "en": "You removed your active strap. Choose which paired band provides your live data, or leave none active and pair one later.",
@@ -3569,13 +3569,13 @@
    "en": "Fused on %1$s. Nothing leaves it: no account, no cloud.",
    "ar": "مدمج على %1$s. لا شيء يغادره: بلا حساب وبلا سحابة."
   },
-  "l10n_fused_record_screen_noop_picks_the_best_sourced_number_5e48b86a": {
-   "en": "NOOP picks the best-sourced number and shows you where each came from. It\\'s for wellness and curiosity. It doesn\\'t diagnose or replace medical advice.",
-   "ar": "يختار NOOP الرقم من أفضل مصدر ويعرض لك مصدر كل رقم. الغرض منه العافية والفضول. لا يشخّص ولا يحل محل الاستشارة الطبية."
+  "l10n_fused_record_screen_pulse_picks_the_best_sourced_number_5e48b86a": {
+   "en": "Pulse picks the best-sourced number and shows you where each came from. It\\'s for wellness and curiosity. It doesn\\'t diagnose or replace medical advice.",
+   "ar": "يختار Pulse الرقم من أفضل مصدر ويعرض لك مصدر كل رقم. الغرض منه العافية والفضول. لا يشخّص ولا يحل محل الاستشارة الطبية."
   },
-  "l10n_fused_record_screen_noop_shows_the_winner_source_displayname_4a3892cc": {
-   "en": "NOOP shows the %1$s reading because it %2$s for this metric: a higher-trust source here, not a verdict that the others are wrong.",
-   "ar": "يعرض NOOP قراءة %1$s لأنها %2$s لهذا المقياس: مصدر أعلى ثقة هنا، لا حكمًا بأن البقية خاطئة."
+  "l10n_fused_record_screen_pulse_shows_the_winner_source_displayname_4a3892cc": {
+   "en": "Pulse shows the %1$s reading because it %2$s for this metric: a higher-trust source here, not a verdict that the others are wrong.",
+   "ar": "يعرض Pulse قراءة %1$s لأنها %2$s لهذا المقياس: مصدر أعلى ثقة هنا، لا حكمًا بأن البقية خاطئة."
   },
   "l10n_fused_record_screen_nothing_to_fuse_yet_30789c4e": {
    "en": "Nothing to fuse yet",
@@ -3586,8 +3586,8 @@
    "ar": "%1$s يتفق: %2$s"
   },
   "l10n_fused_record_screen_your_bands_report_different_numbers_here_03d20d81": {
-   "en": "Your bands report different numbers. Here\\'s every source, and the one NOOP is using.",
-   "ar": "أساورك تسجّل أرقامًا مختلفة. إليك كل المصادر، والمصدر الذي يستخدمه NOOP."
+   "en": "Your bands report different numbers. Here\\'s every source, and the one Pulse is using.",
+   "ar": "أساورك تسجّل أرقامًا مختلفة. إليك كل المصادر، والمصدر الذي يستخدمه Pulse."
   },
   "l10n_fused_record_screen_your_data_fused_a740fd4a": {
    "en": "Your Data, Fused",
@@ -3814,8 +3814,8 @@
    "ar": "تقدير أكسجين الدم مُعطَّل"
   },
   "l10n_health_screen_this_vital_needs_at_least_two_0e41b8b0": {
-   "en": "This vital needs at least two historical readings before NOOP can chart it.",
-   "ar": "يحتاج هذا المؤشر إلى قراءتين تاريخيتين على الأقل قبل أن يتمكن NOOP من رسمه."
+   "en": "This vital needs at least two historical readings before Pulse can chart it.",
+   "ar": "يحتاج هذا المؤشر إلى قراءتين تاريخيتين على الأقل قبل أن يتمكن Pulse من رسمه."
   },
   "l10n_health_screen_value_8dce170d": {
    "en": "Value",
@@ -3838,54 +3838,54 @@
    "ar": "بياناتك، مدمجة"
   },
   "l10n_health_screen_your_strap_banks_the_raw_optical_b52a0f80": {
-   "en": "Your strap banks the raw optical channels, but NOOP does not turn them into a blood oxygen percentage, so this stays empty however long you wear it. Import a WHOOP export in Data Sources to fill it from your account history.",
-   "ar": "يخزّن سوارك القنوات الضوئية الخام، لكن NOOP لا يحوّلها إلى نسبة أكسجين في الدم، لذا يبقى هذا فارغًا مهما طال ارتداؤك له. استورد ملف تصدير WHOOP في «مصادر البيانات» لملئه من سجل حسابك."
+   "en": "Your strap banks the raw optical channels, but Pulse does not turn them into a blood oxygen percentage, so this stays empty however long you wear it. Import a WHOOP export in Data Sources to fill it from your account history.",
+   "ar": "يخزّن سوارك القنوات الضوئية الخام، لكن Pulse لا يحوّلها إلى نسبة أكسجين في الدم، لذا يبقى هذا فارغًا مهما طال ارتداؤك له. استورد ملف تصدير WHOOP في «مصادر البيانات» لملئه من سجل حسابك."
   },
   "l10n_health_screen_your_strap_reports_a_blood_oxygen_349fe34a": {
    "en": "Your strap reports a blood oxygen estimate, but it is unverified and off by default. Turn on the strap estimate in Settings to see it, or import a WHOOP export in Data Sources for the calibrated value.",
    "ar": "يسجّل سوارك تقديرًا لأكسجين الدم، لكنه غير متحقق منه ومعطّل افتراضيًا. فعّل تقدير السوار في الإعدادات لرؤيته، أو استورد ملف تصدير WHOOP في «مصادر البيانات» للقيمة المعايرة."
   },
-  "l10n_how_noop_works_screen_close_bbfa773e": {
+  "l10n_how_pulse_works_screen_close_bbfa773e": {
    "en": "Close",
    "ar": "إغلاق"
   },
-  "l10n_how_noop_works_screen_got_it_5b8027fa": {
+  "l10n_how_pulse_works_screen_got_it_5b8027fa": {
    "en": "Got it",
    "ar": "فهمت"
   },
-  "l10n_how_noop_works_screen_how_noop_works_3396b27a": {
-   "en": "How NOOP works",
-   "ar": "كيف يعمل NOOP"
+  "l10n_how_pulse_works_screen_how_pulse_works_3396b27a": {
+   "en": "How Pulse works",
+   "ar": "كيف يعمل Pulse"
   },
-  "l10n_how_noop_works_screen_how_your_scores_are_computed_1b2d6c30": {
+  "l10n_how_pulse_works_screen_how_your_scores_are_computed_1b2d6c30": {
    "en": "How your scores are computed",
    "ar": "كيف تُحتسب درجاتك"
   },
-  "l10n_how_noop_works_screen_how_your_scores_work_21a0e2be": {
+  "l10n_how_pulse_works_screen_how_your_scores_work_21a0e2be": {
    "en": "How your scores work",
    "ar": "كيف تعمل درجاتك"
   },
-  "l10n_how_noop_works_screen_how_your_sleep_is_sorted_6a8e82e0": {
+  "l10n_how_pulse_works_screen_how_your_sleep_is_sorted_6a8e82e0": {
    "en": "How your sleep is sorted",
    "ar": "كيف يُصنَّف نومك"
   },
-  "l10n_how_noop_works_screen_noop_never_makes_up_a_number_da29aca5": {
-   "en": "NOOP never makes up a number. When it can\\'t compute one honestly it tells you what\\'s missing and what to do, rather than showing a fake value.",
-   "ar": "لا يختلق NOOP رقمًا أبدًا. وحين يتعذّر احتسابه بصدق، يخبرك بما ينقص وما ينبغي فعله، بدلًا من عرض قيمة زائفة."
+  "l10n_how_pulse_works_screen_pulse_never_makes_up_a_number_da29aca5": {
+   "en": "Pulse never makes up a number. When it can\\'t compute one honestly it tells you what\\'s missing and what to do, rather than showing a fake value.",
+   "ar": "لا يختلق Pulse رقمًا أبدًا. وحين يتعذّر احتسابه بصدق، يخبرك بما ينقص وما ينبغي فعله، بدلًا من عرض قيمة زائفة."
   },
-  "l10n_how_noop_works_screen_noop_never_shows_you_a_number_d1db9958": {
-   "en": "NOOP never shows you a number it had to make up. If a score isn\\'t ready, ",
-   "ar": "لا يعرض NOOP أبدًا رقمًا اضطر لاختلاقه. وإذا لم تكن الدرجة جاهزة، "
+  "l10n_how_pulse_works_screen_pulse_never_shows_you_a_number_d1db9958": {
+   "en": "Pulse never shows you a number it had to make up. If a score isn\\'t ready, ",
+   "ar": "لا يعرض Pulse أبدًا رقمًا اضطر لاختلاقه. وإذا لم تكن الدرجة جاهزة، "
   },
-  "l10n_how_noop_works_screen_sleep_scores_recording_where_your_numbers_1b3e981f": {
+  "l10n_how_pulse_works_screen_sleep_scores_recording_where_your_numbers_1b3e981f": {
    "en": "Sleep · scores · recording · where your numbers come from",
    "ar": "النوم · الدرجات · التسجيل · من أين تأتي أرقامك"
   },
-  "l10n_how_noop_works_screen_what_recording_means_b896c422": {
+  "l10n_how_pulse_works_screen_what_recording_means_b896c422": {
    "en": "What \"recording\" means",
    "ar": "ماذا يعني «التسجيل»"
   },
-  "l10n_how_noop_works_screen_where_your_numbers_come_from_e169963a": {
+  "l10n_how_pulse_works_screen_where_your_numbers_come_from_e169963a": {
    "en": "Where your numbers come from",
    "ar": "من أين تأتي أرقامك"
   },
@@ -4010,8 +4010,8 @@
    "ar": "الرؤى"
   },
   "l10n_insights_hub_screen_log_alcohol_or_late_caffeine_with_dec9dadf": {
-   "en": "Log alcohol or late caffeine with an amount and NOOP fits a personal dose curve: ",
-   "ar": "سجّل الكحول أو الكافيين المتأخر مع الكمية، ويضبط NOOP منحنى جرعة شخصيًا: "
+   "en": "Log alcohol or late caffeine with an amount and Pulse fits a personal dose curve: ",
+   "ar": "سجّل الكحول أو الكافيين المتأخر مع الكمية، ويضبط Pulse منحنى جرعة شخصيًا: "
   },
   "l10n_insights_hub_screen_not_enough_overlap_between_your_journal_0ebdd7a2": {
    "en": "Not enough overlap between your journal answers and ",
@@ -4110,8 +4110,8 @@
    "ar": "لا يوجد سجل متداخل كافٍ لربط مقاييسك بعد."
   },
   "l10n_insights_screen_pick_one_behaviour_you_log_one_bd34090e": {
-   "en": "Pick one behaviour you log, one outcome, and a short window. NOOP ",
-   "ar": "اختر سلوكًا واحدًا تسجّله، ونتيجة واحدة، ونافذة قصيرة. وNOOP "
+   "en": "Pick one behaviour you log, one outcome, and a short window. Pulse ",
+   "ar": "اختر سلوكًا واحدًا تسجّله، ونتيجة واحدة، ونافذة قصيرة. وPulse "
   },
   "l10n_insights_screen_pre_filled_from_last_night_tap_ce81097c": {
    "en": "Pre-filled from last night. Tap to confirm or change.",
@@ -4166,8 +4166,8 @@
    "ar": "بدأت %1$s · نختبر %2$s"
   },
   "l10n_insights_screen_tag_a_few_sessions_of_the_97927401": {
-   "en": "Tag a few sessions of the same activity and NOOP will learn its personal recovery cost.",
-   "ar": "وسم بضع جلسات للنشاط نفسه وسيتعلّم NOOP تكلفتها الشخصية على التعافي."
+   "en": "Tag a few sessions of the same activity and Pulse will learn its personal recovery cost.",
+   "ar": "وسم بضع جلسات للنشاط نفسه وسيتعلّم Pulse تكلفتها الشخصية على التعافي."
   },
   "l10n_insights_screen_what_moves_you_ranked_patterns_in_7d89e628": {
    "en": "What moves you. Ranked patterns in your own data, and your dose-response.",
@@ -4350,8 +4350,8 @@
    "ar": "استيراد قراءات"
   },
   "l10n_lab_book_screen_it_s_a_notebook_not_a_45835e98": {
-   "en": "It\\'s a notebook, not a lab. NOOP lines up the numbers you enter. It doesn\\'t test, read, or judge them. Not medical advice.",
-   "ar": "إنه دفتر، لا مختبر. يرتّب NOOP الأرقام التي تدخلها. لا يجري تحاليل ولا يقرأها ولا يحكم عليها. وليس نصيحة طبية."
+   "en": "It\\'s a notebook, not a lab. Pulse lines up the numbers you enter. It doesn\\'t test, read, or judge them. Not medical advice.",
+   "ar": "إنه دفتر، لا مختبر. يرتّب Pulse الأرقام التي تدخلها. لا يجري تحاليل ولا يقرأها ولا يحكم عليها. وليس نصيحة طبية."
   },
   "l10n_lab_book_screen_keep_your_own_numbers_here_1ca6c8ed": {
    "en": "Keep your own numbers here",
@@ -4362,8 +4362,8 @@
    "ar": "دفتر المختبر"
   },
   "l10n_lab_book_screen_lab_book_is_a_private_notebook_d07380ca": {
-   "en": "Lab Book is a private notebook, not a medical service. NOOP stores and lines up the numbers ",
-   "ar": "دفتر المختبر دفتر خاص، لا خدمة طبية. يخزّن NOOP الأرقام ويرتّبها "
+   "en": "Lab Book is a private notebook, not a medical service. Pulse stores and lines up the numbers ",
+   "ar": "دفتر المختبر دفتر خاص، لا خدمة طبية. يخزّن Pulse الأرقام ويرتّبها "
   },
   "l10n_lab_book_screen_lining_them_up_c59ee297": {
    "en": "Lining them up…",
@@ -4394,8 +4394,8 @@
    "ar": "جارٍ قراءة دفترك…"
   },
   "l10n_lab_book_screen_these_are_your_own_numbers_shown_7667508d": {
-   "en": "These are your own numbers shown back to you. NOOP doesn\\'t decide whether any value is normal, high or low.",
-   "ar": "هذه أرقامك أنت معروضة عليك. ولا يقرر NOOP ما إذا كانت أي قيمة طبيعية أو مرتفعة أو منخفضة."
+   "en": "These are your own numbers shown back to you. Pulse doesn\\'t decide whether any value is normal, high or low.",
+   "ar": "هذه أرقامك أنت معروضة عليك. ولا يقرر Pulse ما إذا كانت أي قيمة طبيعية أو مرتفعة أو منخفضة."
   },
   "l10n_lab_book_screen_type_in_a_blood_pressure_reading_c276d418": {
    "en": "Type in a blood-pressure reading or a cholesterol value from your last appointment. ",
@@ -4621,9 +4621,9 @@
    "en": "No match. Add it as a custom marker below.",
    "ar": "لا تطابق. أضفه كمؤشر مخصص أدناه."
   },
-  "l10n_marker_editor_screen_noop_never_fills_this_in_it_7be9653b": {
-   "en": "NOOP never fills this in - it only shows back exactly what you type from your own report.",
-   "ar": "لا يملأ NOOP هذا أبدًا — بل يعرض بالضبط ما تدخله من تقريرك أنت."
+  "l10n_marker_editor_screen_pulse_never_fills_this_in_it_7be9653b": {
+   "en": "Pulse never fills this in - it only shows back exactly what you type from your own report.",
+   "ar": "لا يملأ Pulse هذا أبدًا — بل يعرض بالضبط ما تدخله من تقريرك أنت."
   },
   "l10n_marker_editor_screen_search_markers_103981e0": {
    "en": "Search markers",

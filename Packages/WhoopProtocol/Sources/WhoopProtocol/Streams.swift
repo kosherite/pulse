@@ -45,7 +45,7 @@ public enum StandardHRContact: String, Equatable, Codable, Sendable {
 /// what lets scoring read one copy while both stay on disk as each other's cross-check.
 ///
 /// The raw values are the DURABLE, cross-platform storage codes for `rrInterval.srcChannel` and must
-/// stay in lockstep with Kotlin `RrSourceChannel` — they are written to SQLite and cross the `.noopbak`
+/// stay in lockstep with Kotlin `RrSourceChannel` — they are written to SQLite and cross the `.pulsebak`
 /// boundary, so they are a wire format, not an implementation detail. Never renumber a case; only append.
 public enum RRSourceChannel: Int, Equatable, Codable, Sendable, CaseIterable {
     /// Oura 0x80 `green_ibi_quality_event` — the green-LED beat train, gated on the ring's own
@@ -315,7 +315,7 @@ public struct RespSample: Equatable, Codable {
 /// The 1 Hz gravity vector, plus the strap's OWN gravity-removed motion magnitude from the same record
 /// (`dynamic_acceleration@41`, f32 g).
 ///
-/// The two are different measurements of the same second and belong together. NOOP's motion spine
+/// The two are different measurements of the same second and belong together. Pulse's motion spine
 /// derives its stillness signal from `gravityDeltas` — the L2 distance between CONSECUTIVE 1 Hz gravity
 /// vectors — which is a proxy: it only sees motion that survives the strap's own 1 Hz downsample, and it
 /// measures orientation CHANGE, not acceleration. `dynAccel` is the strap's absolute gravity-removed
@@ -516,7 +516,7 @@ public enum V18AuxSlot: Int, CaseIterable, Sendable {
 /// Every remaining 5/MG v18 per-second field the decoder produces and the storage funnel used to DROP.
 ///
 /// `extractHistoricalStreams` names a dozen fields and silently discards the rest; the strap trims its
-/// banked history as soon as NOOP acks the offload, so a field not banked here is gone permanently and
+/// banked history as soon as Pulse acks the offload, so a field not banked here is gone permanently and
 /// can never be censused, correlated, or validated. These fifteen bytes-worth of slots are what was left
 /// on the floor. They are carried VERBATIM under the decoder's own names — no scaling, no renaming, no
 /// physiological claim — precisely so a later census decides what they are rather than this commit

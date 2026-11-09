@@ -1,6 +1,6 @@
-# NOOP — Cross-Platform Swift Library Reference
+# Pulse — Cross-Platform Swift Library Reference
 
-NOOP is a standalone, fully **offline** companion app for WHOOP straps (4.0 and
+Pulse is a standalone, fully **offline** companion app for WHOOP straps (4.0 and
 5.0). It pairs directly with the user's own strap over Bluetooth — **no WHOOP
 cloud or account** — stores everything on-device in SQLite, can
 import WHOOP CSV and Apple Health exports, and computes recovery, strain, HRV,
@@ -11,9 +11,9 @@ packages** that make that possible. They are designed to be vendored and reused
 independently of the reference macOS app.
 
 > **Not affiliated with WHOOP.** "WHOOP" is used nominatively only to identify
-> the hardware these packages interoperate with. NOOP contains no WHOOP
+> the hardware these packages interoperate with. Pulse contains no WHOOP
 > proprietary code, firmware, or assets and works only with the user's own
-> device and data. **NOOP is not a medical device.** Every derived metric (HR,
+> device and data. **Pulse is not a medical device.** Every derived metric (HR,
 > HRV, recovery, strain, sleep, SpO₂, temperature) is an approximation and is
 > not clinically validated.
 
@@ -274,7 +274,7 @@ busy timeout so two handles to the same file don't deadlock.
 | `sleepSession`, `dailyMetric` | cached derived metrics | `(deviceId, startTs)` / `(deviceId, day)` |
 | `journal`, `workout`, `appleDaily` | journal + workouts + Apple-Health daily | various |
 | `metricSeries` | generic long-format (EAV) metric store | `(deviceId, day, key)` |
-| `scoreInputProvenance` | input provider for a NOOP-computed score | `(deviceId, day, key)` |
+| `scoreInputProvenance` | input provider for a Pulse-computed score | `(deviceId, day, key)` |
 
 ### Key public API
 
@@ -335,7 +335,7 @@ public func pruneRaw(now:keepWindowSeconds:maxUnsyncedBytes:) async throws -> In
 import WhoopStore
 import WhoopProtocol
 
-let store = try await WhoopStore(path: "/path/to/noop.sqlite")
+let store = try await WhoopStore(path: "/path/to/pulse.sqlite")
 try await store.upsertDevice(id: "AA:BB:CC", mac: "AA:BB:CC", name: "My WHOOP")
 
 // Persist decoded streams (idempotent — safe to replay).
@@ -519,7 +519,7 @@ component views `RecoveryRing.swift`, `StrainGauge.swift`, `Hypnogram.swift`,
 ### Depend on it
 
 ```swift
-// Package.swift  (no internal NOOP deps — standalone)
+// Package.swift  (no internal Pulse deps — standalone)
 dependencies: [
     .package(path: "../StrandDesign"),
 ],
@@ -553,7 +553,7 @@ targets: [
 | `Hypnogram` | sleep-stage timeline |
 | `TrendChart`, `Sparkline`, `ChartHover` | line/area charts + hover read-out |
 | `YearHeatStrip` | year-at-a-glance heat strip |
-| `StrandCard`, `NoopCard`, `ChartCard`, `InsightCard` | card containers |
+| `StrandCard`, `PulseCard`, `ChartCard`, `InsightCard` | card containers |
 | `StatePill`, `ConnectionDot`, `SourceBadge` | status chips / source labels |
 | `SectionHeader`, `StatTile`, `ChartFooter`, `SegmentedPillControl` | layout primitives |
 

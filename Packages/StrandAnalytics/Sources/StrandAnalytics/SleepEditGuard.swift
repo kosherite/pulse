@@ -4,7 +4,7 @@ import Foundation
 /// night's bed time from 01:06 back to 23:00; the picker kept the calendar DATE, so the "corrected"
 /// bed landed on the COMING evening: a future-dated night whose staged window came back all-awake,
 /// and the display merge then blanked the whole Sleep tab. Three layered rules, shared by
-/// macOS/iOS (SleepTimeEditor) and Android (com.noop.analytics.SleepEditGuard, byte-for-byte twin),
+/// macOS/iOS (SleepTimeEditor) and Android (com.pulse.analytics.SleepEditGuard, byte-for-byte twin),
 /// all pure and unit-tested:
 ///   1. `autoCorrectedBed`: a time-only roll that lands the bed in the future, or at/after the
 ///      night's wake, almost always means the PREVIOUS evening; auto-decrement the date.

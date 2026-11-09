@@ -11,8 +11,8 @@ import StrandImport
 /// Settings → Backup & restore → "Export CSV…": serialize the merged WHOOP history (imported wins
 /// per day — exactly what the dashboards show; Apple Health rows are deliberately EXCLUDED so a
 /// re-import can't mis-attribute them as WHOOP data) into WHOOP's 4-CSV zip via
-/// StrandImport.WhoopCsvExporter. The zip re-imports into NOOP on Mac (Data Sources → WHOOP Export)
-/// and on Android. On-device computed rows are marked "noop (APPROXIMATE)" in the Source column both
+/// StrandImport.WhoopCsvExporter. The zip re-imports into Pulse on Mac (Data Sources → WHOOP Export)
+/// and on Android. On-device computed rows are marked "pulse (APPROXIMATE)" in the Source column both
 /// importers ignore; the .sqlite backup remains the lossless restore path.
 ///
 /// #458 (the Android twin's bug, mirror-image here): every read goes through the repository's
@@ -98,7 +98,7 @@ enum CsvExport {
                 for j in try await store.journalEntries(deviceId: id, from: fromDay, to: toDay)
                 where seenJournal.insert("\(j.day)|\(j.question)").inserted { journal.append(j) }
             }
-            // Sidecar: every metricSeries row under EVERY NOOP source id, full fidelity (rows keep
+            // Sidecar: every metricSeries row under EVERY Pulse source id, full fidelity (rows keep
             // their own deviceId, so union entries stay distinguishable on re-import).
             var sidecar: [String: [MetricPoint]] = [:]
             for id in importedIds + computedIds {
@@ -130,7 +130,7 @@ enum CsvExport {
                 // real WHOOP import always wins and the strap-only user still exports a full history.
                 var byDay: [String: DailyMetric] = [:]
                 var sourceByDay: [String: String] = [:]
-                for d in computed { byDay[d.day] = d; sourceByDay[d.day] = "noop (APPROXIMATE)" }
+                for d in computed { byDay[d.day] = d; sourceByDay[d.day] = "pulse (APPROXIMATE)" }
                 for d in imported { byDay[d.day] = d; sourceByDay[d.day] = "import" }
                 let days = byDay.values.sorted { $0.day < $1.day }
 
@@ -147,12 +147,12 @@ enum CsvExport {
                 // #715: keep EVERY session, naps and main nights each export as their own sleeps.csv row.
                 // Imported still wins per end-day. Shared, unit-tested grouping (WhoopStore.SleepMerge) replaces
                 // the per-day dict that silently dropped a second same-day session.
-                for s in compSleep { sleepSource[s.startTs] = "noop (APPROXIMATE)" }
+                for s in compSleep { sleepSource[s.startTs] = "pulse (APPROXIMATE)" }
                 for s in impSleep { sleepSource[s.startTs] = "import" }
                 let sleeps = SleepMerge.merge(imported: impSleep, computed: compSleep, endDay: endDay)
 
                 // Workouts: imported WHOOP ∪ on-device detected. Apple-Health workouts are intentionally
-                // omitted (read only the two NOOP sources), matching the cycles/sleep exclusion.
+                // omitted (read only the two Pulse sources), matching the cycles/sleep exclusion.
                 // Dedup by (startTs, sport), imported (deviceId) first so it wins. The same session can
                 // exist under both ids (e.g. a reimported export + BLE re-detection), which double-counted
                 // it in the CSV and inflated totals on reimport. (PR #97 review, tigercraft4.)
@@ -173,13 +173,13 @@ enum CsvExport {
                     ("workouts.csv",
                      Data(WhoopCsvExporter.workoutsCSV(workouts, sourceLabel: { workoutSource($0, computedIds: computedIds) }).utf8)),
                     ("journal_entries.csv", Data(WhoopCsvExporter.journalCSV(journal).utf8)),
-                    ("noop_metric_series.json", WhoopCsvExporter.metricSeriesJSON(sidecar)),
+                    ("pulse_metric_series.json", WhoopCsvExporter.metricSeriesJSON(sidecar)),
                 ]
                 // Deflate to a temp path off main; the cheap atomic swap into the user's chosen destination
                 // stays on main (it needs the panel/picker result).
-                // Inside NOOP's own scratch folder, which also gives this one a sweep: staged flat
-                // under a bare UUID it matched no `noop-` prefix, so an interrupted export leaked it.
-                let out = NoopScratch.file(UUID().uuidString + ".zip")
+                // Inside Pulse's own scratch folder, which also gives this one a sweep: staged flat
+                // under a bare UUID it matched no `pulse-` prefix, so an interrupted export leaked it.
+                let out = PulseScratch.file(UUID().uuidString + ".zip")
                 try WhoopCsvExporter.writeArchive(entries: entries, to: out)
                 return out
             }.value
@@ -209,7 +209,7 @@ enum CsvExport {
             // iOS: move the staged zip to its user-facing name, then hand it to the system document picker
             // so the user can save it into Files / iCloud Drive (DataBackup.runExport precedent). Clear any
             // stale staged copy first.
-            let staged = NoopScratch.file(name)
+            let staged = PulseScratch.file(name)
             if FileManager.default.fileExists(atPath: staged.path) {
                 try FileManager.default.removeItem(at: staged)
             }
@@ -225,11 +225,11 @@ enum CsvExport {
     /// Classify a workout row for the parser-ignored Source column. The strings match how each row
     /// is written on this Mac: WhoopImporter uses source "whoop"; AppModel manual logging uses
     /// "manual"; IntelligenceEngine's on-device detected workouts use the computed source id with
-    /// sport "detected". #458: a detected row's source may be EITHER computed union id (active-noop
-    /// or canonical-noop), so membership replaces the single-id compare.
+    /// sport "detected". #458: a detected row's source may be EITHER computed union id (active-pulse
+    /// or canonical-pulse), so membership replaces the single-id compare.
     private static func workoutSource(_ w: WorkoutRow, computedIds: [String]) -> String {
         if w.source == "manual" { return "manual" }
-        if computedIds.contains(w.source) || w.sport == "detected" { return "noop (APPROXIMATE)" }
+        if computedIds.contains(w.source) || w.sport == "detected" { return "pulse (APPROXIMATE)" }
         return "import"
     }
 
@@ -237,6 +237,6 @@ enum CsvExport {
     // called from `run`, which already is.
     @MainActor
     private static func defaultName() -> String {
-        "noop-export-\(Repository.localDayKey(Date())).zip"
+        "pulse-export-\(Repository.localDayKey(Date())).zip"
     }
 }

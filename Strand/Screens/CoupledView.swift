@@ -8,7 +8,7 @@ import Foundation
 //
 // An optional, default-OFF day view that reads like the classic coupled home: one screen, three numbers,
 // Recovery % / Day Strain on 0–21 / Sleep, for users who came across from another band and want the old
-// glance back. NOOP's Today stays the default and is untouched.
+// glance back. Pulse's Today stays the default and is untouched.
 //
 // DISPLAY-ONLY, like the #268 Effort-scale toggle. This screen invents no score and stores nothing: it
 // reads the SAME values Today already computes (recovery / Rest composite / Effort strain / readiness) and
@@ -29,7 +29,7 @@ struct CoupledView: View {
     @EnvironmentObject var repo: Repository
 
     /// "Card transparency" (0–100, default 100): fades the coupled glance cards in lockstep with the
-    /// frosted cards; content stays readable. Mirrors Kotlin `NoopPrefs.cardOpacityPercent`.
+    /// frosted cards; content stays readable. Mirrors Kotlin `PulsePrefs.cardOpacityPercent`.
     @AppStorage(CardAppearancePrefs.opacityKey) private var cardOpacityPercent = CardAppearancePrefs.defaultPercent
     private var cardOpacity: Double { max(0, min(1, Double(cardOpacityPercent) / 100)) }
 
@@ -88,7 +88,7 @@ struct CoupledView: View {
     /// dimmed ring + the "Last night · <date>" stamp so an old number is never passed off as new (#543/#779).
     private var isCarryingRecovery: Bool { day?.recovery == nil && carriedRecoveryDay?.recovery != nil }
 
-    /// Effort strain on NOOP's 0–100 axis for the day (stored row; no live recompute here, this is a
+    /// Effort strain on Pulse's 0–100 axis for the day (stored row; no live recompute here, this is a
     /// glance screen, not the primary Today hero). nil when the day has no scored Effort.
     private var strain100: Double? { day?.strain }
 
@@ -134,17 +134,17 @@ struct CoupledView: View {
                        topBackground: liquidScaffoldSky()) {
             ViewThatFits(in: .horizontal) {
                 // Regular width (macOS / iPad): hero left, strain + sleep stacked right in a 2-column grid.
-                HStack(alignment: .top, spacing: NoopMetrics.gap) {
+                HStack(alignment: .top, spacing: PulseMetrics.gap) {
                     heroCard
                         .frame(maxWidth: .infinity)
-                    VStack(spacing: NoopMetrics.gap) {
+                    VStack(spacing: PulseMetrics.gap) {
                         strainCard
                         sleepCard
                     }
                     .frame(maxWidth: .infinity)
                 }
                 // Compact (iPhone): the three cards stack full-width.
-                VStack(spacing: NoopMetrics.gap) {
+                VStack(spacing: PulseMetrics.gap) {
                     heroCard
                     strainCard
                     sleepCard
@@ -503,7 +503,7 @@ struct CoupledView: View {
 
     // The brief quotes the footer with the brand word, but the hard legal / anonymity rule ("the word
     // never appears in a shipped UI string") wins over the illustrative copy: this keeps the exact intent
-    // (a coupled read of NOOP's OWN scores, same data, different lens) without the branding word. The
+    // (a coupled read of Pulse's OWN scores, same data, different lens) without the branding word. The
     // matching Android caption is byte-identical.
     private var footerCaption: some View {
         Text("A classic one-glance read of Pulse's own scores. Same data, different lens.")
@@ -543,12 +543,12 @@ struct CoupledView: View {
     private var chargeBreakdownSheet: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+                VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                     // One chargeBreakdown() call per sheet body eval: drivers + confidence share the same
                     // baseline folds (see chargeBreakdown's PERF note).
                     let breakdown = chargeBreakdown()
                     if let breakdown, !breakdown.drivers.isEmpty {
-                        NoopCard(padding: 18, tint: StrandPalette.chargeColor) {
+                        PulseCard(padding: 18, tint: StrandPalette.chargeColor) {
                             ChargeBreakdownSection(
                                 drivers: breakdown.drivers,
                                 confidence: breakdown.confidence,
@@ -558,8 +558,8 @@ struct CoupledView: View {
                         if let banked = calibrationNights {
                             calibrationCard(banked: banked)
                         } else {
-                            NoopCard(padding: 18, tint: StrandPalette.chargeColor) {
-                                VStack(alignment: .leading, spacing: NoopMetrics.space2) {
+                            PulseCard(padding: 18, tint: StrandPalette.chargeColor) {
+                                VStack(alignment: .leading, spacing: PulseMetrics.space2) {
                                     Text("No Charge breakdown yet")
                                         .font(StrandFont.headline)
                                         .foregroundStyle(StrandPalette.textPrimary)
@@ -593,13 +593,13 @@ struct CoupledView: View {
                                 .foregroundStyle(StrandPalette.textTertiary)
                         }
                         .padding(14)
-                        .background(NoopPanelSurface(cornerRadius: 14))
+                        .background(PulsePanelSurface(cornerRadius: 14))
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("How Charge is calculated. The method behind the score.")
                 }
-                .padding(NoopMetrics.screenPadding)
+                .padding(PulseMetrics.screenPadding)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             #if os(iOS)
@@ -634,7 +634,7 @@ struct CoupledView: View {
         let countdown = ChargeBreakdownFormat.calibrationCountdown(nightsRemaining: remaining)
         let unlock = ChargeBreakdownFormat.calibrationUnlockCopy(scoreName: String(localized: "Charge"))
         let progress = ChargeBreakdownFormat.calibrationProgress(banked: banked, seed: Baselines.minNightsSeed)
-        return NoopCard(padding: 14, tint: StrandPalette.chargeColor) {
+        return PulseCard(padding: 14, tint: StrandPalette.chargeColor) {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "gauge.with.dots.needle.bottom.50percent")
                     .font(.system(size: 16, weight: .semibold))
@@ -680,7 +680,7 @@ struct CoupledView: View {
         content()
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(NoopPanelSurface(cornerRadius: 24, surfaceOpacity: cardOpacity))
+            .background(PulsePanelSurface(cornerRadius: 24, surfaceOpacity: cardOpacity))
     }
 
     private func clockString(_ ts: Int) -> String {

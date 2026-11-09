@@ -14,7 +14,7 @@ import StrandAnalytics   // WorkoutsTrace + TestCentre: the GPS-fix line for the
 // off any platform location stack:
 //
 //   • `RouteMath`   — pure Haversine distance, pace, and the Google "Encoded Polyline Algorithm Format"
-//                     (precision 5). A byte-for-byte Swift port of Android `com.noop.analytics.RouteMath`
+//                     (precision 5). A byte-for-byte Swift port of Android `com.pulse.analytics.RouteMath`
 //                     so a route encoded on one platform decodes identically on the other (the polyline
 //                     round-trips through the same local stores / exports as every other workout value).
 //   • `TrackFilter` — pure, stateful fix gate: drops low-accuracy fixes and physically-impossible jumps,
@@ -256,7 +256,7 @@ struct WorkoutRoute: Equatable, Codable {
 enum ActiveRouteStore {
 
     /// Single `UserDefaults` key holding the in-flight `[WorkoutRoutePoint]`. Namespaced like `moments`.
-    static let defaultsKey = "noop.activeWorkoutRoute"
+    static let defaultsKey = "pulse.activeWorkoutRoute"
 
     /// Points captured between writes. At `distanceFilter` 5 m that risks roughly 125 m of route to a
     /// kill, for one rewrite per 25 fixes instead of one per fix.
@@ -300,7 +300,7 @@ enum ActiveRouteStore {
 enum RoutePointStore {
 
     /// `UserDefaults` key for one workout's points, suffixed with the same natural key `RouteStore` uses.
-    static func defaultsKey(for mapKey: String) -> String { "noop.workoutRoutePoints." + mapKey }
+    static func defaultsKey(for mapKey: String) -> String { "pulse.workoutRoutePoints." + mapKey }
 
     /// Encode / decode are pure so the round-trip is unit-testable. An empty array reads back as nil, so
     /// "recorded no points" and "saved before points existed" are the same absent answer to a caller.
@@ -343,7 +343,7 @@ enum RoutePointStore {
 enum RouteStore {
 
     /// Single `UserDefaults` key holding a JSON `[key: WorkoutRoute]` map. Namespaced like `moments`.
-    static let defaultsKey = "noop.workoutRoutes"
+    static let defaultsKey = "pulse.workoutRoutes"
 
     /// Cap on stored routes — newest kept, oldest evicted (keys sort by the leading startTs). A route is
     /// a handful of bytes, but this keeps the map from growing unboundedly across an install's lifetime.

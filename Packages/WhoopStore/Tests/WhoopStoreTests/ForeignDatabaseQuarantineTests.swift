@@ -10,7 +10,7 @@ final class ForeignDatabaseQuarantineTests: XCTestCase {
 
     private func tempPath() -> String {
         FileManager.default.temporaryDirectory
-            .appendingPathComponent("noop-quarantine-\(UUID().uuidString).sqlite").path
+            .appendingPathComponent("pulse-quarantine-\(UUID().uuidString).sqlite").path
     }
 
     private func tableNames(at path: String) throws -> Set<String> {

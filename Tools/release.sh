@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
-# release.sh — cut a NOOP release on BOTH forges.
+# release.sh — cut a Pulse release on BOTH forges.
 # Run from your Mac at release time, after the anonymized binaries are built.
 #
 #   Tools/release.sh <version> <asset> [<asset> ...] [-- "release notes"]
 #   e.g. Tools/release.sh 4.7.0 \
-#          dist/NOOP-v4.7.0-macos.zip dist/NOOP-v4.7.0.ipa dist/NOOP-v4.7.0.apk \
+#          dist/Pulse-v4.7.0-macos.zip dist/Pulse-v4.7.0.ipa dist/Pulse-v4.7.0.apk \
 #          -- "Bug fixes and the new Lab Book."
 #
-# GitHub is CANONICAL — the release is created there FIRST (ryanbr/noop, marked
+# GitHub is CANONICAL — the release is created there FIRST (kosherite/pulse, marked
 # --latest). The self-hosted Forgejo is published SECOND as a mirror by handing
 # the same args straight to forgejo-release.sh. A Forgejo failure is tolerated:
 # it warns but does NOT abort or fail the run, because the GitHub release already
@@ -18,7 +18,7 @@
 # Idempotent: re-running clobbers the release's assets (and edits the title/notes)
 # rather than erroring on an existing tag.
 #
-# GitHub token from ~/.config/noop/gh_token. Forge token handled by forgejo-release.sh.
+# GitHub token from ~/.config/pulse/gh_token. Forge token handled by forgejo-release.sh.
 # No secret ever appears on a command line.
 # ─────────────────────────────────────────────────────────────────────────────
 set -uo pipefail
@@ -26,11 +26,11 @@ set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
 # canonical GitHub mirror coordinates (override via env if ever needed)
-GH_REPO="${GH_REPO:-ryanbr/noop}"
+GH_REPO="${GH_REPO:-kosherite/pulse}"
 
 VER="${1:?usage: release.sh <version> <asset...> [-- notes]}"; shift
 TAG="v$VER"
-NOTES="NOOP $TAG — see CHANGELOG.md."
+NOTES="Pulse $TAG — see CHANGELOG.md."
 ASSETS=()
 # split args into assets + optional "-- notes".
 while [ $# -gt 0 ]; do
@@ -55,16 +55,16 @@ if [[ ! "$NOTES" =~ $NOTES_HANDLE_RE ]]; then
 fi
 
 # ── iOS asset: ONE canonical name ────────────────────────────────────────────
-# The iOS .ipa ships under a SINGLE name: NOOP-v<V>-ios.ipa, which every doc
+# The iOS .ipa ships under a SINGLE name: Pulse-v<V>-ios.ipa, which every doc
 # (README, docs/IOS.md, the wiki) and the AltStore source point at. We used to
-# upload BOTH NOOP-v<V>.ipa and a -ios alias for backward-compat with a v5.2.5
+# upload BOTH Pulse-v<V>.ipa and a -ios alias for backward-compat with a v5.2.5
 # cached-source 404, but that transition is long done, and two byte-identical iOS
 # files only confused users about which to install. So: rename any plain
-# NOOP-v*.ipa to its -ios name and ship exactly one iOS file.
+# Pulse-v*.ipa to its -ios name and ship exactly one iOS file.
 NEW_ASSETS=()
 for f in ${ASSETS[@]+"${ASSETS[@]}"}; do
   case "$f" in
-    *NOOP-v*.ipa)
+    *Pulse-v*.ipa)
       if [ -f "$f" ] && [ "${f%-ios.ipa}" = "$f" ]; then   # a plain .ipa -> ship ONLY as -ios
         ios_f="${f%.ipa}-ios.ipa"
         cp -f "$f" "$ios_f" 2>/dev/null && NEW_ASSETS+=("$ios_f") \
@@ -81,7 +81,7 @@ ASSETS=("${NEW_ASSETS[@]}")
 FORGE_ARGS=(${ASSETS[@]+"${ASSETS[@]}"} -- "$NOTES")
 
 # ── 1. GitHub (canonical) ────────────────────────────────────────────────────
-GH_TOKEN_FILE="$HOME/.config/noop/gh_token"
+GH_TOKEN_FILE="$HOME/.config/pulse/gh_token"
 [ -f "$GH_TOKEN_FILE" ] || { echo "missing $GH_TOKEN_FILE" >&2; exit 1; }
 command -v gh >/dev/null 2>&1 || { echo "gh CLI not found on PATH" >&2; exit 1; }
 
@@ -137,7 +137,7 @@ if GH_TOKEN="$(cat "$GH_TOKEN_FILE")" \
   echo "  release exists — refreshing notes + clobbering assets"
   GH_TOKEN="$(cat "$GH_TOKEN_FILE")" \
     gh release edit "$TAG" --repo "$GH_REPO" \
-      --title "NOOP $TAG" --notes "$NOTES" --latest >/dev/null \
+      --title "Pulse $TAG" --notes "$NOTES" --latest >/dev/null \
     || { echo "  ⚠ gh release edit failed" >&2; GH_OK=0; }
   if [ "${#GH_ASSETS[@]}" -gt 0 ]; then
     GH_TOKEN="$(cat "$GH_TOKEN_FILE")" \
@@ -147,7 +147,7 @@ if GH_TOKEN="$(cat "$GH_TOKEN_FILE")" \
 else
   GH_TOKEN="$(cat "$GH_TOKEN_FILE")" \
     gh release create "$TAG" ${GH_ASSETS[@]+"${GH_ASSETS[@]}"} --repo "$GH_REPO" \
-      --title "NOOP $TAG" --notes "$NOTES" --latest \
+      --title "Pulse $TAG" --notes "$NOTES" --latest \
     || { echo "  ⚠ gh release create failed" >&2; GH_OK=0; }
 fi
 [ "$GH_OK" = 1 ] \
@@ -178,8 +178,8 @@ if [ "$GH_OK" = 1 ]; then
   IPA_ASSET=""; ZIP_ASSET=""
   for f in ${ASSETS[@]+"${ASSETS[@]}"}; do
     case "$f" in
-      *NOOP-v*-ios.ipa|*NOOP-v*.ipa) [ -z "$IPA_ASSET" ] && [ -f "$f" ] && IPA_ASSET="$f" ;;
-      *NOOP-v*-macos.zip|*NOOP-v*macos*.zip) [ -f "$f" ] && ZIP_ASSET="$f" ;;
+      *Pulse-v*-ios.ipa|*Pulse-v*.ipa) [ -z "$IPA_ASSET" ] && [ -f "$f" ] && IPA_ASSET="$f" ;;
+      *Pulse-v*-macos.zip|*Pulse-v*macos*.zip) [ -f "$f" ] && ZIP_ASSET="$f" ;;
     esac
   done
   if [ -n "$IPA_ASSET" ] && [ -x "$HERE/update-altstore-source.sh" ]; then

@@ -8,9 +8,9 @@ import ZIPFoundation
 /// (shared via the iOS Files app), a `.zip` of it, or the bare `<user_id>.db`. The
 /// health metrics live in `DataBase/<user_id>/de/<user_id>.db` as one row per sample
 /// with a JSON `value` column; this importer opens that file **read-only** and folds
-/// the daily-rollup tables and the per-session `sleep` table into NOOP's shapes.
+/// the daily-rollup tables and the per-session `sleep` table into Pulse's shapes.
 ///
-/// This is **parse-only**: it never touches NOOP's own store, only the foreign file
+/// This is **parse-only**: it never touches Pulse's own store, only the foreign file
 /// the user already owns. No Bluetooth, no Xiaomi cloud, no account.
 ///
 /// The table/field mapping and sleep-stage reconstruction are **re-derived** from the
@@ -20,7 +20,7 @@ public struct XiaomiBandImporter {
 
     public init() {}
 
-    // Day-rollup tables, keyed by NOOP day. (`goal_day` is intentionally skipped —
+    // Day-rollup tables, keyed by Pulse day. (`goal_day` is intentionally skipped —
     // it carries targets, not measurements.)
     static let dayTables = [
         "steps_day", "calories_day", "heart_rate_day", "sleep_day",
@@ -71,7 +71,7 @@ public struct XiaomiBandImporter {
 
         // Otherwise treat it as a zip of the sandbox and extract to a temp dir.
         // Inside the app's own bundle-named scratch folder; see the note in AppleHealthImporter and #2446.
-        let scratch = fm.temporaryDirectory.appendingPathComponent((Bundle.main.bundleIdentifier ?? "com.noopapp.noop") + ".scratch",
+        let scratch = fm.temporaryDirectory.appendingPathComponent((Bundle.main.bundleIdentifier ?? "com.pulseapp.pulse") + ".scratch",
                                     isDirectory: true)
         try? fm.createDirectory(at: scratch, withIntermediateDirectories: true)
         let tempDir = scratch.appendingPathComponent("xiaomi-\(UUID().uuidString)")

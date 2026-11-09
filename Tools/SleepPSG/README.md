@@ -1,6 +1,6 @@
 # SleepPSG — scoring `SleepStagerV2` against polysomnography
 
-`Tools/SleepBench` replays NOOP's sleep stagers against the references a wearer's own database happens to
+`Tools/SleepBench` replays Pulse's sleep stagers against the references a wearer's own database happens to
 carry: their manual restages, the strap's band `sleep_state`, Apple Health. Every one of those is either the
 recipe's own output handed back to it, or another vendor's black box. None of them is truth, and the sleep
 work has repeatedly had to say so in its own commit messages.
@@ -10,7 +10,7 @@ This tool supplies the missing reference. It replays the **shipped** `SleepStage
 scores it epoch-for-epoch against those hypnograms.
 
 Everything here is read-only. The dataset is never committed, never modified, and is always a command-line
-argument. No NOOP database is opened and no wearer's health data is involved at any point.
+argument. No Pulse database is opened and no wearer's health data is involved at any point.
 
 ---
 
@@ -134,7 +134,7 @@ truth also carries is physiology, one only the prediction carries is an artefact
 ### 5. Is REM detection physiology, or is it the clock?
 
 REM rises through the night in every population, so a model given nothing but "how far into the night is it"
-already scores respectably. If NOOP's REM output were mostly that, the honest description of the feature
+already scores respectably. If Pulse's REM output were mostly that, the honest description of the feature
 would change.
 
 Three models — clock features alone, physiology features alone, both — fit **leave-one-SUBJECT-out**.
@@ -234,7 +234,7 @@ F1 0.515" is exactly this harness's measured REM **precision** (0.515), against 
   not a WHOOP gravity decode. The absolute scale differs — which is precisely the thing `SleepStagerV2` was
   built not to depend on, since every motion threshold is a multiple of the night's own median per-second
   jerk. A benchmark on foreign hardware is a test of that claim, not a violation of it.
-- **Staging only.** The session window handed to the stager is the labelled span. NOOP's own session
+- **Staging only.** The session window handed to the stager is the labelled span. Pulse's own session
   detection is not exercised, and nothing here says anything about it.
 - **n = 31 subjects**, in a sleep-lab setting, wearing a device on the wrist alongside PSG leads. That is
-  more independent subjects than any other reference NOOP has, and it is still 31 people.
+  more independent subjects than any other reference Pulse has, and it is still 31 people.

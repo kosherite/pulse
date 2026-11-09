@@ -9,7 +9,7 @@ import WhoopStore
 // run from them. It lives in the Effort colour world, like Workouts, because a finished session
 // lands in the `workout` table beside every other workout.
 //
-// EFFORT IS NEVER MODIFIED HERE (load-bearing). NOOP's Effort is computed from heart rate alone
+// EFFORT IS NEVER MODIFIED HERE (load-bearing). Pulse's Effort is computed from heart rate alone
 // (Karvonen %HRR → Edwards TRIMP, `StrainScorer`), and there is no validated public path from typed
 // sets/reps/weight to a cardiovascular-strain equivalent — WHOOP's own muscular load runs
 // velocity-based algorithms over strap accelerometer/gyroscope data under an unpublished model.
@@ -44,7 +44,7 @@ struct LiftLogView: View {
             subtitle: "Build a program once, then tap through it at the gym. Kept on \(Platform.deviceNounPhrase).",
             onRefresh: { await load() }
         ) {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                 headerCard
                 programsSection
                 weekSection
@@ -70,9 +70,9 @@ struct LiftLogView: View {
     // MARK: - Header
 
     private var headerCard: some View {
-        NoopCard(tint: StrandPalette.effortColor) {
-            VStack(alignment: .leading, spacing: NoopMetrics.gap) {
-                HStack(spacing: NoopMetrics.rowSpacing) {
+        PulseCard(tint: StrandPalette.effortColor) {
+            VStack(alignment: .leading, spacing: PulseMetrics.gap) {
+                HStack(spacing: PulseMetrics.rowSpacing) {
                     Image(systemName: "dumbbell.fill")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(StrandPalette.effortColor)
@@ -101,7 +101,7 @@ struct LiftLogView: View {
     // MARK: - Programs
 
     private var programsSection: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Programs", overline: "Saved")
 
             if !loaded {
@@ -114,13 +114,13 @@ struct LiftLogView: View {
                 }
             }
 
-            HStack(spacing: NoopMetrics.rowSpacing) {
+            HStack(spacing: PulseMetrics.rowSpacing) {
                 Button {
                     editing = ProgramEditTarget(id: "new", program: nil)
                 } label: {
                     Label("New program", systemImage: "plus")
                 }
-                .buttonStyle(NoopButtonStyle(.secondary))
+                .buttonStyle(PulseButtonStyle(.secondary))
 
                 // Filling a dozen exercise lines by hand on a phone is the most tedious thing in the
                 // feature; a spreadsheet on a computer does it in a couple of minutes.
@@ -129,13 +129,13 @@ struct LiftLogView: View {
                 } label: {
                     Label("Import", systemImage: "tablecells")
                 }
-                .buttonStyle(NoopButtonStyle(.secondary))
+                .buttonStyle(PulseButtonStyle(.secondary))
             }
         }
     }
 
     private var emptyState: some View {
-        NoopCard {
+        PulseCard {
             VStack(alignment: .leading, spacing: 8) {
                 Text("No programs yet")
                     .font(StrandFont.headline)
@@ -149,8 +149,8 @@ struct LiftLogView: View {
     }
 
     private func programRow(_ program: LiftProgramRow) -> some View {
-        NoopCard {
-            HStack(spacing: NoopMetrics.gap) {
+        PulseCard {
+            HStack(spacing: PulseMetrics.gap) {
                 Button {
                     editing = ProgramEditTarget(id: program.id, program: program)
                 } label: {
@@ -174,7 +174,7 @@ struct LiftLogView: View {
                 .buttonStyle(.plain)
 
                 Button(session.isActive ? "Running" : "Start") { Task { await start(program) } }
-                    .buttonStyle(.noopPrimary)
+                    .buttonStyle(.pulsePrimary)
                     .frame(maxWidth: 110)
                     .accessibilityLabel("Start this program")
             }
@@ -222,22 +222,22 @@ struct LiftLogView: View {
 
     private var weekSection: some View {
         let ordered = LiftMuscle.ordered.filter { (weekCounts[$0] ?? 0) > 0 }
-        return VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        return VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Sets per muscle", overline: "Last 7 days · estimated")
             if ordered.isEmpty {
-                NoopCard {
+                PulseCard {
                     Text("Once you've logged a session, this shows how many sets each muscle got this week, against what the research associates with growth.")
                         .font(StrandFont.footnote)
                         .foregroundStyle(StrandPalette.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             } else {
-                NoopCard {
-                    VStack(alignment: .leading, spacing: NoopMetrics.rowSpacing) {
+                PulseCard {
+                    VStack(alignment: .leading, spacing: PulseMetrics.rowSpacing) {
                         ForEach(ordered, id: \.self) { muscle in
                             muscleBar(muscle, sets: weekCounts[muscle] ?? 0)
                         }
-                        // The band is named and sourced, never phrased as a target NOOP sets for
+                        // The band is named and sourced, never phrased as a target Pulse sets for
                         // anyone: this is not a medical device and does not prescribe.
                         Text("Counted from the muscles you assigned each exercise: direct sets count once, indirect ones half. The tick is about 4 sets a week — below that, studies across GROUPS of people stop reliably detecting growth. It is a research reference, not a target for you, and above it gains continue with strongly diminishing returns and no clear ceiling, so the bar has no \"full\".")
                             .font(StrandFont.footnote)
@@ -314,10 +314,10 @@ struct LiftLogView: View {
     // MARK: - History
 
     private var historySection: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Sessions", overline: "Recent")
             if history.isEmpty {
-                NoopCard {
+                PulseCard {
                     Text("Finished sessions land here, with every set you logged.")
                         .font(StrandFont.footnote)
                         .foregroundStyle(StrandPalette.textSecondary)
@@ -336,8 +336,8 @@ struct LiftLogView: View {
     }
 
     private func historyRow(_ session: LiftSessionRow) -> some View {
-        NoopCard {
-            HStack(spacing: NoopMetrics.gap) {
+        PulseCard {
+            HStack(spacing: PulseMetrics.gap) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(session.programName ?? String(localized: "Session"))
                         .font(StrandFont.headline)

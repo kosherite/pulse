@@ -134,7 +134,7 @@ def build_puffin_command(cmd: int, seq: int = 0, payload: bytes = b"\x00",
 # WHOOP 5 / MG (puffin): the maverick haptic, opcode 0x13 = RUN_HAPTIC_PATTERN_MAVERICK (NOT 79 — a
 # real-MG capture showed the strap rejecting RUN_HAPTICS_PATTERN=79 with COMMAND_RESPONSE result=0x03).
 # Body = [0x01, effects(u8…), loopControl u16 LE, overallLoop] — here the "notify" preset (effects
-# 47,152). This is the exact command the official app sends, matched byte-for-byte (noop issue #48),
+# 47,152). This is the exact command the official app sends, matched byte-for-byte (pulse issue #48),
 # and shipped in Strand's BLEManager.send(). On real hardware the strap acknowledges with
 # COMMAND_RESPONSE(type 36, cmd 0x13).
 MAVERICK_HAPTIC_CMD = 0x13
@@ -266,7 +266,7 @@ WHOOP5_END_DATA_LEN = 8
 # Accepted frame floor per family, mirroring `FrameLimits` in the Swift WhoopProtocol package
 # (whoop4MinimumFrameBytes = 11, whoop5MinimumFrameBytes = 13). The 4.0 value is structural for its
 # type/seq/cmd record. The 5.0 value is empirical: a 12-byte empty-payload envelope is internally
-# consistent (and accepted by Goose's v5Payload), but NOOP requires at least the inner type byte.
+# consistent (and accepted by Goose's v5Payload), but Pulse requires at least the inner type byte.
 # Captured fixtures exist at 20, 24 and 32 bytes, not at the 12-byte boundary, so they do not prove
 # the configured floor.
 #

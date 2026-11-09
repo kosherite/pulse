@@ -110,7 +110,7 @@ public struct FrameRejectTally: Equatable, Sendable {
     /// record that a link was resyncing at all would be a counter nothing reads. Monotonic total;
     /// only the growth since the last fold is added, so calling it per notification is idempotent.
     ///
-    /// Kotlin twin: `FrameRejectTally.absorbReassemblerHeaderDrops`. It lives under `com/noop/ble`,
+    /// Kotlin twin: `FrameRejectTally.absorbReassemblerHeaderDrops`. It lives under `com/pulse/ble`,
     /// outside the ledger's Kotlin inventory roots, so the pair is declared here rather than inferred.
     public mutating func absorbReassemblerHeaderDrops(_ monotonicTotal: Int) {
         guard monotonicTotal > absorbedReassemblerHeaderDrops else { return }

@@ -130,7 +130,7 @@ enum TestBundleAssembler {
     ///
     /// WHY NOT PROPORTIONAL-TO-SIZE (the original rule): it hands the budget to the BULKIEST stream, and for
     /// these sidecars bulk is close to inversely correlated with diagnostic value. Measured on a real export
-    /// (`noop-master-iOS-v9.3.1-260809-0716.zip`, six trimmable sidecars over a 20,863,648-byte budget):
+    /// (`pulse-master-iOS-v9.3.1-260809-0716.zip`, six trimmable sidecars over a 20,863,648-byte budget):
     /// `oura-spo2.jsonl` — a per-sample dump whose values are also in the SQLite the same bundle ships —
     /// took **53.9 %**, while `oura-raw.jsonl` got **1.9 %** (388,064 bytes: 8 min 43 s of an 8.4 h night).
     /// The raw sidecar is the UNDECODED wire bytes, the one file in the bundle from which a protocol fact can
@@ -519,6 +519,6 @@ enum TestBundleAssembler {
     /// automatically. Lives in the app's caches dir so it is never iCloud-synced.
     static func crashLogURL() -> URL? {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
-            .appendingPathComponent("noop-last-crash.txt")
+            .appendingPathComponent("pulse-last-crash.txt")
     }
 }

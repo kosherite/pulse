@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Split out of `BLEManager` because it is the whole of the decision and none of the CoreBluetooth: BLE
 /// behaviour cannot be tested in CI, but *this* can, and it is the part that silently files rows under the
-/// wrong device when it is wrong. The Kotlin twin is `com.noop.ble.SourceIdentity`.
+/// wrong device when it is wrong. The Kotlin twin is `com.pulse.ble.SourceIdentity`.
 ///
 /// The bug it exists to prevent: `BLEManager` held one `deviceId` meaning "the active device" and reused it
 /// as "the device these bytes came from". Those were the same thing only while every registered device was

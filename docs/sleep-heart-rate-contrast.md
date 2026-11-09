@@ -1,12 +1,12 @@
 # Sleep vs wake heart-rate contrast
 
-`SleepHeartRateContrast` (StrandAnalytics + `com.noop.analytics` twin) is a small, descriptive engine
+`SleepHeartRateContrast` (StrandAnalytics + `com.pulse.analytics` twin) is a small, descriptive engine
 that compares mean HR during an explicitly supplied **primary-sleep** window against mean HR during an
 explicitly supplied **wake** window. It is wellness context, not a clinical measure.
 
 ## What it is not
 
-- **Not a resting-heart-rate definition.** NOOP already ships a floor-style RHR (the scoring input) and
+- **Not a resting-heart-rate definition.** Pulse already ships a floor-style RHR (the scoring input) and
   collects a separate primary-session mean RHR candidate (#1174/#1188; evidence in #1169, which also
   records that a lowest-30-minute candidate performed *worse* than the primary-session mean). This engine
   adds no third RHR and changes neither of the existing ones.

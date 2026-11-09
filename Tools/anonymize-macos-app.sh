@@ -11,13 +11,13 @@
 #     xcodebuild -scheme Strand -configuration Release -derivedDataPath build/dd \
 #         -destination 'generic/platform=macOS' ARCHS="x86_64 arm64" ONLY_ACTIVE_ARCH=NO \
 #         CODE_SIGNING_ALLOWED=NO build
-#     Tools/anonymize-macos-app.sh build/dd/Build/Products/Release/NOOP.app
+#     Tools/anonymize-macos-app.sh build/dd/Build/Products/Release/Pulse.app
 #
 # IMPORTANT: build with the *generic* macOS destination and an explicit universal ARCHS, NOT
 # `-destination 'platform=macOS'`. On an Apple-Silicon host the latter resolves to the host's
 # active arch and silently thins the binary to arm64 — which is exactly how a release once
 # shipped that Intel Macs couldn't launch (#177/#165). Always confirm both slices before zipping:
-#     lipo -info build/dd/Build/Products/Release/NOOP.app/Contents/MacOS/NOOP   # -> x86_64 arm64
+#     lipo -info build/dd/Build/Products/Release/Pulse.app/Contents/MacOS/Pulse   # -> x86_64 arm64
 #
 # The replacement is the SAME byte length as the original path, so all Mach-O offsets stay
 # valid; only the read-only string section changes. The script reads $HOME at runtime and

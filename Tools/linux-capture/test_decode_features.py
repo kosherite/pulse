@@ -348,7 +348,7 @@ class DecodeNewTests(unittest.TestCase):
         self.assertEqual(fdb.db.execute("SELECT COUNT(*) FROM feat_second").fetchone()[0], 2)
         self.assertEqual(fdb.state(1)["last_decoded_frame_id"], "3")
 
-    def test_incremental_second_run_is_noop(self):
+    def test_incremental_second_run_is_pulse(self):
         fdb = self._db()
         df.decode_new(fdb, 1, decode_fn=self._decoder)
         res2 = df.decode_new(fdb, 1, decode_fn=self._decoder)

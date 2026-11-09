@@ -18,12 +18,12 @@ import UIKit
 @MainActor
 final class LiftLiveActivityController {
     private var activity: Activity<LiftActivityAttributes>?
-    /// A Lift Log banner is on screen — what NOOP's live heart rate banner makes room for (`LiveHRBannerLifecycle`).
+    /// A Lift Log banner is on screen — what Pulse's live heart rate banner makes room for (`LiveHRBannerLifecycle`).
     var isShowing: Bool { activity != nil }
-    /// Writes to NOOP's strap log — only when the banner's situation CHANGES (picked up after a restart,
-    /// or waiting for NOOP to be opened), never per push.
+    /// Writes to Pulse's strap log — only when the banner's situation CHANGES (picked up after a restart,
+    /// or waiting for Pulse to be opened), never per push.
     private let log: (String) -> Void
-    /// Set while a session runs with no banner that NOOP may start, so the reason is logged once.
+    /// Set while a session runs with no banner that Pulse may start, so the reason is logged once.
     private var waitingForForeground = false
     private var lastPush: Date = .distantPast
     private var lastSignature: String?
@@ -45,7 +45,7 @@ final class LiftLiveActivityController {
     static let silentAlertSound = "lift-step-silence.caf"
 
     /// What the push for a strap step did about lighting the screen — one strap-log line per step, so a
-    /// step that did not light can be told apart: NOOP was on screen, no banner was running, or the alert
+    /// step that did not light can be told apart: Pulse was on screen, no banner was running, or the alert
     /// went to iOS and iOS chose (a face-down phone, a Focus, its own limits).
     enum LightUp {
         case askedIOS, appOnScreen, noBanner
@@ -70,7 +70,7 @@ final class LiftLiveActivityController {
     /// step, so a lifter sees what they are on, and the screen goes dark again on the phone's own timer
     /// (Utku, 16–17 Sep 2026: "just light up", nothing else). It is an ActivityKit alert, the only way iOS
     /// lets an app light the screen, carried on the update the step needs anyway, and it is sent whenever
-    /// NOOP is not the app on screen. It used to wait for the phone to report itself LOCKED (protected
+    /// Pulse is not the app on screen. It used to wait for the phone to report itself LOCKED (protected
     /// data unavailable), but iOS reports that only about 10 s after the screen goes dark, so a tap soon
     /// after it dimmed — right after checking the rest timer, say — lit nothing (gym session, 17 Sep
     /// 2026: "sometimes it lights up and sometimes not"). With another app open, iOS shows the step in the
@@ -136,7 +136,7 @@ final class LiftLiveActivityController {
             return alert ? (lightsScreen ? .askedIOS : .appOnScreen) : nil
         } else {
             // iOS starts a Live Activity only for the app on screen; asked from the background it throws,
-            // and this runs several times a second. The banner comes back the next time NOOP is opened.
+            // and this runs several times a second. The banner comes back the next time Pulse is opened.
             guard UIApplication.shared.applicationState == .active else {
                 if !waitingForForeground {
                     waitingForForeground = true

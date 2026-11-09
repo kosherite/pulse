@@ -1,4 +1,4 @@
-# AGENTS.md — working on NOOP
+# AGENTS.md — working on Pulse
 
 Guidance for anyone (human or AI agent) submitting a pull request. This is the high-signal map;
 [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) is the full guide (BLE safety contract, design-system
@@ -7,12 +7,12 @@ rules, add-a-metric/screen/command recipes), [`docs/BUILD.md`](docs/BUILD.md) co
 specific WHOOP-app features that stay out of scope (and their local equivalents). Read this first;
 follow the links for depth.
 
-## What NOOP is (and the hard scope limits)
+## What Pulse is (and the hard scope limits)
 
-NOOP is an **offline-by-default, on-device** companion app for WHOOP 4.0 and 5.0/MG straps (with
+Pulse is an **offline-by-default, on-device** companion app for WHOOP 4.0 and 5.0/MG straps (with
 **experimental** Oura support in the tree — gated behind `ExperimentalBrand`, not a shipped supported
 strap). It pairs over Bluetooth, stores everything in on-device SQLite, and computes recovery / strain
-/ HRV / sleep locally. There is **no NOOP-operated server, no account, no cloud dependency, no
+/ HRV / sleep locally. There is **no Pulse-operated server, no account, no cloud dependency, no
 telemetry**, and the project stays **anonymous** (iOS/Android ship build-from-source / sideload, not
 via the App Store). Issue #1314 permits one narrow exception: a default-off Experimental client may
 export data one way to an HTTP(S) endpoint the user owns and configures. It must remain outside strap
@@ -22,7 +22,7 @@ These are hard constraints, not preferences. A PR is out of scope if it:
 - adds a server, account, cloud dependency, or sends data off-device without the explicit user export
   boundary in [`docs/SCOPE.md`](docs/SCOPE.md) (including #1314's one-way self-hosted push);
 - adds analytics/telemetry/crash-reporting that phones home;
-- adds WHOOP firmware, decompiled app code, logos/assets, or any DRM circumvention. NOOP is
+- adds WHOOP firmware, decompiled app code, logos/assets, or any DRM circumvention. Pulse is
   **clean-room interoperability** with hardware the user owns — keep it that way. (That bars
   *implementations* and literals, not every fact learned from one: a protocol offset may be
   re-derived with attribution as an unvalidated candidate — see the "facts vs code" bullet in
@@ -44,9 +44,9 @@ build-from-source target** folded into the same repo.
 | Analytics (pure) | `Packages/StrandAnalytics` | HRV / recovery / strain / sleep / correlation math. Database-free. |
 | Import | `Packages/StrandImport` | WHOOP CSV + Apple Health importers. |
 | Design system | `Packages/StrandDesign` | SwiftUI palette / components / charts. |
-| macOS + shared app | `Strand/` (scheme **Strand**, product `NOOP`, macOS 13+) | `BLE/` (CoreBluetooth), `Collect/`, `Data/` (Repository), `Screens/`, `App/` (`RootView`/`ContentView` = sidebar shell). Shared with iOS where a file isn't macOS-only. |
-| iOS-only app | `StrandiOS/` (scheme **NOOPiOS**, iOS 17+), `StrandiOSShared/`, `StrandiOSWidgets/`, `NOOPWatch*` | `StrandiOSApp` (@main), `RootTabView` (the iOS tab shell — no macOS analogue), iOS widgets, watch app. |
-| Android app | `android/` (Kotlin, Compose, Room; flavors `Full`/`Demo`) | `com.noop.{ble,collect,data,ingest,analytics,protocol,ui,widget,…}` — mirrors the Swift layering with its own reimplementations. |
+| macOS + shared app | `Strand/` (scheme **Strand**, product `Pulse`, macOS 13+) | `BLE/` (CoreBluetooth), `Collect/`, `Data/` (Repository), `Screens/`, `App/` (`RootView`/`ContentView` = sidebar shell). Shared with iOS where a file isn't macOS-only. |
+| iOS-only app | `StrandiOS/` (scheme **PulseiOS**, iOS 17+), `StrandiOSShared/`, `StrandiOSWidgets/`, `PulseWatch*` | `StrandiOSApp` (@main), `RootTabView` (the iOS tab shell — no macOS analogue), iOS widgets, watch app. |
+| Android app | `android/` (Kotlin, Compose, Room; flavors `Full`/`Demo`) | `com.pulse.{ble,collect,data,ingest,analytics,protocol,ui,widget,…}` — mirrors the Swift layering with its own reimplementations. |
 
 `project.yml` is the **XcodeGen source of truth**; `Strand.xcodeproj/` is generated — never hand-edit
 or commit it. Re-run `xcodegen generate` after adding/removing files or editing `project.yml`.
@@ -76,8 +76,8 @@ Swift. So:
   differ; the *behavior* and the *data* must not.
 - **Cross-platform hashes/dedup keys must use a platform-neutral algorithm** (e.g. FNV-1a over UTF-16
   code units) — never `hashValue` (Swift randomizes it) or Kotlin `hashCode` if the value crosses the
-  `.noopbak` boundary.
-- **The `.noopbak` backup whitelist is a byte-identical contract.** `BackupSettings.swift`
+  `.pulsebak` boundary.
+- **The `.pulsebak` backup whitelist is a byte-identical contract.** `BackupSettings.swift`
   (`Packages/WhoopStore`) and `BackupSettingsCodec` (`android/…/data/BackupSettings.kt`) must carry
   the same canonical keys + JSON kinds. Only Int/Double/String cross the wire — no dates/objects.
 - **Room (Android) and GRDB (iOS) migrations must agree** on the resulting schema. Column order in a
@@ -111,7 +111,7 @@ Versions are pinned by the repo — install these before the loops below:
 # Swift packages (fastest; no Xcode, no strap):
 cd Packages/WhoopProtocol && swift build && swift test     # also OuraProtocol
 # Android JVM unit tests (run on Linux/macOS, no device):
-cd android && ./gradlew testFullDebugUnitTest              # add --tests "com.noop.…" to filter
+cd android && ./gradlew testFullDebugUnitTest              # add --tests "com.pulse.…" to filter
 # After a branch switch, ALWAYS: --no-build-cache --rerun-tasks. Gradle can otherwise serve
 # generated sources (Room/KSP) from the previous branch and fail classes you never touched.
 cd android && ./gradlew compileFullDebugKotlin             # compile the whole app module
@@ -123,8 +123,8 @@ xcodegen generate && xcodebuild -project Strand.xcodeproj -scheme Strand \
 ### What each CI job covers — and the gaps
 | Workflow | Covers | Runner | Default state |
 |---|---|---|---|
-| `swift-packages.yml` | TWO jobs. `test`: `swift test` over **`Packages/**`** (WhoopProtocol, WhoopStore, StrandAnalytics, StrandImport, StrandDesign, NoopLocalAccess). `tools`: `swift build` + `swift test` over **`Tools/SleepBench`, `Tools/SleepPSG`, `Tools/Backfill`** — Backfill has no test target, so it is build-only. Path-filtered to those directories. | macos-15 | **active** |
-| `app-build.yml` | Builds the **app targets** (`Strand` macOS + `NOOPiOS` iOS) **and runs `StrandTests`** on the macOS/`Strand` leg only — the iOS leg is compile-only. iOS leg needs **macos-26** (iOS 26 SDK / `glassEffect`). | macos-15 / macos-26 | **active** — auto-runs on PRs touching its paths (`Strand/**`, `StrandTests/**`, `StrandiOS*/**`, `NOOPWatch*/**`, `Packages/**`, `project.yml`). NO push trigger, so a direct commit to `main` needs a manual dispatch. |
+| `swift-packages.yml` | TWO jobs. `test`: `swift test` over **`Packages/**`** (WhoopProtocol, WhoopStore, StrandAnalytics, StrandImport, StrandDesign, PulseLocalAccess). `tools`: `swift build` + `swift test` over **`Tools/SleepBench`, `Tools/SleepPSG`, `Tools/Backfill`** — Backfill has no test target, so it is build-only. Path-filtered to those directories. | macos-15 | **active** |
+| `app-build.yml` | Builds the **app targets** (`Strand` macOS + `PulseiOS` iOS) **and runs `StrandTests`** on the macOS/`Strand` leg only — the iOS leg is compile-only. iOS leg needs **macos-26** (iOS 26 SDK / `glassEffect`). | macos-15 / macos-26 | **active** — auto-runs on PRs touching its paths (`Strand/**`, `StrandTests/**`, `StrandiOS*/**`, `PulseWatch*/**`, `Packages/**`, `project.yml`). NO push trigger, so a direct commit to `main` needs a manual dispatch. |
 | `android.yml` | `assembleFullDebug` + `testFullDebugUnitTest` | ubuntu | **active**, path-filtered to `android/**` |
 | `source-hygiene.yml` | Doc comments that bind to nothing (`Tools/doc_comment_lint.py`) | ubuntu | **active** |
 | `i18n-coverage.yml` | Diff-scoped translation gate (`Tools/i18n_audit.py --ci`) | ubuntu | **active** |
@@ -144,16 +144,16 @@ The workflow has no push trigger; a direct non-release commit to `main` needs an
 - **On Linux:** `WhoopProtocol` / `OuraProtocol` (pure) build & test with a bare toolchain. The
   GRDB-linked packages need the snapshot-enabled SQLite build in [`docs/BUILD.md`](docs/BUILD.md) — with
   it, all four build AND test: `StrandAnalytics` (1523), `WhoopStore` (439), `StrandImport` (249) and
-  `NoopLocalAccess` (9). Without those flags they fail with `sqlite3.h not found` (GRDB's CSQLite). `StrandDesign`
+  `PulseLocalAccess` (9). Without those flags they fail with `sqlite3.h not found` (GRDB's CSQLite). `StrandDesign`
   needs SwiftUI and is macOS-only. Android JVM unit tests **do** run on Linux.
   **None of this is CI-enforced** — `swift-packages.yml` is macOS-only, so Linux support is honour-system
   and a change can break it silently.
-- **App targets** (`Strand`, `NOOPiOS`) need **Xcode on macOS**; `StrandTests` runs only under
+- **App targets** (`Strand`, `PulseiOS`) need **Xcode on macOS**; `StrandTests` runs only under
   `xcodebuild … test` on macOS — locally, or via `app-build.yml`, which does run it on the `Strand` leg.
   The workflow runs automatically on relevant PRs; verify its macOS test step passed on the current
   head. Writing app-target tests is not the same as having run them.
 - **BLE behavior cannot be CI- or Linux-tested.** Anything on the CoreBluetooth / offload / live-HR
-  path (`Strand/BLE`, `Strand/Collect`, Android `com.noop.ble`) must be **validated on a real strap**;
+  path (`Strand/BLE`, `Strand/Collect`, Android `com.pulse.ble`) must be **validated on a real strap**;
   compile-success proves nothing about connection behavior. Say what you tested on hardware.
 
 ## Hard rules before you touch these areas
@@ -255,7 +255,7 @@ The workflow has no push trigger; a direct non-release commit to `main` needs an
 
 ## iOS / Android specifics worth knowing
 
-- **iOS is `NOOPiOS`**, not `Strand`. `ContentView`/`RootView` (the macOS sidebar) are excluded from
+- **iOS is `PulseiOS`**, not `Strand`. `ContentView`/`RootView` (the macOS sidebar) are excluded from
   iOS; the iOS shell is `RootTabView`. A file shared with macOS (`TodayView`, `Repository`, analytics)
   must keep compiling for **both** — check the `Strand` (macOS) build too when you edit shared files.
 - **Android** is Compose + Room, flavors `Full` (real) and `Demo`. Profile/prefs live in

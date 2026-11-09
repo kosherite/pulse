@@ -4,13 +4,13 @@ import WhoopStore
 // MARK: - Menstrual cycle tracker storage
 //
 // A logged period start is one value-1 metricSeries point under the dedicated local source
-// `noop-cycle`. The source is intentionally separate from strap/import/computed ids so an import or
+// `pulse-cycle`. The source is intentionally separate from strap/import/computed ids so an import or
 // re-analysis cannot overwrite sensitive user-entered history. This is the byte-parity twin of Android
 // `CycleTrackingStore`: same source id, key, value, local ISO day, ordering, and real-delete semantics.
 // No schema change is needed and no data leaves the device.
 
 enum CycleTrackingStore {
-    static let sourceId = "noop-cycle"
+    static let sourceId = "pulse-cycle"
     static let periodStartKey = "period_start"
     static let loggedValue = 1.0
     static let earliestDay = "0000-01-01"

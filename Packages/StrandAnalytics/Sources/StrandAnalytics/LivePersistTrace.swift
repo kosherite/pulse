@@ -27,7 +27,7 @@ public enum StandardHRLifecycleFlush {
 /// log full of `rr emit … offered=N` and no indication that none of it landed. That is the worst shape a
 /// diagnostic gap can take: the instrumentation that exists reads like success.
 ///
-/// Twin of the Kotlin `liveInsertFailedLine` in `com.noop.ble.StalledLinkDiagnostics`, so an Android and
+/// Twin of the Kotlin `liveInsertFailedLine` in `com.pulse.ble.StalledLinkDiagnostics`, so an Android and
 /// an Apple log of the same failure compare directly. Rendered strings match for ASCII (store errors).
 /// The 200-character bound is not a Unicode-identical truncation: Kotlin `take(200)` counts UTF-16 code
 /// units and Swift `prefix(200)` counts grapheme clusters. Store error descriptions are ASCII, which is
@@ -77,7 +77,7 @@ public enum LivePersistTrace {
     /// back while the Test Centre's HRV or Connection mode is on, which is what those modes are for: gate the
     /// per-sample readout behind the domain, leave the rare-event evidence always on (`AGENTS.md`).
     ///
-    /// Twin of the Kotlin `StandardHrHostReceivedTrace` (`com.noop.ble`), line for line: same window, same
+    /// Twin of the Kotlin `StandardHrHostReceivedTrace` (`com.pulse.ble`), line for line: same window, same
     /// rules, same rendered text.
     public struct StandardHRHostReceivedTrace: Sendable {
 

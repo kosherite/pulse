@@ -23,7 +23,7 @@ enum DataSourceImportKind {
 final class AppModel: ObservableObject {
     /// The live instance, so an AppIntent (Shortcuts) can reach the bonded strap rather than spinning
     /// up a dead second AppModel (which would start a duplicate BLE engine and never buzz). Set in
-    /// init(); `weak` so an intent fired while NOOP is closed sees nil and asks the user to open it. (#42)
+    /// init(); `weak` so an intent fired while Pulse is closed sees nil and asks the user to open it. (#42)
     static weak var shared: AppModel?
 
     /// Timestamp formatter for the generic-HR strap-log lines routed through `straplog` into the shared
@@ -33,7 +33,7 @@ final class AppModel: ObservableObject {
         let f = DateFormatter(); f.dateFormat = "HH:mm:ss"; return f
     }()
 
-    /// One of our own strap-log lines, stamped like the lines around it. NOOP's log takes each line's time from
+    /// One of our own strap-log lines, stamped like the lines around it. Pulse's log takes each line's time from
     /// whoever writes it, and the Lift Log's lines arrived without one: all 98 of them in Utku's 22 Sep session,
     /// so the moment a tap or a step happened had to be inferred from the neighbouring lines. A diagnostic says
     /// when it happened.
@@ -43,7 +43,7 @@ final class AppModel: ObservableObject {
 
     /// The CANONICAL imported/computed id ("my-whoop"). The WHOOP-IMPORT target (`WhoopImporter`), the
     /// FusionSource `.whoopImport` mapping, and a manually-saved workout all land under THIS stable id, and
-    /// the engine writes its computed scores under the matching `-noop` sibling. It must NOT follow the
+    /// the engine writes its computed scores under the matching `-pulse` sibling. It must NOT follow the
     /// active strap (#814 union-model follow-up): a remove+re-add gives the strap a fresh "whoop-<uuid>" id,
     /// but if the import/computed target drifted to it, history banked earlier under "my-whoop" would be
     /// orphaned. The Repository's ACTIVE-strap read id follows the registry instead (`adoptActiveDevice`),
@@ -445,10 +445,10 @@ final class AppModel: ObservableObject {
 
         // Turn the strap's offloaded raw data into dashboard scores on launch and every 15
         // minutes, so recovery / strain / sleep populate from the strap itself with no import.
-        // IntelligenceEngine computes, persists under "my-whoop-noop", and refreshes the dashboard.
+        // IntelligenceEngine computes, persists under "my-whoop-pulse", and refreshes the dashboard.
         // One-shot reclaim of any stale Documents/Inbox picker drops a previous build left behind
-        // before cleanup() reclaimed the original, PLUS any stranded `noop-*` temp scratch (e.g. the
-        // multi-GB `noop-health-*` export.xml an interrupted import leaves behind , #590). Off the main
+        // before cleanup() reclaimed the original, PLUS any stranded `pulse-*` temp scratch (e.g. the
+        // multi-GB `pulse-health-*` export.xml an interrupted import leaves behind , #590). Off the main
         // actor; no-op on macOS for the Inbox part.
         Task.detached { AppModel.purgeImportInbox(); AppModel.purgeImportTemp() }
 
@@ -595,14 +595,14 @@ final class AppModel: ObservableObject {
     /// `startWhoop`/`stopWhoop` are thin closures over BLEManager's EXISTING public methods (via the
     /// model's `scan()` / `disconnect()`), so the coordinator never references BLEManager directly.
     /// #1410: record an `APP_VERSION_CHANGED` event on the first launch after an update. UserDefaults holds
-    /// the last-seen version; `"noop-app"` is a synthetic non-strap deviceId sentinel (strap ids are UUIDs,
+    /// the last-seen version; `"pulse-app"` is a synthetic non-strap deviceId sentinel (strap ids are UUIDs,
     /// so it can't collide) — the same sentinel the Android twin uses.
     private func recordAppVersionChangeIfNeeded() async {
         let current = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
-        let last = UserDefaults.standard.string(forKey: "noop.lastSeenVersion")
+        let last = UserDefaults.standard.string(forKey: "pulse.lastSeenVersion")
         guard AppVersionEvent.shouldRecord(lastSeen: last, current: current), let last else {
             // First launch (last == nil) or unchanged: nothing to record, just anchor the pointer.
-            UserDefaults.standard.set(current, forKey: "noop.lastSeenVersion")
+            UserDefaults.standard.set(current, forKey: "pulse.lastSeenVersion")
             return
         }
         // A real transition: advance the pointer only once the event is durably recorded, so a not-yet-ready
@@ -611,9 +611,9 @@ final class AppModel: ObservableObject {
         let payload = AppVersionEvent.payloadJson(from: last, to: current,
                                                   schemaVersion: WhoopStoreInfo.schemaVersion)
         do {
-            try await store.recordEvent(deviceId: "noop-app", ts: Int(Date().timeIntervalSince1970),
+            try await store.recordEvent(deviceId: "pulse-app", ts: Int(Date().timeIntervalSince1970),
                                         kind: AppVersionEvent.kind, payloadJSON: payload)
-            UserDefaults.standard.set(current, forKey: "noop.lastSeenVersion")
+            UserDefaults.standard.set(current, forKey: "pulse.lastSeenVersion")
         } catch {
             // insert failed — leave last-seen so the transition is retried next launch
         }
@@ -686,7 +686,7 @@ final class AppModel: ObservableObject {
     /// the canonical id, so both the re-added strap's live data AND the canonical history surface. The engine
     /// already resolves the active strap per day via the registry's own active id (`resolveDayOwner`), so it
     /// reads + scores the re-added strap's raw and writes the computed result to the STABLE canonical
-    /// `-noop` sibling, no engine re-point needed.
+    /// `-pulse` sibling, no engine re-point needed.
     private func adoptActiveDevice(_ activeId: String) async {
         let trimmed = activeId.trimmingCharacters(in: .whitespaces)
         let repoMoved = repo.adoptActiveDeviceId(trimmed)
@@ -1005,7 +1005,7 @@ final class AppModel: ObservableObject {
         // A session under a minute is a start/stop the wearer did not mean to keep, and it was the thing
         // that made deletion feel broken: the list filled with 5-30 second entries (#2278). Discarded HERE,
         // at save, rather than retained and pruned later, which is the whole difference between dropping
-        // something that never had training data in it and deleting a wearer's history. NOOP has no server
+        // something that never had training data in it and deleting a wearer's history. Pulse has no server
         // and no cloud copy, so a later prune would be irreversible; this is not, because nothing with real
         // data is ever removed.
         //
@@ -1161,7 +1161,7 @@ final class AppModel: ObservableObject {
     }
     func disconnect() { ble.disconnect() }
     /// Restart the connected strap (user-initiated, confirmation-gated in DevicesView). Non-destructive —
-    /// the strap keeps its data and re-advertises after boot; NOOP auto-reconnects. See BLEManager.rebootStrap().
+    /// the strap keeps its data and re-advertises after boot; Pulse auto-reconnects. See BLEManager.rebootStrap().
     func rebootStrap() { ble.rebootStrap() }
     /// Send one WHOOP 4.0 reboot-probe candidate (Test Centre → Connection, 4.0 only). Confirmation-gated
     /// in DevicesView; finds the real 4.0 reboot frame when the production one is ignored (#235).
@@ -1658,7 +1658,7 @@ final class AppModel: ObservableObject {
     }
 
     /// Arm (or clear) the strap's firmware alarm from the smart-alarm settings. The firmware alarm
-    /// fires even if the Mac is asleep / NOOP is closed. No-op until bonded (send is gated on bond).
+    /// fires even if the Mac is asleep / Pulse is closed. No-op until bonded (send is gated on bond).
     ///
     /// On iOS this ALSO (dis)arms the best-effort backup wake notification (#4 + #6): a repeating daily
     /// `UNCalendarNotificationTrigger` that survives suspend/relaunch, so a missed strap buzz still gets
@@ -2123,7 +2123,7 @@ final class AppModel: ObservableObject {
 
     /// UserDefaults key for the cycle-awareness opt-in (default OFF , the most sensitive health category,
     /// manual-first). The Settings toggle + the card's opt-in CTA both write this single key.
-    static let cycleAwarenessKey = "noopCycleAwareness"
+    static let cycleAwarenessKey = "pulseCycleAwareness"
     var cycleAwarenessEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: Self.cycleAwarenessKey) }
         set { UserDefaults.standard.set(newValue, forKey: Self.cycleAwarenessKey) }
@@ -2133,17 +2133,17 @@ final class AppModel: ObservableObject {
     /// age-based (menopause age varies too widely to infer). When true, the cycle-awareness OFFER is
     /// suppressed on Today and Health; the Automations toggle stays visible so it's reversible. Default
     /// false. Distinct from `cycleAwarenessEnabled` (active tracking): this hides the invitation itself.
-    static let cycleAwarenessHiddenKey = "noopCycleAwarenessHidden"
+    static let cycleAwarenessHiddenKey = "pulseCycleAwarenessHidden"
     var cycleAwarenessHidden: Bool {
         get { UserDefaults.standard.bool(forKey: Self.cycleAwarenessHiddenKey) }
         set { UserDefaults.standard.set(newValue, forKey: Self.cycleAwarenessHiddenKey) }
     }
 
-    /// #polar-debug: whether a connecting Polar strap logs the model NOOP identifies it as (+ its PMD/HRV
+    /// #polar-debug: whether a connecting Polar strap logs the model Pulse identifies it as (+ its PMD/HRV
     /// capability summary) to the strap log. Default off; the Test Centre only exposes the toggle when a
     /// Polar strap is paired. Diagnostic-only — nothing gates behaviour on it. Twin of Android
-    /// `NoopPrefs.KEY_POLAR_DEBUG_LOGGING`.
-    static let polarDebugLoggingKey = "noopPolarDebugLogging"
+    /// `PulsePrefs.KEY_POLAR_DEBUG_LOGGING`.
+    static let polarDebugLoggingKey = "pulsePolarDebugLogging"
     var polarDebugLogging: Bool {
         get { UserDefaults.standard.bool(forKey: Self.polarDebugLoggingKey) }
         set { UserDefaults.standard.set(newValue, forKey: Self.polarDebugLoggingKey) }
@@ -2154,19 +2154,19 @@ final class AppModel: ObservableObject {
     /// and a completeness guard suppresses/replaces a duplicate re-serve BEFORE it is banked — closing the
     /// window where the wrong night shows until the next analyze pass. Off = the shipped end-anchored persist.
     /// A hardware-validation toggle (Test Centre); no effect for a user with no Oura ring.
-    static let ouraOnsetKeyingKey = "noopOuraOnsetKeying"
+    static let ouraOnsetKeyingKey = "pulseOuraOnsetKeying"
     var ouraOnsetKeying: Bool {
         get { UserDefaults.standard.bool(forKey: Self.ouraOnsetKeyingKey) }
         set { UserDefaults.standard.set(newValue, forKey: Self.ouraOnsetKeyingKey) }
     }
 
     /// Oura packed-notification A/B (EXPERIMENTAL, default OFF): send the official app's SetNotification
-    /// mask `1c 01 ff` at the next connect instead of NOOP's `3f`. The ring packs ~10 packets per
-    /// notification for the official app (9x the drain throughput) and NOOP's session never gets that
+    /// mask `1c 01 ff` at the next connect instead of Pulse's `3f`. The ring packs ~10 packets per
+    /// notification for the official app (9x the drain throughput) and Pulse's session never gets that
     /// shape; the mask is the first candidate switch (OURA_PROTOCOL.md s2.3). Read once per connect, so
     /// turning it off restores `3f` on the next session — nothing persists on the ring. Readout: the
     /// `-> notify_all(ff)` line and the raw sidecar's notification-size histogram. Test Centre only.
-    static let ouraNotifyMaskFullKey = "noopOuraNotifyMaskFull"
+    static let ouraNotifyMaskFullKey = "pulseOuraNotifyMaskFull"
     var ouraNotifyMaskFull: Bool {
         get { UserDefaults.standard.bool(forKey: Self.ouraNotifyMaskFullKey) }
         set { UserDefaults.standard.set(newValue, forKey: Self.ouraNotifyMaskFullKey) }
@@ -2178,7 +2178,7 @@ final class AppModel: ObservableObject {
     /// only while a client holds that mode, so with the screen-keyed suspend a pocketed phone empties the
     /// day. ON costs ring battery (its own daytime PPG); OFF is today's behaviour, and the night is
     /// unchanged either way. No effect without an Oura ring; cold start (no learned schedule) keeps OFF's rule.
-    static let ouraAllDayLiveHRKey = "noopOuraAllDayLiveHR"
+    static let ouraAllDayLiveHRKey = "pulseOuraAllDayLiveHR"
     var ouraAllDayLiveHR: Bool {
         get { UserDefaults.standard.bool(forKey: Self.ouraAllDayLiveHRKey) }
         set { UserDefaults.standard.set(newValue, forKey: Self.ouraAllDayLiveHRKey) }
@@ -2229,7 +2229,7 @@ final class AppModel: ObservableObject {
             nights.append(CyclePhaseEngine.Night(day: d.day, tempZ: tempZ, rhrZ: rhrZ, hrvZ: hrvZ))
             if let fused = CyclePhaseEngine.fusedIndex(tempZ: tempZ, rhrZ: rhrZ, hrvZ: hrvZ) { curve.append(fused) }
         }
-        // Optional user-entered cycle-day-1 anchors live under the isolated `noop-cycle` source.
+        // Optional user-entered cycle-day-1 anchors live under the isolated `pulse-cycle` source.
         // The pure engine cross-validates them against the temperature shift rather than trusting a
         // mistimed log blindly.
         let loggedPeriodStarts = await repo.periodStarts()
@@ -2305,7 +2305,7 @@ final class AppModel: ObservableObject {
         // IS the canonical source id, but the strap's real id is `deviceId`/`computed` , map explicitly.)
         let sources: [(FusionSource, String)] = [
             (.whoopImport, deviceId),
-            (.noopComputed, deviceId + "-noop"),
+            (.pulseComputed, deviceId + "-pulse"),
             (.appleHealth, appleDeviceId),
             (.xiaomiBand, FusionSource.xiaomiBand.rawValue),
         ]
@@ -2404,7 +2404,7 @@ final class AppModel: ObservableObject {
     nonisolated static func materializeForImport(_ picked: URL) async throws -> ImportFile {
         #if os(iOS)
         let ext = picked.pathExtension.isEmpty ? "dat" : picked.pathExtension
-        let dst = NoopScratch.file("import-\(UUID().uuidString)")
+        let dst = PulseScratch.file("import-\(UUID().uuidString)")
             .appendingPathExtension(ext)
         var coordError: NSError?
         var ioError: Error?
@@ -2574,14 +2574,14 @@ final class AppModel: ObservableObject {
         #endif
     }
 
-    /// Total bytes of NOOP's own temp scratch: its owned folder, plus the flat scratch earlier builds
+    /// Total bytes of Pulse's own temp scratch: its owned folder, plus the flat scratch earlier builds
     /// left beside it. A crash mid-import can strand a multi-GB extraction in there (#590).
     ///
     /// Recurses, because the scratch holds directories (the Xiaomi importer stages one). Scoped to what
     /// [purgeImportTemp] would actually reclaim, so the Storage screen cannot attribute another
-    /// program's disk to NOOP (#2446).
+    /// program's disk to Pulse (#2446).
     nonisolated static func importTempSizeBytes() -> Int64 {
-        NoopScratch.sizeBytes { item in
+        PulseScratch.sizeBytes { item in
             let vals = try? item.resourceValues(forKeys: [.fileSizeKey, .isDirectoryKey])
             if vals?.isDirectory == true { return directorySizeBytes(item) }
             return Int64(vals?.fileSize ?? 0)
@@ -2612,13 +2612,13 @@ final class AppModel: ObservableObject {
         return await storageReport()
     }
 
-    /// Remove NOOP's stranded temp scratch: everything in the folder it owns, plus the flat scratch
-    /// earlier builds wrote (the multi-GB `noop-health-*` export.xml an interrupted import leaves
+    /// Remove Pulse's stranded temp scratch: everything in the folder it owns, plus the flat scratch
+    /// earlier builds wrote (the multi-GB `pulse-health-*` export.xml an interrupted import leaves
     /// behind, #590). Keeps `purgeImportInbox`'s 60 s in-flight guard, so a concurrent import or
-    /// export is not disturbed. See `NoopScratch` for why ownership is a folder and not a prefix.
-    nonisolated static func purgeImportTemp() { NoopScratch.purge() }
+    /// export is not disturbed. See `PulseScratch` for why ownership is a folder and not a prefix.
+    nonisolated static func purgeImportTemp() { PulseScratch.purge() }
 
-    /// Handle a `noop://import-health` deep link (PR #581), the HealthKit-free Shortcuts import for
+    /// Handle a `pulse://import-health` deep link (PR #581), the HealthKit-free Shortcuts import for
     /// sideloaded installs. Custom URL schemes are forgeable by other apps/sites, so this only decodes
     /// and stages the payload. The iOS shell shows a confirmation alert before `confirmHealthImport()`
     /// writes anything into the `apple-health` source.

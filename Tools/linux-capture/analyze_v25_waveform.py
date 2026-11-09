@@ -4,7 +4,7 @@
 Reimplemented from @vulnix0x4's PR #307 (RFC for #194); the 1440/N disproof is @ryanbr's.
 
 WHOOP 4.0's offloaded type-47 **v25** record carries an optical PPG waveform (PostHooks labels bytes
-~23–73 "PPG waveform (optical)"), but NOOP decodes only its motion + timestamp. #194 proposes reading
+~23–73 "PPG waveform (optical)"), but Pulse decodes only its motion + timestamp. #194 proposes reading
 that waveform on the odd i16 grid and routing it through the existing `PpgHr` lane to recover HR — the
 way the v26/WHOOP-5 sibling already does — which would give 4.0 *offloaded* sleep + recovery.
 

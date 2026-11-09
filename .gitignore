@@ -45,7 +45,7 @@ playground.xcworkspace
 
 # ── App bundles / build output ──────────────────────────────────
 *.app/
-NOOP.app/
+Pulse.app/
 
 # ── Android (Gradle / Studio) ───────────────────────────────────
 android/.gradle/
@@ -76,7 +76,7 @@ deploy.env.*
 secrets.*
 android/local.properties
 android/keystore.properties
-android/noop-release.jks
+android/pulse-release.jks
 
 # ── Personal data — NEVER publish (real WHOOP/Apple Health exports) ──
 Fixtures/

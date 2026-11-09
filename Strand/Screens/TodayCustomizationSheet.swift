@@ -174,8 +174,8 @@ struct TodayCustomizationSheet: View {
         .tint(StrandPalette.accent)
         #if os(macOS)
         .frame(
-            minWidth: NoopMetrics.editorSheetMinWidth,
-            minHeight: NoopMetrics.editorSheetMinHeight
+            minWidth: PulseMetrics.editorSheetMinWidth,
+            minHeight: PulseMetrics.editorSheetMinHeight
         )
         #endif
     }

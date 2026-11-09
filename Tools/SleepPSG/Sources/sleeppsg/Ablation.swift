@@ -4,7 +4,7 @@ import Foundation
 // or is it reading the clock?"
 //
 // The question is not rhetorical. REM rises through the night in every population, so a model given nothing
-// but "how far into the night is it" already scores respectably. If NOOP's REM output were mostly that, the
+// but "how far into the night is it" already scores respectably. If Pulse's REM output were mostly that, the
 // per-epoch cardiac and movement terms would be decoration and the honest description of the feature would
 // change. The test is to fit three models on the same epochs and compare: clock features alone, physiology
 // features alone, and both.

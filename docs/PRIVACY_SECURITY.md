@@ -1,16 +1,16 @@
 # Privacy & Security
 
-This document describes NOOP's privacy posture, security model, and the hardening
+This document describes Pulse's privacy posture, security model, and the hardening
 applied to the parts of the codebase that touch untrusted input. It is written
 against the actual source tree; file paths and identifiers below are real and can
 be checked.
 
-> **Not affiliated with WHOOP. Not a medical device.** NOOP is an independent,
+> **Not affiliated with WHOOP. Not a medical device.** Pulse is an independent,
 > unofficial, local-first companion app. It interoperates with a WHOOP strap that
 > **you own**, reading **your own** biometric data from **your own** device. It is
 > not affiliated with, endorsed by, or connected to WHOOP, Inc. All computed
 > outputs (Charge, Effort, Rest, HRV, SpO₂, skin temperature, respiratory rate — Charge/Effort/Rest
-> being NOOP's own recovery/strain/sleep scores, not WHOOP's)
+> being Pulse's own recovery/strain/sleep scores, not WHOOP's)
 > are approximations and are not clinically validated. Self-tracking features such
 > as the Mind / mood check-in and nutrition import are **informational only** and are
 > **not** a diagnosis, treatment, or dietary/medical advice. Use at your own risk;
@@ -22,9 +22,9 @@ be checked.
 
 ## 1. Design principle: offline by default
 
-NOOP is **offline by default**. The biometric pipeline — strap → on-device decode →
+Pulse is **offline by default**. The biometric pipeline — strap → on-device decode →
 local SQLite — has no network layer at all: no phone-home, no analytics, no accounts,
-no login, no cloud sync, and no telemetry. Everything NOOP computes about you lives in a
+no login, no cloud sync, and no telemetry. Everything Pulse computes about you lives in a
 single SQLite file on your own device.
 
 **Offline does not mean the app has no internet permission or never makes a request.**
@@ -39,22 +39,22 @@ The main local data paths are:
 |------|-----------|-----------|
 | Live collection | Bluetooth LE, strap → device | Read-only from the strap |
 | File import (Apple Health, WHOOP CSV, nutrition CSV) | User-selected files on disk | Read-only from disk |
-| Apple Health export, incl. iOS "Export for Shortcuts" | On-device, user-initiated | NOOP → your Apple Health, on your device only (§1.3) |
+| Apple Health export, incl. iOS "Export for Shortcuts" | On-device, user-initiated | Pulse → your Apple Health, on your device only (§1.3) |
 
-These local hand-offs do not upload data through NOOP's HTTP clients. What another app or
+These local hand-offs do not upload data through Pulse's HTTP clients. What another app or
 the operating system does with shared data is governed by that service and your settings (§1.3).
 
 <a id="11-network-code-the-four-exceptions"></a>
 
 ### 1.1 Network paths (canonical inventory)
 
-The following table covers NOOP's direct HTTP clients. A path can make several requests;
+The following table covers Pulse's direct HTTP clients. A path can make several requests;
 these are features, not a count of individual requests or destinations.
 
 | Path / platforms | Default and trigger | What is sent | Destination |
 | --- | --- | --- | --- |
 | AI Coach / macOS, iOS, Android (§1.1a) | Unconfigured initially; requests after provider setup for chat, model refresh or enabled briefs | Provider authentication when required; conversation text; health summaries only with data consent; optional chart attachment on Apple/Gemini | Chosen provider or Custom server |
-| Oura history import / opt-in macOS, iOS build (§1.1b) | Compiled out by default; user starts authorization/import | OAuth credentials, authorization/refresh tokens and history query parameters; no existing NOOP health data | `cloud.ouraring.com`, `api.ouraring.com` |
+| Oura history import / opt-in macOS, iOS build (§1.1b) | Compiled out by default; user starts authorization/import | OAuth credentials, authorization/refresh tokens and history query parameters; no existing Pulse health data | `cloud.ouraring.com`, `api.ouraring.com` |
 | Update check / macOS, iOS, Android (§1.1c) | Automatic check **on by default**, at most daily after onboarding/Terms; manual check on tap | Public release `GET`; no health data or app-added user/account identifier | `api.github.com` |
 | Self-hosted push / Android (§1.1d) | Experimental, **off by default**; configured export after offload/launch or on tap; explicit connection test | Bearer authentication; capability `GET`; versioned health batches with local installation/device IDs on export | User-owned HTTP(S) endpoint |
 
@@ -64,7 +64,7 @@ The route overlay is built locally; that does not guarantee the map makes no net
 Opening a web link hands it to a browser; Apple Health/Health Connect and sideloaders have their
 own network and sharing settings. This inventory does not promise those services are offline.
 
-For ordinary strap collection without NOOP's direct HTTP requests: turn off **Check automatically**
+For ordinary strap collection without Pulse's direct HTTP requests: turn off **Check automatically**
 in Settings → About, leave the AI Coach and self-hosted push unconfigured, use a default build
 without the Oura cloud import, and do not tap the manual update check. This does not disable
 platform-service traffic such as the route map.
@@ -80,7 +80,7 @@ resolves at build time, never at runtime:
 ```
 Packages/WhoopStore/Package.swift   → https://github.com/groue/GRDB.swift.git
 Packages/StrandImport/Package.swift → https://github.com/weichsel/ZIPFoundation.git
-Packages/NoopLocalAccess/Package.swift → https://github.com/groue/GRDB.swift.git
+Packages/PulseLocalAccess/Package.swift → https://github.com/groue/GRDB.swift.git
 ```
 
 GRDB.swift is the SQLite layer; ZIPFoundation is the archive reader used by the
@@ -108,15 +108,15 @@ The AI Coach sends requests directly to the provider you choose:
   summaries. Scheduled briefs require provider configuration and data consent.
 - **What is not automatically attached.** Raw biometric streams, BLE frames and local device
   identifiers. Text you type and charts you attach can contain personal information.
-- **Your provider, your relationship.** NOOP operates no intermediary. Provider retention and
-  processing policies apply to what you send. The conversation is also stored locally in NOOP.
+- **Your provider, your relationship.** Pulse operates no intermediary. Provider retention and
+  processing policies apply to what you send. The conversation is also stored locally in Pulse.
 
 Code: `Strand/AI/AICoach.swift`, `Strand/AI/AIProvider.swift`, `Strand/AI/Providers/`,
-`Strand/System/CoachBriefScheduler.swift`; Android `com.noop.ai` and `com.noop.ui.CoachViewModel`.
+`Strand/System/CoachBriefScheduler.swift`; Android `com.pulse.ai` and `com.pulse.ui.CoachViewModel`.
 
 ### 1.1b The Oura history import (compiled out by default, bring your own OAuth app)
 
-The Oura history import pulls your own historical Oura data into NOOP over Oura's official
+The Oura history import pulls your own historical Oura data into Pulse over Oura's official
 API — a one-time, foreground backfill you trigger yourself, not an ongoing background sync
 (nothing runs on a timer, at launch, or in the background):
 
@@ -132,20 +132,20 @@ API — a one-time, foreground backfill you trigger yourself, not an ongoing bac
   remains too: absent/blank credentials disable the lane — `OuraCredentials.fromBundle`.)
 - **What is sent.** An OAuth authorization-code handshake — you sign into Oura's own
   consent page (`cloud.ouraring.com`) through Apple's system `ASWebAuthenticationSession`,
-  not an in-app WebView NOOP controls — followed by bearer-token `GET` requests to
+  not an in-app WebView Pulse controls — followed by bearer-token `GET` requests to
   `api.ouraring.com/v2/usercollection/*` carrying only your access token and the
-  endpoint/date-range parameters needed to page through your history. No NOOP data rides
+  endpoint/date-range parameters needed to page through your history. No Pulse data rides
   along with these requests beyond the token itself.
 - **What comes back.** Your own Oura data — sleep, readiness, activity, workouts, heart
   rate, and the other endpoints your granted scopes cover — flowing **in**, once, to seed
   your local database. Oura's own readiness/sleep scores are kept for reference only
-  (`ref_*`/`oura_*` metric keys); NOOP's own Charge/Effort/Rest are never derived from
+  (`ref_*`/`oura_*` metric keys); Pulse's own Charge/Effort/Rest are never derived from
   them and are never sent anywhere.
-- **What is NOT sent.** None of your existing NOOP data — no WHOOP streams, no other
+- **What is NOT sent.** None of your existing Pulse data — no WHOOP streams, no other
   imports, no computed scores — ever leaves the device via this lane. It is inbound-only.
 - **Your app, your grant, revocable at Oura.** You register your own OAuth app at Oura's
-  developer portal; NOOP runs no server in between. Revoke access any time from your Oura
-  account settings, or tap **Forget Oura access** in NOOP, which signs out locally and
+  developer portal; Pulse runs no server in between. Revoke access any time from your Oura
+  account settings, or tap **Forget Oura access** in Pulse, which signs out locally and
   deletes the stored tokens plus every row this lane wrote — including the raw archive
   (`ouraRaw` table, see `docs/DATA_MODEL.md`).
 - **Tokens in the Keychain, not a plist.** The access/refresh tokens are stored via
@@ -157,14 +157,14 @@ If you never build the lane in, your binary cannot call `ouraring.com` — the c
 
 ### 1.1c The update check
 
-NOOP is sideloaded on every platform — there is no App Store or Play Store to update it — so an install
+Pulse is sideloaded on every platform — there is no App Store or Play Store to update it — so an install
 that is never told about a release simply runs an old build indefinitely. Two paths address that, and
-both read the **same** public endpoint: `https://api.github.com/repos/ryanbr/noop/releases/latest`.
+both read the **same** public endpoint: `https://api.github.com/repos/kosherite/pulse/releases/latest`.
 
 - **"Check for updates"** in Settings → About. Runs only when tapped. It has always existed;
   it was previously undocumented here, which is why this section is new rather than merely amended.
 - **"Check automatically"**, beside it. At most once a day, after onboarding and the
-  Terms gate, NOOP reads that endpoint and — if a newer release exists — puts a row in the Updates
+  Terms gate, Pulse reads that endpoint and — if a newer release exists — puts a row in the Updates
   inbox. **On by default**, and switchable off, at which point it makes no request at all.
 
 What is sent: an unauthenticated `GET` of a public URL, with normal HTTP headers but no app-added
@@ -174,26 +174,26 @@ release notes. **It never installs anything** — on iOS no API permits that for
 
 The request is a plain HTTPS call, so your IP address is visible to GitHub exactly as it would be if
 you opened the releases page in a browser. If that is not a trade you want, turn the toggle off; the
-manual button then remains the only way NOOP touches the network for this.
+manual button then remains the only way Pulse touches the network for this.
 
 Code: `Strand/System/UpdateChecker.swift` + `Strand/System/UpdateAvailability.swift` (Swift),
-`com.noop.update.UpdateCheck` + `com.noop.update.UpdateAvailability` (Android).
+`com.pulse.update.UpdateCheck` + `com.pulse.update.UpdateAvailability` (Android).
 
 ### 1.1d Self-hosted push (Experimental, Android, off by default)
 
 Self-hosted push keeps a fresh one-way copy of selected rows on a machine the user controls. It is
-not a NOOP cloud, account, restore path, or two-way sync:
+not a Pulse cloud, account, restore path, or two-way sync:
 
 - **Off until configured.** No endpoint means the worker does not send. The user supplies both the
-  HTTP(S) URL and bearer token; NOOP operates no intermediary or receiver.
+  HTTP(S) URL and bearer token; Pulse operates no intermediary or receiver.
 - **After offload, at launch, or explicitly now — always outside BLE sync.** Automatic work is queued
   after a complete strap offload and at app launch to catch up; the user may also press **Export now**.
   An unavailable or slow endpoint cannot delay BLE collection, local persistence, analytics, or UI.
 - **What is sent.** The finite, versioned stream registry in
   [`PUSH_PROTOCOL.md`](PUSH_PROTOCOL.md) includes biometric rows and rolling snapshots of selected
   recomputed/editable tables, scoped by a locally generated installation ID and local device ID.
-- **What comes back.** The receiver may advertise only a subset of NOOP's fixed v1 stream names, and
-  acknowledges submitted batches. NOOP never fetches health rows, remote changes, commands, URLs,
+- **What comes back.** The receiver may advertise only a subset of Pulse's fixed v1 stream names, and
+  acknowledges submitted batches. Pulse never fetches health rows, remote changes, commands, URLs,
   schemas, settings, or conflict decisions. The local database remains authoritative.
 - **Connection test.** The explicit **Test connection** action performs only the authenticated
   capability `GET`; it does not open the health database or submit a batch, and uses the same
@@ -231,7 +231,7 @@ That is the entire entitlement file. Four keys:
 - **`app-sandbox`** — the process runs inside the macOS App Sandbox container.
 - **`device.bluetooth`** — permits BLE access to talk to the strap. The matching
   `NSBluetoothAlwaysUsageDescription` string (declared in `project.yml`) states
-  plainly: *"NOOP connects directly to your WHOOP strap over Bluetooth to read heart
+  plainly: *"Pulse connects directly to your WHOOP strap over Bluetooth to read heart
   rate, R-R intervals, battery, and sensor data locally on your Mac. Nothing leaves
   your device."*
 - **`files.user-selected.read-write`** — lets the app read import files the user
@@ -264,19 +264,19 @@ gates and request construction, not on an OS restriction to particular servers.
 
 ### 1.3 iOS Apple Health export ("Export for Shortcuts") — on-device, user-initiated, one-way
 
-On iOS NOOP can hand your metrics to **Apple Health**. This is the one path where data leaves
-NOOP's own store — but it never leaves your **device**, and never touches the network.
+On iOS Pulse can hand your metrics to **Apple Health**. This is the one path where data leaves
+Pulse's own store — but it never leaves your **device**, and never touches the network.
 
-- **You initiate it; NOOP writes only what you enable.** Nothing is exported automatically. You
-  choose which metrics to push, and NOOP writes only those, only when you trigger the export. There
+- **You initiate it; Pulse writes only what you enable.** Nothing is exported automatically. You
+  choose which metrics to push, and Pulse writes only those, only when you trigger the export. There
   is no background sync.
 - **On-device, not a network upload.** The export is a local hand-off to Apple Health on the same
-  phone. No NOOP server, no cloud, no telemetry is involved — consistent with §1.
+  phone. No Pulse server, no cloud, no telemetry is involved — consistent with §1.
 - **HealthKit-free option.** The **"Export for Shortcuts"** path produces data for the Apple
   Shortcuts app rather than writing through HealthKit directly, so you can route it with a Shortcut
   you control. Where it does write to Apple Health, it does so through Apple's permission-gated APIs:
   you grant access per data type, and you can revoke it in iOS Settings at any time.
-- **Once it's in Apple Health, it's yours and Apple's, not NOOP's.** NOOP cannot read back, manage,
+- **Once it's in Apple Health, it's yours and Apple's, not Pulse's.** Pulse cannot read back, manage,
   or delete what you exported; that store, its backups (e.g. iCloud Health if *you* enabled it), and
   its sharing settings are governed by Apple and by your choices. **You are responsible for the data
   you push into Apple Health and for anything you or your Shortcuts then do with it.** See
@@ -324,7 +324,7 @@ database — they live in the same container.
 
 ### 2.2 Encryption
 
-The SQLite file is **not encrypted at rest by NOOP itself.** Confidentiality of the
+The SQLite file is **not encrypted at rest by Pulse itself.** Confidentiality of the
 data on disk relies on the platform:
 
 - **FileVault** (full-disk encryption, on by default on modern Macs) protects the
@@ -339,7 +339,7 @@ session, or a backup/Time Machine copy of the container made while FileVault is
 unlocked. The data is plaintext SQLite once the volume is mounted.
 
 > **Option: SQLCipher.** GRDB supports SQLCipher (an encrypted SQLite build) as a
-> drop-in. Wiring NOOP's `DatabaseQueue` to a SQLCipher build with a
+> drop-in. Wiring Pulse's `DatabaseQueue` to a SQLCipher build with a
 > Keychain-derived key would give at-rest encryption independent of FileVault. This
 > is not enabled in the current build, but the persistence layer is small and
 > centralized (one `WhoopStore.init(path:)`), so it is a contained change.
@@ -356,14 +356,14 @@ DELETE FROM rawBatch WHERE syncedAt IS NOT NULL AND syncedAt < ?
 ```
 
 So raw captures do not accumulate forever. (The `syncedAt`/upload-related columns are
-schema scaffolding inherited from the upstream collection library; in NOOP's offline
+schema scaffolding inherited from the upstream collection library; in Pulse's offline
 configuration nothing uploads, and the raw buffer is purely a local replay/recovery
 aid.)
 
 ### 2.4 Diagnostics: the strap connection log
 
 When a strap won't connect or behaves oddly, the single most useful thing a user can
-send is the connection log. NOOP keeps one so it can be shared **without** needing
+send is the connection log. Pulse keeps one so it can be shared **without** needing
 `adb` or a developer setup (this is what made issues #17/#18 reportable), and the same
 log doubles as the primary tool for **debugging and protocol development** (see
 `ANDROID.md` → "Debugging the strap connection").
@@ -375,7 +375,7 @@ ring buffer** — the last
 advertised name + RSSI), the bond/handshake state machine, command names with their
 outbound payload **hex**, and offload progress (trim cursors, chunk acks). It is held
 in RAM only; the "Share strap log" button writes it to a private app-cache file at
-share time and hands that file to the OS share sheet. Nothing is uploaded by NOOP.
+share time and hands that file to the OS share sheet. Nothing is uploaded by Pulse.
 
 **What it does *not* contain.** No account credentials (there is no account), no
 decoded biometric *values* (heart-rate numbers, R-R intervals, SpO₂, skin-temp are not
@@ -389,7 +389,7 @@ secret payload). The one mild identifier is the strap's advertised name (e.g.
 (`Log.d`/logcat). A user has no reason to emit the connection log to the device-wide
 log, so they don't. Developers who want to watch a session live over
 `adb logcat -s WhoopBleClient` turn on **Settings → Strap → "Debug logging"**
-(persisted as `NoopPrefs.KEY_DEBUG_LOGGING`, default `false`); the flag drives
+(persisted as `PulsePrefs.KEY_DEBUG_LOGGING`, default `false`); the flag drives
 `WhoopBleClient.debugLogcat`, which gates the single `Log.d` call. The in-app buffer
 and the "Share strap log" export work the same whether or not debug logging is on, so
 the diagnostic path is always available without ever defaulting users into logcat.
@@ -400,33 +400,33 @@ Android wrist alerts (buzz the strap when chosen apps notify you) need a
 `NotificationListenerService` — that's the only way to register in the OS's
 **Notification Access** list and be told a notification was posted. Notification
 access is a powerful permission, so for a privacy-first app it's worth being precise
-about what NOOP does and does not do with it:
+about what Pulse does and does not do with it:
 
 - **Off by default, double opt-in.** The service does nothing until you both grant
-  Notification Access in system settings *and* turn on **Wrist alerts** in NOOP, then
+  Notification Access in system settings *and* turn on **Wrist alerts** in Pulse, then
   enable specific apps (each app is off by default).
 - **It reads only the posting package name — never content.** On a posted
-  notification NOOP looks at *which app* posted (and skips ongoing / foreground-service /
+  notification Pulse looks at *which app* posted (and skips ongoing / foreground-service /
   group-summary noise), checks your settings (master toggle, that app's opt-in, quiet
   hours, only-when-worn), and if all pass, sends a haptic-pattern command to the strap.
   The notification's title, text, sender, and extras are never read, stored, logged, or
   transmitted.
 - **Nothing leaves the device.** There is no server; the only output is a Bluetooth
-  buzz to your own strap. (`android/.../notif/NoopNotificationListener.kt`.)
+  buzz to your own strap. (`android/.../notif/PulseNotificationListener.kt`.)
 
 ---
 
 ## 3. Threat model
 
-NOOP parses two classes of **untrusted input**: bytes arriving over Bluetooth, and
+Pulse parses two classes of **untrusted input**: bytes arriving over Bluetooth, and
 files chosen for import. Both are treated as hostile and validated before anything
 reaches the database. Apple Health and WHOOP files in particular can be very large
 (multi-hundred-MB to multi-GB), so resource exhaustion is part of the model.
 
-What is explicitly **out of scope**: NOOP cannot defend the data against an attacker
+What is explicitly **out of scope**: Pulse cannot defend the data against an attacker
 who already controls your unlocked user session (see §2.2), and it makes no claim of
 cryptographic authentication of the strap — BLE pairing/bonding security is provided
-by the OS Bluetooth stack and the device, not by NOOP.
+by the OS Bluetooth stack and the device, not by Pulse.
 
 ### 3.1 Threat A: a malicious or malfunctioning BLE peer
 
@@ -596,19 +596,19 @@ dedicated source id `nutrition-csv`, alongside your other metrics and entirely o
 
 ---
 
-## 4. What NOOP does *not* collect or transmit
+## 4. What Pulse does *not* collect or transmit
 
-- **No NOOP account, no NOOP login.** Nothing to sign into with NOOP itself; NOOP
+- **No Pulse account, no Pulse login.** Nothing to sign into with Pulse itself; Pulse
   issues no credentials of its own. The one exception is opt-in: the Oura history import
   (§1.1b) has *you* sign into *your own* Oura account, at Oura's own login page, over
-  OAuth — NOOP never sees your Oura password, only the resulting tokens, kept in the
+  OAuth — Pulse never sees your Oura password, only the resulting tokens, kept in the
   Keychain.
 - **No telemetry / analytics / crash reporting.** No third-party SDKs of that kind.
-- **No NOOP cloud, account sync, or operated remote backup.** The Oura history import (§1.1b) is
+- **No Pulse cloud, account sync, or operated remote backup.** The Oura history import (§1.1b) is
   **inbound only**. Android self-hosted push (§1.1d) is the sole standing outbound export: off by
   default, one-way, and directed only to the endpoint the user configured and owns.
 - **No advertising identifiers, no tracking.**
-- **No WHOOP account or API credentials.** NOOP talks only to the strap over local
+- **No WHOOP account or API credentials.** Pulse talks only to the strap over local
   BLE; it does not authenticate against, or pull from, any WHOOP server. (Oura is the
   one account-based exception — see above and §1.1b.)
 
@@ -618,8 +618,8 @@ dedicated source id `nutrition-csv`, alongside your other metrics and entirely o
 
 | Surface | Risk | Mitigation | Where |
 |---------|------|------------|-------|
-| Process | Data exfiltration / network egress | Feature defaults, triggers, destinations and payloads are documented once in the [§1.1 inventory](#11-network-paths-canonical-inventory), including update checks and platform-service boundaries. No NOOP server, account or telemetry. Internet permission is not a destination allow-list. | App HTTP clients and source paths in §1.1 |
-| Oura history import | OAuth token / scope leakage, cross-account data mixing | Compiled out by default (`OURA_CLOUD_IMPORT`, §1.1b); tokens Keychain-only (`kSecAttrAccessibleAfterFirstUnlock`, never UserDefaults/plist); fixed OAuth scopes set at build time; raw + normalized rows partitioned under `deviceId = "oura-api"`; Oura's own scores kept reference-only (`ref_*`/`oura_*` metricSeries keys, never NOOP's Charge/Effort/Rest); `.cloudImport` is structurally priority-2 so it never seizes a WHOOP day; Forget Oura access purges tokens + every `oura-api` row incl. the raw archive | `Strand/Oura/OuraTokenStore.swift`, `Strand/Oura/OuraConnectModel.swift`, `Packages/WhoopStore/Sources/WhoopStore/OuraRawStore.swift` |
+| Process | Data exfiltration / network egress | Feature defaults, triggers, destinations and payloads are documented once in the [§1.1 inventory](#11-network-paths-canonical-inventory), including update checks and platform-service boundaries. No Pulse server, account or telemetry. Internet permission is not a destination allow-list. | App HTTP clients and source paths in §1.1 |
+| Oura history import | OAuth token / scope leakage, cross-account data mixing | Compiled out by default (`OURA_CLOUD_IMPORT`, §1.1b); tokens Keychain-only (`kSecAttrAccessibleAfterFirstUnlock`, never UserDefaults/plist); fixed OAuth scopes set at build time; raw + normalized rows partitioned under `deviceId = "oura-api"`; Oura's own scores kept reference-only (`ref_*`/`oura_*` metricSeries keys, never Pulse's Charge/Effort/Rest); `.cloudImport` is structurally priority-2 so it never seizes a WHOOP day; Forget Oura access purges tokens + every `oura-api` row incl. the raw archive | `Strand/Oura/OuraTokenStore.swift`, `Strand/Oura/OuraConnectModel.swift`, `Packages/WhoopStore/Sources/WhoopStore/OuraRawStore.swift` |
 | Filesystem | Broad disk access | Only `files.user-selected.read-write`; data stays in the sandbox container | `Strand.entitlements`, `Strand/Collect/StorePaths.swift` |
 | BLE frames | Malformed / adversarial packets | CRC8 + CRC32 (+ CRC16 for v5) gating; reject on failure | `WhoopProtocol/Framing.swift`, `Strand/BLE/FrameRouter.swift` |
 | BLE frames | Out-of-bounds reads from short/lying length | `nil`-returning bounds-checked readers; slice clamping; min-length guards | `WhoopProtocol/Interpreter.swift` |
@@ -630,13 +630,13 @@ dedicated source id `nutrition-csv`, alongside your other metrics and entirely o
 | CSV import | Zip bomb / oversized entries | 256 MB per-entry cap (declared + running budget); CRC32 verify | `StrandImport/WhoopExportImporter.swift` |
 | CSV import | Arbitrary archive members | Filename allow-list; tolerant optional-column parsing | `StrandImport/WhoopExportImporter.swift` |
 | Data at rest | Disk theft / offline access | Relies on FileVault + sandbox container; SQLCipher available as an option | `WhoopStore/WhoopStore.swift` |
-| Diagnostics log | Leaking the strap log to the device-wide system log | In-app ring buffer only; logcat mirroring is **opt-in** (Settings → Strap → "Debug logging", default off); no biometric values / tokens logged (§2.4) | `android/.../ble/WhoopBleClient.kt` (`debugLogcat`), `android/.../ui/MainActivity.kt` (`NoopPrefs`) |
+| Diagnostics log | Leaking the strap log to the device-wide system log | In-app ring buffer only; logcat mirroring is **opt-in** (Settings → Strap → "Debug logging", default off); no biometric values / tokens logged (§2.4) | `android/.../ble/WhoopBleClient.kt` (`debugLogcat`), `android/.../ui/MainActivity.kt` (`PulsePrefs`) |
 
 ---
 
 ## 6. Reporting a security issue
 
-NOOP is a hobbyist, non-commercial interoperability and research project provided
+Pulse is a hobbyist, non-commercial interoperability and research project provided
 **as-is, with no warranty**, for personal and educational use only (see
 `DISCLAIMER.md`). If you find a security or privacy issue, please open a GitHub issue
 describing the problem and a reproduction; sensitive reports can be coordinated
@@ -647,7 +647,7 @@ good faith.
 
 ## 7. Credits
 
-The protocol and persistence work NOOP builds on is community reverse-engineering of
+The protocol and persistence work Pulse builds on is community reverse-engineering of
 hardware the user owns, used for interoperability:
 
 - **`johnmiddleton12/my-whoop`** — the WHOOP 4.0 BLE framing/command/decode work and
@@ -660,5 +660,5 @@ hardware the user owns, used for interoperability:
 - **`weichsel/ZIPFoundation`** — the archive reader used by the importers.
 
 See `ATTRIBUTION.md` and `DISCLAIMER.md` for the full attribution and good-faith
-notice. NOOP contains no WHOOP proprietary code, firmware, binaries, logos, or
+notice. Pulse contains no WHOOP proprietary code, firmware, binaries, logos, or
 assets, and performs no DRM circumvention.

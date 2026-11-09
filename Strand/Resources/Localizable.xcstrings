@@ -67,7 +67,7 @@
           "de": {"stringUnit": {"state": "translated", "value": "Oura-Benachrichtigungsmaske ff (experimentell)"}}, "es": {"stringUnit": {"state": "translated", "value": "Máscara de notificación Oura ff (experimental)"}}, "fr": {"stringUnit": {"state": "translated", "value": "Masque de notification Oura ff (expérimental)"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Máscara de notificação Oura ff (experimental)"}}, "it": {"stringUnit": {"state": "translated", "value": "Maschera di notifica Oura ff (sperimentale)"}}, "pl": {"stringUnit": {"state": "translated", "value": "Maska powiadomień Oura ff (eksperymentalne)"}}, "ru": {"stringUnit": {"state": "translated", "value": "Маска уведомлений Oura ff (экспериментально)"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "Oura 通知掩码 ff（实验性）"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "Oura 通知遮罩 ff（實驗性）"}}
         } },
         "Sends the official app’s SetNotification mask (1c 01 ff) instead of Pulse’s 3f at the next connect. The ring packs ~10 packets per notification for the official app and one for Pulse (9× slower drains); this is the first candidate switch. Off by default; the next connect after turning it off is back on 3f. Watch the strap log for “-> notify_all(ff)” and compare notification sizes in the raw capture.": { "localizations": {
-          "de": {"stringUnit": {"state": "translated", "value": "Sendet beim nächsten Verbinden die SetNotification-Maske der offiziellen App (1c 01 ff) statt NOOPs 3f. Der Ring packt für die offizielle App ~10 Pakete in eine Benachrichtigung, für Pulse nur eines (9× langsameres Auslesen); das ist der erste Kandidat für den Schalter. Standardmäßig aus; die erste Verbindung nach dem Ausschalten läuft wieder mit 3f. Im Strap-Protokoll auf „-> notify_all(ff)“ achten und die Benachrichtigungsgrößen in der Rohaufzeichnung vergleichen."}}, "es": {"stringUnit": {"state": "translated", "value": "Envía la máscara SetNotification de la aplicación oficial (1c 01 ff) en lugar del 3f de Pulse en la próxima conexión. El anillo agrupa ~10 paquetes por notificación para la aplicación oficial y uno para Pulse (descarga 9× más lenta); este es el primer interruptor candidato. Desactivado por defecto; la conexión siguiente a desactivarlo vuelve a 3f. Busca «-> notify_all(ff)» en el registro de la pulsera y compara los tamaños de notificación en la captura sin procesar."}}, "fr": {"stringUnit": {"state": "translated", "value": "Envoie le masque SetNotification de l’application officielle (1c 01 ff) au lieu du 3f de Pulse à la prochaine connexion. La bague regroupe ~10 paquets par notification pour l’application officielle et un seul pour Pulse (vidage 9× plus lent) ; c’est le premier commutateur candidat. Désactivé par défaut ; la connexion suivant la désactivation repasse en 3f. Surveillez « -> notify_all(ff) » dans le journal du bracelet et comparez la taille des notifications dans la capture brute."}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Envia a máscara SetNotification da aplicação oficial (1c 01 ff) em vez do 3f do Pulse na próxima ligação. O anel agrupa ~10 pacotes por notificação para a aplicação oficial e um para o Pulse (descarga 9× mais lenta); este é o primeiro candidato a interruptor. Desligado por predefinição; a ligação seguinte após desligar volta a 3f. Procure «-> notify_all(ff)» no registo da pulseira e compare os tamanhos das notificações na captura em bruto."}}, "it": {"stringUnit": {"state": "translated", "value": "Alla prossima connessione invia la maschera SetNotification dell’app ufficiale (1c 01 ff) invece del 3f di Pulse. L’anello impacchetta ~10 pacchetti per notifica per l’app ufficiale e uno solo per Pulse (scarico 9× più lento); questo è il primo interruttore candidato. Disattivato per impostazione predefinita; la connessione successiva alla disattivazione torna a 3f. Cerca «-> notify_all(ff)» nel registro del cinturino e confronta le dimensioni delle notifiche nella cattura grezza."}}, "pl": {"stringUnit": {"state": "translated", "value": "Przy następnym połączeniu wysyła maskę SetNotification oficjalnej aplikacji (1c 01 ff) zamiast 3f używanego przez Pulse. Pierścień pakuje ~10 pakietów w jedno powiadomienie dla oficjalnej aplikacji, a dla Pulse tylko jeden (9× wolniejsze zrzuty); to pierwszy kandydat na przełącznik. Domyślnie wyłączone; pierwsze połączenie po wyłączeniu wraca do 3f. Szukaj „-> notify_all(ff)” w dzienniku opaski i porównaj rozmiary powiadomień w surowym przechwyceniu."}}, "ru": {"stringUnit": {"state": "translated", "value": "При следующем подключении отправляет маску SetNotification официального приложения (1c 01 ff) вместо 3f, которую использует Pulse. Для официального приложения кольцо упаковывает ~10 пакетов в одно уведомление, для Pulse — только один (выгрузка в 9× медленнее); это первый кандидат на переключатель. По умолчанию выключено; первое подключение после выключения снова использует 3f. Ищите «-> notify_all(ff)» в журнале браслета и сравните размеры уведомлений в сырой записи."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "下次连接时发送官方应用的 SetNotification 掩码（1c 01 ff），而不是 Pulse 的 3f。戒指为官方应用把约 10 个数据包打包进一条通知，为 Pulse 只发一个（读取慢 9 倍）；这是第一个候选开关。默认关闭；关闭后的下一次连接恢复为 3f。请在腕带日志中查看“-> notify_all(ff)”，并在原始捕获中比较通知大小。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "下次連線時傳送官方應用程式的 SetNotification 遮罩（1c 01 ff），而非 Pulse 的 3f。戒指為官方應用程式把約 10 個封包打包進一則通知，為 Pulse 只送一個（讀取慢 9 倍）；這是第一個候選開關。預設關閉；關閉後的下一次連線恢復為 3f。請在腕帶記錄中查看「-> notify_all(ff)」，並在原始擷取中比較通知大小。"}}
+          "de": {"stringUnit": {"state": "translated", "value": "Sendet beim nächsten Verbinden die SetNotification-Maske der offiziellen App (1c 01 ff) statt Pulses 3f. Der Ring packt für die offizielle App ~10 Pakete in eine Benachrichtigung, für Pulse nur eines (9× langsameres Auslesen); das ist der erste Kandidat für den Schalter. Standardmäßig aus; die erste Verbindung nach dem Ausschalten läuft wieder mit 3f. Im Strap-Protokoll auf „-> notify_all(ff)“ achten und die Benachrichtigungsgrößen in der Rohaufzeichnung vergleichen."}}, "es": {"stringUnit": {"state": "translated", "value": "Envía la máscara SetNotification de la aplicación oficial (1c 01 ff) en lugar del 3f de Pulse en la próxima conexión. El anillo agrupa ~10 paquetes por notificación para la aplicación oficial y uno para Pulse (descarga 9× más lenta); este es el primer interruptor candidato. Desactivado por defecto; la conexión siguiente a desactivarlo vuelve a 3f. Busca «-> notify_all(ff)» en el registro de la pulsera y compara los tamaños de notificación en la captura sin procesar."}}, "fr": {"stringUnit": {"state": "translated", "value": "Envoie le masque SetNotification de l’application officielle (1c 01 ff) au lieu du 3f de Pulse à la prochaine connexion. La bague regroupe ~10 paquets par notification pour l’application officielle et un seul pour Pulse (vidage 9× plus lent) ; c’est le premier commutateur candidat. Désactivé par défaut ; la connexion suivant la désactivation repasse en 3f. Surveillez « -> notify_all(ff) » dans le journal du bracelet et comparez la taille des notifications dans la capture brute."}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Envia a máscara SetNotification da aplicação oficial (1c 01 ff) em vez do 3f do Pulse na próxima ligação. O anel agrupa ~10 pacotes por notificação para a aplicação oficial e um para o Pulse (descarga 9× mais lenta); este é o primeiro candidato a interruptor. Desligado por predefinição; a ligação seguinte após desligar volta a 3f. Procure «-> notify_all(ff)» no registo da pulseira e compare os tamanhos das notificações na captura em bruto."}}, "it": {"stringUnit": {"state": "translated", "value": "Alla prossima connessione invia la maschera SetNotification dell’app ufficiale (1c 01 ff) invece del 3f di Pulse. L’anello impacchetta ~10 pacchetti per notifica per l’app ufficiale e uno solo per Pulse (scarico 9× più lento); questo è il primo interruttore candidato. Disattivato per impostazione predefinita; la connessione successiva alla disattivazione torna a 3f. Cerca «-> notify_all(ff)» nel registro del cinturino e confronta le dimensioni delle notifiche nella cattura grezza."}}, "pl": {"stringUnit": {"state": "translated", "value": "Przy następnym połączeniu wysyła maskę SetNotification oficjalnej aplikacji (1c 01 ff) zamiast 3f używanego przez Pulse. Pierścień pakuje ~10 pakietów w jedno powiadomienie dla oficjalnej aplikacji, a dla Pulse tylko jeden (9× wolniejsze zrzuty); to pierwszy kandydat na przełącznik. Domyślnie wyłączone; pierwsze połączenie po wyłączeniu wraca do 3f. Szukaj „-> notify_all(ff)” w dzienniku opaski i porównaj rozmiary powiadomień w surowym przechwyceniu."}}, "ru": {"stringUnit": {"state": "translated", "value": "При следующем подключении отправляет маску SetNotification официального приложения (1c 01 ff) вместо 3f, которую использует Pulse. Для официального приложения кольцо упаковывает ~10 пакетов в одно уведомление, для Pulse — только один (выгрузка в 9× медленнее); это первый кандидат на переключатель. По умолчанию выключено; первое подключение после выключения снова использует 3f. Ищите «-> notify_all(ff)» в журнале браслета и сравните размеры уведомлений в сырой записи."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "下次连接时发送官方应用的 SetNotification 掩码（1c 01 ff），而不是 Pulse 的 3f。戒指为官方应用把约 10 个数据包打包进一条通知，为 Pulse 只发一个（读取慢 9 倍）；这是第一个候选开关。默认关闭；关闭后的下一次连接恢复为 3f。请在腕带日志中查看“-> notify_all(ff)”，并在原始捕获中比较通知大小。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "下次連線時傳送官方應用程式的 SetNotification 遮罩（1c 01 ff），而非 Pulse 的 3f。戒指為官方應用程式把約 10 個封包打包進一則通知，為 Pulse 只送一個（讀取慢 9 倍）；這是第一個候選開關。預設關閉；關閉後的下一次連線恢復為 3f。請在腕帶記錄中查看「-> notify_all(ff)」，並在原始擷取中比較通知大小。"}}
         } },
         "Over-reports R-R, so no value is shown": { "localizations": {
           "de": {"stringUnit": {"state": "translated", "value": "Meldet zu viele RR-Intervalle, daher kein Wert"}}, "es": {"stringUnit": {"state": "translated", "value": "Cuenta de más los intervalos R-R, por eso no se muestra"}}, "fr": {"stringUnit": {"state": "translated", "value": "Surestime les intervalles R-R, donc aucune valeur"}}, "it": {"stringUnit": {"state": "translated", "value": "Conta troppi intervalli R-R, quindi nessun valore"}}, "pl": {"stringUnit": {"state": "translated", "value": "Zawyża liczbę interwałów R-R, więc nie pokazujemy wartości"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Conta intervalos R-R a mais, por isso não há valor"}}, "ru": {"stringUnit": {"state": "translated", "value": "Завышает число интервалов R-R, поэтому значение не показано"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "R-R 间期计数偏多，因此不显示数值"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "R-R 間期計數偏多，因此不顯示數值"}}
@@ -24154,7 +24154,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein klassischer Überblick über NOOPs eigene Werte auf einen Blick. Gleiche Daten, andere Perspektive."
+            "value": "Ein klassischer Überblick über Pulses eigene Werte auf einen Blick. Gleiche Daten, andere Perspektive."
           }
         },
         "ru": {
@@ -30964,7 +30964,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Entsperre dein iPhone nach einem Neustart einmal. Bis dahin hält iOS NOOPs Dateien gesperrt (Data Protection), sodass kein neuer Verlauf geschrieben oder synchronisiert werden kann."
+            "value": "Entsperre dein iPhone nach einem Neustart einmal. Bis dahin hält iOS Pulses Dateien gesperrt (Data Protection), sodass kein neuer Verlauf geschrieben oder synchronisiert werden kann."
           }
         },
         "es": {
@@ -34028,7 +34028,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bewaffnet auf dem gurt selbst, so dass es zu ihrer wachzeit summen kann, auch wenn ihr telefon schläft oder xnoopx geschlossen ist. Sendet den genauen Alarmbefehl, den die offizielle App sendet, bestätigtes Summen auf einem echten WHOOP 4.0 (Community-Wire-Capture + On-Device-Test, #535). Halte einen Backup-Alarm für alles, was du wirklich nicht verpassen kannst."
+            "value": "Bewaffnet auf dem gurt selbst, so dass es zu ihrer wachzeit summen kann, auch wenn ihr telefon schläft oder xpulsex geschlossen ist. Sendet den genauen Alarmbefehl, den die offizielle App sendet, bestätigtes Summen auf einem echten WHOOP 4.0 (Community-Wire-Capture + On-Device-Test, #535). Halte einen Backup-Alarm für alles, was du wirklich nicht verpassen kannst."
           }
         },
         "es": {
@@ -55678,7 +55678,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "AltStore oder SideStore installieren es automatisch für dich, wenn du NOOPs Quelle hinzugefügt hast; eine direkte .ipa muss weiterhin auf deinem Gerät signiert werden."
+            "value": "AltStore oder SideStore installieren es automatisch für dich, wenn du Pulses Quelle hinzugefügt hast; eine direkte .ipa muss weiterhin auf deinem Gerät signiert werden."
           }
         },
         "en": {
@@ -57988,7 +57988,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zählerticks pro Schritt. Lass es auf 1,0, außer deine Schritte fallen zu hoch aus. Auf einem WHOOP 5/MG können sie sehr hoch ausfallen (10× oder mehr), daher geht das hier bis 30. Geh bekannte 1.000 Schritte und teile NOOPs Zählung durch die echte Zahl, um deinen Wert zu erhalten."
+            "value": "Zählerticks pro Schritt. Lass es auf 1,0, außer deine Schritte fallen zu hoch aus. Auf einem WHOOP 5/MG können sie sehr hoch ausfallen (10× oder mehr), daher geht das hier bis 30. Geh bekannte 1.000 Schritte und teile Pulses Zählung durch die echte Zahl, um deinen Wert zu erhalten."
           }
         },
         "es": {
@@ -85479,7 +85479,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "So liest du das: HRV, Ruhe-HF, Schlafdauer, Atemfrequenz und Hauttemperatur werden vom Strap gemessen (Hauttemperatur wird als Abweichung von deiner eigenen Basislinie angezeigt). Workouts ist die Zahl der Aktivitäten, die du erfasst hast oder die erkannt wurden. Erholung, Belastung und Stress sind NOOPs eigene Werte auf dem Gerät, keine klinischen Messungen: Erholung ist ein täglicher Bereitschafts-Kompositwert (HRV, Ruhe-HF, Schlaf und Hauttemperatur-Trend), Belastung ist die aus der Herzfrequenz abgeleitete kardiovaskuläre Last, und Stress ist ein 0–3-Index der autonomen Belastung aus Ruhe-HF und HRV."
+            "value": "So liest du das: HRV, Ruhe-HF, Schlafdauer, Atemfrequenz und Hauttemperatur werden vom Strap gemessen (Hauttemperatur wird als Abweichung von deiner eigenen Basislinie angezeigt). Workouts ist die Zahl der Aktivitäten, die du erfasst hast oder die erkannt wurden. Erholung, Belastung und Stress sind Pulses eigene Werte auf dem Gerät, keine klinischen Messungen: Erholung ist ein täglicher Bereitschafts-Kompositwert (HRV, Ruhe-HF, Schlaf und Hauttemperatur-Trend), Belastung ist die aus der Herzfrequenz abgeleitete kardiovaskuläre Last, und Stress ist ein 0–3-Index der autonomen Belastung aus Ruhe-HF und HRV."
           }
         },
         "es": {
@@ -89707,7 +89707,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOPs Schlüssel wird installiert und bestätigt, dass der Ring nur noch Pulse antwortet. Halte den Ring in der Nähe und öffne die Oura-App nicht."
+            "value": "Pulses Schlüssel wird installiert und bestätigt, dass der Ring nur noch Pulse antwortet. Halte den Ring in der Nähe und öffne die Oura-App nicht."
           }
         },
         "es": {
@@ -103824,118 +103824,118 @@
         }
       }
     },
-    "Mirror at noop dot fans, a fallback if GitHub is down": {
+    "Mirror at pulse dot fans, a fallback if GitHub is down": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Spiegel auf noop punkt fans, ein Fallback, falls GitHub ausfällt"
+            "value": "Spiegel auf pulse punkt fans, ein Fallback, falls GitHub ausfällt"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Réplica en noop punto fans, una alternativa si GitHub está caído"
+            "value": "Réplica en pulse punto fans, una alternativa si GitHub está caído"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Miroir sur noop point fans, une solution de secours si GitHub est indisponible"
+            "value": "Miroir sur pulse point fans, une solution de secours si GitHub est indisponible"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mirror su noop punto fans, un'alternativa se GitHub è inattivo"
+            "value": "Mirror su pulse punto fans, un'alternativa se GitHub è inattivo"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mirror at noop dot fans, uma alternativa se o GitHub estiver em baixo"
+            "value": "Mirror at pulse dot fans, uma alternativa se o GitHub estiver em baixo"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Зеркало на noop точка fans — запасной вариант, если GitHub недоступен"
+            "value": "Зеркало на pulse точка fans — запасной вариант, если GitHub недоступен"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "位于 noop dot fans 的镜像，当 GitHub 故障时的备选方案"
+            "value": "位于 pulse dot fans 的镜像，当 GitHub 故障时的备选方案"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "位於 noop dot fans 的鏡像，當 GitHub 故障時的備選方案"
+            "value": "位於 pulse dot fans 的鏡像，當 GitHub 故障時的備選方案"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lustro na fanach kropek noop, rozwiązanie awaryjne, jeśli GitHub nie działa"
+            "value": "Lustro na fanach kropek pulse, rozwiązanie awaryjne, jeśli GitHub nie działa"
           }
         }
       }
     },
-    "Mirror: noop.fans": {
+    "Mirror: github.com/kosherite/pulse": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Spiegel: noop.fans"
+            "value": "Spiegel: github.com/kosherite/pulse"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Réplica: noop.fans"
+            "value": "Réplica: github.com/kosherite/pulse"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Miroir : noop.fans"
+            "value": "Miroir : github.com/kosherite/pulse"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mirror, noop.fans"
+            "value": "Mirror, github.com/kosherite/pulse"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Espelho: noop.fans"
+            "value": "Espelho: github.com/kosherite/pulse"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Зеркало: noop.fans"
+            "value": "Зеркало: github.com/kosherite/pulse"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "镜像，noop.fans"
+            "value": "镜像，github.com/kosherite/pulse"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "鏡像，noop.fans"
+            "value": "鏡像，github.com/kosherite/pulse"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lustro: noop.wentylatory"
+            "value": "Lustro: pulse.wentylatory"
           }
         }
       }
@@ -106064,7 +106064,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOP-Energie"
+            "value": "Pulse-Energie"
           }
         },
         "es": {
@@ -108351,7 +108351,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOPs eigene Energie, Belastung und Erholung, berechnet auf deinem Gerät nach veröffentlichten Methoden."
+            "value": "Pulses eigene Energie, Belastung und Erholung, berechnet auf deinem Gerät nach veröffentlichten Methoden."
           }
         },
         "es": {
@@ -108409,7 +108409,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOPs primäres, voll unterstütztes Band"
+            "value": "Pulses primäres, voll unterstütztes Band"
           }
         },
         "es": {
@@ -108510,13 +108510,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOP，，你的全部数据，不上云端。"
+            "value": "Pulse，，你的全部数据，不上云端。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOP，，你的全部資料，不上雲端。"
+            "value": "Pulse，，你的全部資料，不上雲端。"
           }
         },
         "pl": {
@@ -108527,7 +108527,7 @@
         }
       }
     },
-    "NOOP-computed": {
+    "Pulse-computed": {
       "extractionState": "stale",
       "localizations": {
         "de": {
@@ -108539,7 +108539,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOP-computed"
+            "value": "Pulse-computed"
           }
         },
         "es": {
@@ -108633,13 +108633,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOP，你的全部数据，不上云端。"
+            "value": "Pulse，你的全部数据，不上云端。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOP，你的全部資料，不上雲端。"
+            "value": "Pulse，你的全部資料，不上雲端。"
           }
         },
         "pl": {
@@ -131485,7 +131485,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lies deine Herzfrequenz, HRV, deinen Blutsauerstoff, deine Atemfrequenz, deinen Schlaf, deine Schritte und Energie direkt aus Apple Health und schreibe NOOPs strap-basierte Metriken zurück. Alles bleibt auf %@."
+            "value": "Lies deine Herzfrequenz, HRV, deinen Blutsauerstoff, deine Atemfrequenz, deinen Schlaf, deine Schritte und Energie direkt aus Apple Health und schreibe Pulses strap-basierte Metriken zurück. Alles bleibt auf %@."
           }
         },
         "es": {
@@ -134818,7 +134818,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Erholung, NOOPs Energiewert, wird von deiner Herzfrequenzvariabilität gegenüber deiner persönlichen Basislinie angeführt. Ein Brustgurt streamt Schlag-zu-Schlag-Daten die ganze Nacht dicht, er kann diese Basislinie also schnell lernen. Eine Apple Watch misst HRV dagegen stichprobenartig, eine Handvoll Messungen über den Tag plus nachts – das Signal ist echt, aber dünner."
+            "value": "Die Erholung, Pulses Energiewert, wird von deiner Herzfrequenzvariabilität gegenüber deiner persönlichen Basislinie angeführt. Ein Brustgurt streamt Schlag-zu-Schlag-Daten die ganze Nacht dicht, er kann diese Basislinie also schnell lernen. Eine Apple Watch misst HRV dagegen stichprobenartig, eine Handvoll Messungen über den Tag plus nachts – das Signal ist echt, aber dünner."
           }
         },
         "es": {
@@ -144064,7 +144064,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ in NOOPs Ordner in der Dateien-App gesichert."
+            "value": "%@ in Pulses Ordner in der Dateien-App gesichert."
           }
         },
         "es": {
@@ -165621,7 +165621,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Weckalarm oben vibriert dein Handgelenk aus der Firmware des Straps. Er kann keinen lauten Alarm abspielen, und eine sideloadete App kann auf diesem Gerät auch kein zuverlässiges Hintergrund-Wecken abspielen (dafür braucht es eine Berechtigung für kritische Hinweise, die dieser Build nicht hat). Behalte den eingebauten Wecker deines Telefons als Backup. NOOPs telefonbasiertes Smart-Wecken (Leichtschlaf-Erkennung) gibt es in der Android-App."
+            "value": "Der Weckalarm oben vibriert dein Handgelenk aus der Firmware des Straps. Er kann keinen lauten Alarm abspielen, und eine sideloadete App kann auf diesem Gerät auch kein zuverlässiges Hintergrund-Wecken abspielen (dafür braucht es eine Berechtigung für kritische Hinweise, die dieser Build nicht hat). Behalte den eingebauten Wecker deines Telefons als Backup. Pulses telefonbasiertes Smart-Wecken (Leichtschlaf-Erkennung) gibt es in der Android-App."
           }
         },
         "es": {
@@ -165679,7 +165679,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Weckalarm oben vibriert dein Handgelenk aus der Firmware des Straps. Er kann keinen lauten Alarm abspielen. Wir planen zusätzlich eine Backup-Mitteilung zu deiner Aufwachzeit, aber eine sideloadete App kann auf diesem Gerät kein garantiertes Wecken abspielen (dafür braucht es eine Berechtigung für kritische Hinweise, die dieser Build nicht hat) – Fokus oder Lautlos können sie also stummschalten. Behalte den eingebauten Wecker deines Telefons als echtes Backup. NOOPs telefonbasiertes Smart-Wecken (Leichtschlaf-Erkennung) gibt es in der Android-App."
+            "value": "Der Weckalarm oben vibriert dein Handgelenk aus der Firmware des Straps. Er kann keinen lauten Alarm abspielen. Wir planen zusätzlich eine Backup-Mitteilung zu deiner Aufwachzeit, aber eine sideloadete App kann auf diesem Gerät kein garantiertes Wecken abspielen (dafür braucht es eine Berechtigung für kritische Hinweise, die dieser Build nicht hat) – Fokus oder Lautlos können sie also stummschalten. Behalte den eingebauten Wecker deines Telefons als echtes Backup. Pulses telefonbasiertes Smart-Wecken (Leichtschlaf-Erkennung) gibt es in der Android-App."
           }
         },
         "es": {
@@ -176703,7 +176703,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WHOOP ist NOOPs primäres, voll unterstütztes Band. Andere Herzfrequenzgurte sind eine frühe Ergänzung in Entwicklung: Sie streamen Live-Herzfrequenz und HRV, aber nicht WHOOPs tiefere Schlaf- und Erholungsdaten."
+            "value": "WHOOP ist Pulses primäres, voll unterstütztes Band. Andere Herzfrequenzgurte sind eine frühe Ergänzung in Entwicklung: Sie streamen Live-Herzfrequenz und HRV, aber nicht WHOOPs tiefere Schlaf- und Erholungsdaten."
           }
         },
         "es": {
@@ -176761,7 +176761,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WHOOP ist NOOPs primäres, voll unterstütztes Band. Andere Herzfrequenzgurte streamen Live-Herzfrequenz und HRV, aber nicht WHOOPs tiefere Schlaf- und Erholungsdaten."
+            "value": "WHOOP ist Pulses primäres, voll unterstütztes Band. Andere Herzfrequenzgurte streamen Live-Herzfrequenz und HRV, aber nicht WHOOPs tiefere Schlaf- und Erholungsdaten."
           }
         },
         "es": {
@@ -182097,60 +182097,60 @@
         }
       }
     },
-    "When this is on, Pulse rewrites a plain-text file (On My iPhone › Pulse › noop_sync.txt) each time you leave the app: one line per 15 minutes of heart rate, HRV and steps, read straight from your strap. Pair it with the Siri Shortcut that reads the file and logs everything into Apple Health (no HealthKit entitlement needed), so it works on sideloaded installs. The setup guide and the pre-built Shortcut live in the project wiki on GitHub.": {
+    "When this is on, Pulse rewrites a plain-text file (On My iPhone › Pulse › pulse_sync.txt) each time you leave the app: one line per 15 minutes of heart rate, HRV and steps, read straight from your strap. Pair it with the Siri Shortcut that reads the file and logs everything into Apple Health (no HealthKit entitlement needed), so it works on sideloaded installs. The setup guide and the pre-built Shortcut live in the project wiki on GitHub.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wenn das an ist, schreibt Pulse bei jedem Verlassen der App eine Klartextdatei neu (Auf meinem iPhone › Pulse › noop_sync.txt): eine Zeile pro 15 Minuten Herzfrequenz, HRV und Schritte, direkt von deinem Strap gelesen. Kombiniere sie mit dem Siri-Kurzbefehl, der die Datei liest und alles in Apple Health einträgt (keine HealthKit-Berechtigung nötig), sodass es auf sideloadeten Installationen funktioniert. Die Anleitung und der fertige Kurzbefehl liegen im Projekt-Wiki auf GitHub."
+            "value": "Wenn das an ist, schreibt Pulse bei jedem Verlassen der App eine Klartextdatei neu (Auf meinem iPhone › Pulse › pulse_sync.txt): eine Zeile pro 15 Minuten Herzfrequenz, HRV und Schritte, direkt von deinem Strap gelesen. Kombiniere sie mit dem Siri-Kurzbefehl, der die Datei liest und alles in Apple Health einträgt (keine HealthKit-Berechtigung nötig), sodass es auf sideloadeten Installationen funktioniert. Die Anleitung und der fertige Kurzbefehl liegen im Projekt-Wiki auf GitHub."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cuando está activado, Pulse reescribe un archivo de texto plano (En mi iPhone › Pulse › noop_sync.txt) cada vez que sales de la app: una línea por cada 15 minutos de frecuencia cardíaca, VFC y pasos, leídos directamente desde tu pulsera. Combínalo con el atajo de Siri que lee el archivo y registra todo en Apple Health (sin necesidad del permiso de HealthKit), así funciona en instalaciones sideloaded. La guía de configuración y el atajo ya hecho están en la wiki del proyecto en GitHub."
+            "value": "Cuando está activado, Pulse reescribe un archivo de texto plano (En mi iPhone › Pulse › pulse_sync.txt) cada vez que sales de la app: una línea por cada 15 minutos de frecuencia cardíaca, VFC y pasos, leídos directamente desde tu pulsera. Combínalo con el atajo de Siri que lee el archivo y registra todo en Apple Health (sin necesidad del permiso de HealthKit), así funciona en instalaciones sideloaded. La guía de configuración y el atajo ya hecho están en la wiki del proyecto en GitHub."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quand c'est activé, Pulse réécrit un fichier texte brut (Sur mon iPhone › Pulse › noop_sync.txt) chaque fois que vous quittez l'application : une ligne toutes les 15 minutes pour la fréquence cardiaque, la VFC et les pas, lues directement depuis votre bracelet. Associez-le au raccourci Siri qui lit le fichier et enregistre tout dans Apple Santé (aucune autorisation HealthKit nécessaire), afin que cela fonctionne sur les installations en side-loading. Le guide de configuration et le raccourci prêt à l'emploi se trouvent dans le wiki du projet sur GitHub."
+            "value": "Quand c'est activé, Pulse réécrit un fichier texte brut (Sur mon iPhone › Pulse › pulse_sync.txt) chaque fois que vous quittez l'application : une ligne toutes les 15 minutes pour la fréquence cardiaque, la VFC et les pas, lues directement depuis votre bracelet. Associez-le au raccourci Siri qui lit le fichier et enregistre tout dans Apple Santé (aucune autorisation HealthKit nécessaire), afin que cela fonctionne sur les installations en side-loading. Le guide de configuration et le raccourci prêt à l'emploi se trouvent dans le wiki du projet sur GitHub."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quando questa opzione è attiva, Pulse riscrive un file di testo, On My iPhone › Pulse › noop_sync.txt, ogni volta che esci dall'app: una riga per ogni 15 minuti di frequenza cardiaca, HRV e passi, letti direttamente dalla tua fascia. Abbinalo allo Shortcut di Siri che legge il file e registra tutto in Apple Health, non serve alcuna autorizzazione HealthKit, quindi funziona sulle installazioni sideloaded. La guida alla configurazione e lo Shortcut già pronto si trovano nella wiki del progetto su GitHub."
+            "value": "Quando questa opzione è attiva, Pulse riscrive un file di testo, On My iPhone › Pulse › pulse_sync.txt, ogni volta che esci dall'app: una riga per ogni 15 minuti di frequenza cardiaca, HRV e passi, letti direttamente dalla tua fascia. Abbinalo allo Shortcut di Siri che legge il file e registra tutto in Apple Health, non serve alcuna autorizzazione HealthKit, quindi funziona sulle installazioni sideloaded. La guida alla configurazione e lo Shortcut già pronto si trovano nella wiki del progetto su GitHub."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quando ativado, o Pulse reescreve um ficheiro de texto simples (No meu iPhone › Pulse › noop_sync.txt) cada vez que sai da aplicação: uma linha a cada 15 minutos de frequência cardíaca, VFC e passos, lida diretamente na tua bracelete. Combine-o com o atalho Siri que lê o ficheiro e regista tudo no Apple Health (não é necessário ter direito ao HealthKit), para que funcione em instalações de sideload. O guia de configuração e o atalho pré-construído estão na wiki do projeto no GitHub."
+            "value": "Quando ativado, o Pulse reescreve um ficheiro de texto simples (No meu iPhone › Pulse › pulse_sync.txt) cada vez que sai da aplicação: uma linha a cada 15 minutos de frequência cardíaca, VFC e passos, lida diretamente na tua bracelete. Combine-o com o atalho Siri que lê o ficheiro e regista tudo no Apple Health (não é necessário ter direito ao HealthKit), para que funcione em instalações de sideload. O guia de configuração e o atalho pré-construído estão na wiki do projeto no GitHub."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Когда это включено, Pulse каждый раз при выходе из приложения перезаписывает текстовый файл (На моём iPhone › Pulse › noop_sync.txt): одна строка на каждые 15 минут пульса, ВСР и шагов, считанных прямо с браслета. Используйте его вместе с ярлыком Siri, который читает файл и записывает всё в Apple Здоровье (без разрешения HealthKit), поэтому это работает и при установке сайдлоадингом. Руководство по настройке и готовый ярлык находятся в вики проекта на GitHub."
+            "value": "Когда это включено, Pulse каждый раз при выходе из приложения перезаписывает текстовый файл (На моём iPhone › Pulse › pulse_sync.txt): одна строка на каждые 15 минут пульса, ВСР и шагов, считанных прямо с браслета. Используйте его вместе с ярлыком Siri, который читает файл и записывает всё в Apple Здоровье (без разрешения HealthKit), поэтому это работает и при установке сайдлоадингом. Руководство по настройке и готовый ярлык находятся в вики проекта на GitHub."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "开启此项后，每次你离开应用时，Pulse 都会重写一个纯文本文件 ，「在我的 iPhone 上 › Pulse › noop_sync.txt」， 每 15 分钟一行，包含直接从你手环读取的心率、HRV 和步数。将它与那个读取该文件并将一切记录到 Apple 健康的 Siri 快捷指令搭配使用，无需 HealthKit 权限，因此它在旁加载安装上也能工作。设置指南和预制的快捷指令位于 GitHub 上的项目 wiki 中。"
+            "value": "开启此项后，每次你离开应用时，Pulse 都会重写一个纯文本文件 ，「在我的 iPhone 上 › Pulse › pulse_sync.txt」， 每 15 分钟一行，包含直接从你手环读取的心率、HRV 和步数。将它与那个读取该文件并将一切记录到 Apple 健康的 Siri 快捷指令搭配使用，无需 HealthKit 权限，因此它在旁加载安装上也能工作。设置指南和预制的快捷指令位于 GitHub 上的项目 wiki 中。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "開啟此項後，每次你離開應用程式時，Pulse 都會重寫一個純文字檔案 ，「在我的 iPhone 上 › Pulse › noop_sync.txt」， 每 15 分鐘一行，包含直接從你手環讀取的心率、HRV 和步數。將它與那個讀取該檔案並將一切記錄到 Apple 健康的 Siri 捷徑搭配使用，無需 HealthKit 權限，因此它在側載安裝上也能工作。設定指南和預製的捷徑位於 GitHub 上的專案 wiki 中。"
+            "value": "開啟此項後，每次你離開應用程式時，Pulse 都會重寫一個純文字檔案 ，「在我的 iPhone 上 › Pulse › pulse_sync.txt」， 每 15 分鐘一行，包含直接從你手環讀取的心率、HRV 和步數。將它與那個讀取該檔案並將一切記錄到 Apple 健康的 Siri 捷徑搭配使用，無需 HealthKit 權限，因此它在側載安裝上也能工作。設定指南和預製的捷徑位於 GitHub 上的專案 wiki 中。"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gdy ta opcja jest włączona, Pulse zapisuje plik w postaci zwykłego tekstu (Na moim iPhonie › Pulse › noop_sync.txt) za każdym razem, gdy opuszczasz aplikację: jedna linia na 15 minut tętna, HRV i kroków, odczytywane bezpośrednio z paska. Połącz go ze skrótem Siri, który odczytuje plik i loguje wszystko do Apple Health (nie jest wymagane uprawnienie HealthKit), aby działało w przypadku instalacji ładowanych z boku. Przewodnik konfiguracji i wstępnie utworzony skrót są dostępne na wiki projektu w serwisie GitHub."
+            "value": "Gdy ta opcja jest włączona, Pulse zapisuje plik w postaci zwykłego tekstu (Na moim iPhonie › Pulse › pulse_sync.txt) za każdym razem, gdy opuszczasz aplikację: jedna linia na 15 minut tętna, HRV i kroków, odczytywane bezpośrednio z paska. Połącz go ze skrótem Siri, który odczytuje plik i loguje wszystko do Apple Health (nie jest wymagane uprawnienie HealthKit), aby działało w przypadku instalacji ładowanych z boku. Przewodnik konfiguracji i wstępnie utworzony skrót są dostępne na wiki projektu w serwisie GitHub."
           }
         }
       }
@@ -182276,7 +182276,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wohin NOOPs Speicher auf dem Gerät geht, und ein Ein-Tipp-Aufräumen."
+            "value": "Wohin Pulses Speicher auf dem Gerät geht, und ein Ein-Tipp-Aufräumen."
           }
         },
         "es": {
@@ -183449,7 +183449,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Verdrahte NOOPs Aktionen mit einem Back-Tap, einer Fokus-Automation oder einem längeren Kurzbefehl. Zum Beispiel: Doppeltippe auf die Rückseite deines iPhones, um den Strap vibrieren zu lassen."
+            "value": "Verdrahte Pulses Aktionen mit einem Back-Tap, einer Fokus-Automation oder einem längeren Kurzbefehl. Zum Beispiel: Doppeltippe auf die Rückseite deines iPhones, um den Strap vibrieren zu lassen."
           }
         },
         "es": {
@@ -184524,7 +184524,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schreibt einmal täglich eine zeitgestempelte Kopie deines Strap-Logs in NOOPs Ordner in der Dateien-App. Praktisch für einen Fehlerbericht, ohne daran denken zu müssen. Auf dem iPhone läuft es, wenn iOS Pulse das nächste Mal nahe deiner gewählten Zeit weckt, nicht minutengenau garantiert (lass Pulse über Nacht offen für die beste Chance). Alles bleibt auf %@; nichts wird hochgeladen."
+            "value": "Schreibt einmal täglich eine zeitgestempelte Kopie deines Strap-Logs in Pulses Ordner in der Dateien-App. Praktisch für einen Fehlerbericht, ohne daran denken zu müssen. Auf dem iPhone läuft es, wenn iOS Pulse das nächste Mal nahe deiner gewählten Zeit weckt, nicht minutengenau garantiert (lass Pulse über Nacht offen für die beste Chance). Alles bleibt auf %@; nichts wird hochgeladen."
           }
         },
         "es": {
@@ -188949,7 +188949,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Uhr, NOOPs Gehirn"
+            "value": "Deine Uhr, Pulses Gehirn"
           }
         },
         "es": {
@@ -205515,7 +205515,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NOOP-Grenzen"
+            "value": "Pulse-Grenzen"
           }
         },
         "es": {
@@ -217594,7 +217594,7 @@
     "Your clock": {"localizations":{"de":{"stringUnit":{"state":"translated","value":"Deine innere Uhr"}},"es":{"stringUnit":{"state":"translated","value":"Tu reloj interno"}},"fr":{"stringUnit":{"state":"translated","value":"Votre horloge"}},"it":{"stringUnit":{"state":"translated","value":"Il tuo orologio"}},"pl":{"stringUnit":{"state":"translated","value":"Twój zegar"}},"pt-PT":{"stringUnit":{"state":"translated","value":"O seu relógio"}},"ru":{"stringUnit":{"state":"translated","value":"Ваши часы"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"你的生物钟"}},"zh-Hant":{"stringUnit":{"state":"translated","value":"你的生理時鐘"}}}},
     "iCloud Drive": {"localizations":{"de":{"stringUnit":{"state":"translated","value":"iCloud Drive"}},"es":{"stringUnit":{"state":"translated","value":"iCloud Drive"}},"fr":{"stringUnit":{"state":"translated","value":"iCloud Drive"}},"it":{"stringUnit":{"state":"translated","value":"iCloud Drive"}},"pl":{"stringUnit":{"state":"translated","value":"iCloud Drive"}},"pt-PT":{"stringUnit":{"state":"translated","value":"iCloud Drive"}},"ru":{"stringUnit":{"state":"translated","value":"iCloud Drive"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"iCloud 云盘"}},"zh-Hant":{"stringUnit":{"state":"translated","value":"iCloud 雲碟"}}}},
     "iCloud Drive › %@": {"localizations":{"de":{"stringUnit":{"state":"translated","value":"iCloud Drive › %@"}},"es":{"stringUnit":{"state":"translated","value":"iCloud Drive › %@"}},"fr":{"stringUnit":{"state":"translated","value":"iCloud Drive › %@"}},"it":{"stringUnit":{"state":"translated","value":"iCloud Drive › %@"}},"pl":{"stringUnit":{"state":"translated","value":"iCloud Drive › %@"}},"pt-PT":{"stringUnit":{"state":"translated","value":"iCloud Drive › %@"}},"ru":{"stringUnit":{"state":"translated","value":"iCloud Drive › %@"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"iCloud 云盘 › %@"}},"zh-Hant":{"stringUnit":{"state":"translated","value":"iCloud 雲碟 › %@"}}}},
-    "Pulse (in Files)": {"localizations":{"de":{"stringUnit":{"state":"translated","value":"Pulse (in Dateien)"}},"es":{"stringUnit":{"state":"translated","value":"Pulse (en Archivos)"}},"fr":{"stringUnit":{"state":"translated","value":"Pulse (dans Fichiers)"}},"it":{"stringUnit":{"state":"translated","value":"Pulse (in File)"}},"pl":{"stringUnit":{"state":"translated","value":"Pulse (w Plikach)"}},"pt-PT":{"stringUnit":{"state":"translated","value":"Pulse (em Ficheiros)"}},"ru":{"stringUnit":{"state":"translated","value":"Pulse (в Файлах)"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"NOOP（在“文件”中）"}},"zh-Hant":{"stringUnit":{"state":"translated","value":"NOOP（在「檔案」中）"}}}},
+    "Pulse (in Files)": {"localizations":{"de":{"stringUnit":{"state":"translated","value":"Pulse (in Dateien)"}},"es":{"stringUnit":{"state":"translated","value":"Pulse (en Archivos)"}},"fr":{"stringUnit":{"state":"translated","value":"Pulse (dans Fichiers)"}},"it":{"stringUnit":{"state":"translated","value":"Pulse (in File)"}},"pl":{"stringUnit":{"state":"translated","value":"Pulse (w Plikach)"}},"pt-PT":{"stringUnit":{"state":"translated","value":"Pulse (em Ficheiros)"}},"ru":{"stringUnit":{"state":"translated","value":"Pulse (в Файлах)"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"Pulse（在“文件”中）"}},"zh-Hant":{"stringUnit":{"state":"translated","value":"Pulse（在「檔案」中）"}}}},
     "Live heart rate is streaming, but your strap is not fully paired. The encrypted pairing is what carries motion, skin temperature, SpO₂ and respiratory rate — without it, sleep is staged from heart rate alone. Buzz, alarms and history sync need it too.": {"localizations":{"de":{"stringUnit":{"state":"translated","value":"Die Live-Herzfrequenz wird übertragen, aber dein Strap ist nicht vollständig gekoppelt. Die verschlüsselte Kopplung liefert Bewegung, Hauttemperatur, SpO₂ und Atemfrequenz — ohne sie wird der Schlaf allein aus der Herzfrequenz abgeleitet. Auch Buzz, Wecker und Verlaufssynchronisierung brauchen sie."}},"es":{"stringUnit":{"state":"translated","value":"La frecuencia cardíaca en vivo se está transmitiendo, pero tu correa no está totalmente emparejada. El emparejamiento cifrado es el que aporta movimiento, temperatura de la piel, SpO₂ y frecuencia respiratoria: sin él, el sueño se calcula solo a partir de la frecuencia cardíaca. El zumbido, las alarmas y la sincronización del historial también lo necesitan."}},"fr":{"stringUnit":{"state":"translated","value":"La fréquence cardiaque en direct est transmise, mais votre bracelet n'est pas entièrement appairé. C'est l'appairage chiffré qui transporte le mouvement, la température cutanée, la SpO₂ et la fréquence respiratoire — sans lui, le sommeil est estimé à partir de la seule fréquence cardiaque. Le buzz, les alarmes et la synchronisation de l'historique en ont besoin aussi."}},"it":{"stringUnit":{"state":"translated","value":"La frequenza cardiaca live viene trasmessa, ma il tuo strap non è completamente associato. È l'associazione cifrata a trasportare movimento, temperatura della pelle, SpO₂ e frequenza respiratoria — senza di essa il sonno viene stimato dalla sola frequenza cardiaca. Anche buzz, sveglie e sincronizzazione della cronologia ne hanno bisogno."}},"pl":{"stringUnit":{"state":"translated","value":"Tętno na żywo jest przesyłane, ale opaska nie jest w pełni sparowana. To szyfrowane parowanie przenosi ruch, temperaturę skóry, SpO₂ i częstość oddechów — bez niego sen jest wyznaczany wyłącznie z tętna. Wibracje, alarmy i synchronizacja historii też go wymagają."}},"pt-PT":{"stringUnit":{"state":"translated","value":"A frequência cardíaca em direto está a ser transmitida, mas a sua pulseira não está totalmente emparelhada. É o emparelhamento encriptado que transporta movimento, temperatura da pele, SpO₂ e taxa respiratória — sem ele, o sono é calculado apenas a partir da frequência cardíaca. O zumbido, os alarmes e a sincronização do histórico também precisam dele."}},"ru":{"stringUnit":{"state":"translated","value":"Пульс передаётся в реальном времени, но ремешок сопряжён не полностью. Именно зашифрованное сопряжение передаёт движение, температуру кожи, SpO₂ и частоту дыхания — без него сон определяется только по пульсу. Вибрация, будильники и синхронизация истории тоже требуют его."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"实时心率正在传输，但你的手环尚未完全配对。加密配对才能传输动作、皮肤温度、SpO₂ 和呼吸频率——没有它，睡眠只能依据心率推算。震动、闹钟和历史同步同样需要它。"}},"zh-Hant":{"stringUnit":{"state":"translated","value":"即時心率正在傳輸，但你的手環尚未完全配對。加密配對才能傳輸動作、皮膚溫度、SpO₂ 和呼吸頻率——沒有它，睡眠只能依據心率推算。震動、鬧鐘和歷史同步同樣需要它。"}}}},
     "Clear conversation": {"localizations": {
         "en": {"stringUnit": {"state": "translated", "value": "Clear conversation"}},
@@ -218191,7 +218191,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiviert oder deaktiviert SpO2 oder Echte Schritte direkt per SetFeatureMode und liest danach den Funktionsstatus erneut. Auf NOOPs eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5) — diese Buttons dienen dazu, einen Bericht eines Drittanbieters zu testen."
+            "value" : "Aktiviert oder deaktiviert SpO2 oder Echte Schritte direkt per SetFeatureMode und liest danach den Funktionsstatus erneut. Auf Pulses eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5) — diese Buttons dienen dazu, einen Bericht eines Drittanbieters zu testen."
           }
         },
         "es" : {
@@ -218249,7 +218249,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiviert oder deaktiviert SpO2, Echte Schritte, Trainings-HF oder den CVA-PPG-Sampler direkt per SetFeatureMode und liest danach den Funktionsstatus erneut. Auf NOOPs eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5) — diese Buttons dienen dazu, einen Bericht eines Drittanbieters zu testen. Tages-HF und Ruhe-HF werden hier bewusst nicht angeboten: Tages-HF hat einen eigenen Live-HF-Pfad, und Ruhe-HF hat überhaupt keinen App-seitigen Schalter."
+            "value" : "Aktiviert oder deaktiviert SpO2, Echte Schritte, Trainings-HF oder den CVA-PPG-Sampler direkt per SetFeatureMode und liest danach den Funktionsstatus erneut. Auf Pulses eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5) — diese Buttons dienen dazu, einen Bericht eines Drittanbieters zu testen. Tages-HF und Ruhe-HF werden hier bewusst nicht angeboten: Tages-HF hat einen eigenen Live-HF-Pfad, und Ruhe-HF hat überhaupt keinen App-seitigen Schalter."
           }
         },
         "es" : {
@@ -218829,7 +218829,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sendet %@ an den Ring. Auf NOOPs eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5). Modus 0x00 stellt immer den ursprünglichen Zustand wieder her. Achte im Strap-Log auf das anschließende Feature-Status-Lesen."
+            "value" : "Sendet %@ an den Ring. Auf Pulses eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5). Modus 0x00 stellt immer den ursprünglichen Zustand wieder her. Achte im Strap-Log auf das anschließende Feature-Status-Lesen."
           }
         },
         "es" : {
@@ -218887,7 +218887,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sendet %@ an den Ring. Auf NOOPs eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5). Achte im Strap-Log auf das anschließende Feature-Status-Lesen."
+            "value" : "Sendet %@ an den Ring. Auf Pulses eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5). Achte im Strap-Log auf das anschließende Feature-Status-Lesen."
           }
         },
         "es" : {
@@ -218945,7 +218945,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sendet einen SetFeatureMode-Schreibbefehl für SpO2 oder Echte Schritte und liest den Funktionsstatus danach erneut. Auf NOOPs eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5) — dieser Button dient dazu, einen Bericht eines Drittanbieters zu testen. Modus „aus“ stellt immer den ursprünglichen Zustand wieder her."
+            "value" : "Sendet einen SetFeatureMode-Schreibbefehl für SpO2 oder Echte Schritte und liest den Funktionsstatus danach erneut. Auf Pulses eigener Hardware nicht validiert (OURA_PROTOCOL.md §7.5) — dieser Button dient dazu, einen Bericht eines Drittanbieters zu testen. Modus „aus“ stellt immer den ursprünglichen Zustand wieder her."
           }
         },
         "es" : {
@@ -219431,7 +219431,7 @@
         "Autonomic load across your waking day": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Autonome Belastung im Verlauf deines wachen Tages"}}, "es": {"stringUnit": {"state": "translated", "value": "Carga autonómica durante las horas de vigilia"}}, "fr": {"stringUnit": {"state": "translated", "value": "Charge autonome au fil de votre journée éveillée"}}, "it": {"stringUnit": {"state": "translated", "value": "Carico autonomico durante le ore di veglia"}}, "pl": {"stringUnit": {"state": "translated", "value": "Obciążenie autonomiczne w ciągu dnia"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Carga autonómica ao longo do teu dia acordado"}}, "ru": {"stringUnit": {"state": "translated", "value": "Вегетативная нагрузка в течение дня бодрствования"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "清醒时段的自主神经负荷"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "清醒時段的自主神經負荷"}}}},
         "The line is each waking hour's 0-3 proxy, scored against your personal daytime baseline (how your own days usually run). The bar below splits your day into calm, moderate and high stress time.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Die Linie zeigt den 0–3-Näherungswert jeder Wachstunde, bewertet anhand deiner persönlichen Tages-Baseline (wie deine Tage normalerweise verlaufen). Der Balken darunter teilt deinen Tag in ruhige, mäßige und hohe Stresszeiten."}}, "es": {"stringUnit": {"state": "translated", "value": "La línea muestra el indicador de 0 a 3 de cada hora de vigilia, comparado con tu referencia diurna personal (cómo suelen transcurrir tus días). La barra inferior divide el día en periodos de estrés bajo, moderado y alto."}}, "fr": {"stringUnit": {"state": "translated", "value": "La ligne représente l'indice 0–3 de chaque heure éveillée, évalué par rapport à votre référence diurne personnelle (le déroulement habituel de vos journées). La barre ci-dessous répartit votre journée en périodes de stress faible, modéré et élevé."}}, "it": {"stringUnit": {"state": "translated", "value": "La linea mostra l'indicatore da 0 a 3 per ogni ora di veglia, valutato rispetto al tuo riferimento diurno personale (l'andamento abituale delle tue giornate). La barra sottostante divide la giornata in periodi di stress basso, moderato e alto."}}, "pl": {"stringUnit": {"state": "translated", "value": "Linia pokazuje wskaźnik 0–3 dla każdej godziny czuwania, oceniany względem Twojej osobistej dziennej linii bazowej (typowego przebiegu Twoich dni). Pasek poniżej dzieli dzień na okresy niskiego, umiarkowanego i wysokiego stresu."}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "A linha mostra o indicador de 0–3 de cada hora de vigília, avaliado em relação à tua linha de base diurna pessoal (como os teus dias costumam decorrer). A barra abaixo divide o teu dia em períodos de stress baixo, moderado e elevado."}}, "ru": {"stringUnit": {"state": "translated", "value": "Линия показывает показатель 0–3 за каждый час бодрствования относительно вашей личной дневной нормы (обычного хода ваших дней). Полоса ниже делит день на периоды низкого, умеренного и высокого стресса."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "折线显示每个清醒小时的 0–3 指标，并以你的个人日间基线（你平时一天的状态）为基准评分。下方的条形将你的一天划分为低、中、高压力时段。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "折線顯示每個清醒小時的 0–3 指標，並以你的個人日間基線（你平時一天的狀態）為基準評分。下方的長條將你的一天劃分為低、中、高壓力時段。"}}}},
         "End session": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Sitzung beenden"}}, "es": {"stringUnit": {"state": "translated", "value": "Finalizar sesión"}}, "fr": {"stringUnit": {"state": "translated", "value": "Terminer la session"}}, "it": {"stringUnit": {"state": "translated", "value": "Termina sessione"}}, "pl": {"stringUnit": {"state": "translated", "value": "Zakończ sesję"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Encerrar sessão"}}, "ru": {"stringUnit": {"state": "translated", "value": "Завершить сессию"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "结束监测"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "結束監測"}}}},
-        "Use Pulse's own folder (browse in Files)": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "NOOPs eigenen Ordner verwenden (in Dateien durchsuchen)"}}, "es": {"stringUnit": {"state": "translated", "value": "Usar la carpeta propia de Pulse (explorar en Archivos)"}}, "fr": {"stringUnit": {"state": "translated", "value": "Utiliser le dossier de Pulse (parcourir dans Fichiers)"}}, "it": {"stringUnit": {"state": "translated", "value": "Usa la cartella di Pulse (sfoglia in File)"}}, "pl": {"stringUnit": {"state": "translated", "value": "Użyj własnego folderu Pulse (przeglądaj w Plikach)"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Usar a pasta própria do Pulse (explorar em Ficheiros)"}}, "ru": {"stringUnit": {"state": "translated", "value": "Использовать собственную папку Pulse (открыть в «Файлах»)"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "使用 Pulse 自己的文件夹（在“文件”中浏览）"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "使用 Pulse 自己的檔案夾（在「檔案」中瀏覽）"}}}},
+        "Use Pulse's own folder (browse in Files)": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Pulses eigenen Ordner verwenden (in Dateien durchsuchen)"}}, "es": {"stringUnit": {"state": "translated", "value": "Usar la carpeta propia de Pulse (explorar en Archivos)"}}, "fr": {"stringUnit": {"state": "translated", "value": "Utiliser le dossier de Pulse (parcourir dans Fichiers)"}}, "it": {"stringUnit": {"state": "translated", "value": "Usa la cartella di Pulse (sfoglia in File)"}}, "pl": {"stringUnit": {"state": "translated", "value": "Użyj własnego folderu Pulse (przeglądaj w Plikach)"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Usar a pasta própria do Pulse (explorar em Ficheiros)"}}, "ru": {"stringUnit": {"state": "translated", "value": "Использовать собственную папку Pulse (открыть в «Файлах»)"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "使用 Pulse 自己的文件夹（在“文件”中浏览）"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "使用 Pulse 自己的檔案夾（在「檔案」中瀏覽）"}}}},
         "Generate now": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Jetzt erstellen"}}, "es": {"stringUnit": {"state": "translated", "value": "Generar ahora"}}, "fr": {"stringUnit": {"state": "translated", "value": "Générer maintenant"}}, "it": {"stringUnit": {"state": "translated", "value": "Genera ora"}}, "pl": {"stringUnit": {"state": "translated", "value": "Wygeneruj teraz"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Gerar agora"}}, "ru": {"stringUnit": {"state": "translated", "value": "Сгенерировать сейчас"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "立即生成"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "立即生成"}}}},
         "Generating…": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Wird erstellt…"}}, "es": {"stringUnit": {"state": "translated", "value": "Generando…"}}, "fr": {"stringUnit": {"state": "translated", "value": "Génération…"}}, "it": {"stringUnit": {"state": "translated", "value": "Generazione…"}}, "pl": {"stringUnit": {"state": "translated", "value": "Generowanie…"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "A gerar…"}}, "ru": {"stringUnit": {"state": "translated", "value": "Генерация…"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "生成中…"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "生成中…"}}}},
         "YOUR BANDS": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "DEINE BÄNDER"}}, "es": {"stringUnit": {"state": "translated", "value": "TUS PULSERAS"}}, "fr": {"stringUnit": {"state": "translated", "value": "VOS BRACELETS"}}, "it": {"stringUnit": {"state": "translated", "value": "LE TUE FASCE"}}, "pl": {"stringUnit": {"state": "translated", "value": "TWOJE PASKI"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "AS TUAS BRACELETES"}}, "ru": {"stringUnit": {"state": "translated", "value": "ВАШИ БРАСЛЕТЫ"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "你的手环"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "你的手環"}}}},

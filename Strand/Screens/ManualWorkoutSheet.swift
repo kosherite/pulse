@@ -113,9 +113,9 @@ struct ManualWorkoutSheet: View {
     var body: some View {
         #if os(macOS)
         formContent
-            .padding(NoopMetrics.space6)
+            .padding(PulseMetrics.space6)
             .frame(width: 420)
-            .background(NoopChromeSurface())
+            .background(PulseChromeSurface())
             // Lets the user dismiss the decimal pad (which has no return key) and reach Cancel/Add.
             .keyboardDoneToolbar($focusedField)
         #else
@@ -130,7 +130,7 @@ struct ManualWorkoutSheet: View {
         // content, so nothing needs to leave its own bounds to stay clear of the keyboard.
         ScrollView {
             formContent
-                .padding(NoopMetrics.space6)
+                .padding(PulseMetrics.space6)
         }
         // #697/#horizontal-swipe parity, see ScreenScaffold.
         .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
@@ -140,17 +140,17 @@ struct ManualWorkoutSheet: View {
         // right edge (#185, same fix as WhatsNewView/ScoringGuideView). iOS fills the presented
         // sheet's width and sizes to content height instead.
         .frame(maxWidth: .infinity)
-        .noopSheetPresentation(largeFirst: true)
-        .background(NoopChromeSurface())
+        .pulseSheetPresentation(largeFirst: true)
+        .background(PulseChromeSurface())
         // Lets the user dismiss the decimal pad (which has no return key) and reach Cancel/Add.
         .keyboardDoneToolbar($focusedField)
         #endif
     }
 
     private var formContent: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.space5) {
+        VStack(alignment: .leading, spacing: PulseMetrics.space5) {
             header
-            VStack(alignment: .leading, spacing: NoopMetrics.space4) {
+            VStack(alignment: .leading, spacing: PulseMetrics.space4) {
                 field(String(localized: "Sport")) {
                     sportPicker
                 }
@@ -204,7 +204,7 @@ struct ManualWorkoutSheet: View {
     //
     // A searchable PICKER over the shared WorkoutCatalog (the same named-sport list the live tracker
     // uses, incl. Padel) with a free-text FALLBACK: the text field IS the value, so an unusual sport
-    // NOOP doesn't enumerate still saves exactly as typed (#519). Typing filters the catalogue
+    // Pulse doesn't enumerate still saves exactly as typed (#519). Typing filters the catalogue
     // beneath the field; tapping a match fills it; the list collapses on a settled / off-catalogue
     // entry so the short form isn't permanently covered. Mirrors Android WorkoutsScreen.SportPickerField.
 
@@ -342,10 +342,10 @@ struct ManualWorkoutSheet: View {
     }
 
     private var footer: some View {
-        HStack(spacing: NoopMetrics.space3) {
-            NoopButton("Cancel", kind: .tertiary) { dismiss() }
+        HStack(spacing: PulseMetrics.space3) {
+            PulseButton("Cancel", kind: .tertiary) { dismiss() }
             Spacer()
-            NoopButton(editing == nil ? "Add" : "Save", systemImage: "checkmark", kind: .primary) {
+            PulseButton(editing == nil ? "Add" : "Save", systemImage: "checkmark", kind: .primary) {
                 save()
             }
             .disabled(builtRow == nil)

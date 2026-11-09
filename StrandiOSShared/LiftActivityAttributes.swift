@@ -5,7 +5,7 @@ import ActivityKit
 /// Live Activity attributes for a running Lift Log session — the minimised session bar, on the Lock
 /// Screen and in the Dynamic Island.
 ///
-/// Deliberately a SEPARATE activity type from `NOOPActivityAttributes` (live HR). They answer
+/// Deliberately a SEPARATE activity type from `PulseActivityAttributes` (live HR). They answer
 /// different questions and have different lifetimes: the HR activity lives as long as the strap is
 /// streaming, this one as long as a gym session is open. While a session is running this one is the
 /// useful surface — it carries the heart rate too — so the app suppresses the HR activity rather

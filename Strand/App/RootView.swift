@@ -25,7 +25,7 @@ enum NavItem: String, CaseIterable, Identifiable, Hashable {
     case backupSync = "Backup & Sync"
     case fusedRecord = "Your Data, Fused"
     case devices = "Devices"
-    case noopLimitations = "Pulse Limitations"
+    case pulseLimitations = "Pulse Limitations"
     case notifications = "Notifications"
     case automation = "Automations"
     case smartAlarm = "Smart Alarm"
@@ -62,7 +62,7 @@ enum NavItem: String, CaseIterable, Identifiable, Hashable {
         case .backupSync: return "Backup & Sync"
         case .fusedRecord: return "Your Data, Fused"
         case .devices: return "Devices"
-        case .noopLimitations: return "Pulse Limitations"
+        case .pulseLimitations: return "Pulse Limitations"
         case .notifications: return "Notifications"
         case .automation: return "Automations"
         // "Alarms" is the ONE alarm surface (#766): the strap's silent wake-alarm (moved in from
@@ -106,7 +106,7 @@ enum NavItem: String, CaseIterable, Identifiable, Hashable {
         case .backupSync: return String(localized: "Backup & Sync")
         case .fusedRecord: return String(localized: "Your Data, Fused")
         case .devices: return String(localized: "Devices")
-        case .noopLimitations: return String(localized: "Pulse Limitations")
+        case .pulseLimitations: return String(localized: "Pulse Limitations")
         case .notifications: return String(localized: "Notifications")
         case .automation: return String(localized: "Automations")
         // Mirrors the `titleKey` remap above (#766): the row reads "Alarms", not the raw "Smart Alarm".
@@ -142,7 +142,7 @@ enum NavItem: String, CaseIterable, Identifiable, Hashable {
         case .backupSync: return "externaldrive.fill.badge.icloud"
         case .fusedRecord: return "square.stack.3d.up.fill"
         case .devices: return "badge.plus.radiowaves.right"
-        case .noopLimitations: return "list.bullet.rectangle"
+        case .pulseLimitations: return "list.bullet.rectangle"
         case .notifications: return "bell.badge.fill"
         case .automation: return "wand.and.stars"
         case .smartAlarm: return "alarm.fill"
@@ -181,7 +181,7 @@ struct NavGroup: Identifiable {
             .labBook, .rhythm, .trends,
         ]),
         NavGroup(title: "Data & App", id: "data_app", items: [
-            .devices, .noopLimitations, .dataSources, .appleHealth, .xiaomi, .backupSync, .fusedRecord,
+            .devices, .pulseLimitations, .dataSources, .appleHealth, .xiaomi, .backupSync, .fusedRecord,
             .notifications, .automation, .smartAlarm, .powerSaving, .settings, .testCentre,
         ]),
     ]
@@ -201,9 +201,9 @@ struct RootView: View {
     /// switch the sidebar selection without owning it — see `NavRouter`.
     @EnvironmentObject var router: NavRouter
     /// The liquid Today (default) vs the classic Today, same flag the iOS shell + Settings toggle read.
-    @AppStorage("noop.liquidTodayEnabled") private var liquidTodayEnabled = true
-    /// The Coach master switch (`noop.coachEnabled`, shared by name with Android and iOS). Default ON.
-    @AppStorage("noop.coachEnabled") private var coachEnabled = true
+    @AppStorage("pulse.liquidTodayEnabled") private var liquidTodayEnabled = true
+    /// The Coach master switch (`pulse.coachEnabled`, shared by name with Android and iOS). Default ON.
+    @AppStorage("pulse.coachEnabled") private var coachEnabled = true
 
     @State private var selection: NavItem? = .today
     /// Which sidebar groups are expanded (S1, #805). Default = the group owning the launch selection
@@ -415,7 +415,7 @@ struct RootView: View {
     private var brand: some View {
         HStack(spacing: 8) {
             // In-app logo: the open recovery-ring mark so the wordmark reads as a true lockup
-            // (README logo system — mark + "NOOP"). Flat gold gradient, low glow per the v3 restraint.
+            // (README logo system — mark + "Pulse"). Flat gold gradient, low glow per the v3 restraint.
             BrandMark(size: 22)
             Text("Pulse")
                 .font(StrandFont.rounded(20, weight: .bold))
@@ -454,7 +454,7 @@ struct RootView: View {
         case .backupSync: BackupSyncView()
         case .fusedRecord: FusedRecordHost()
         case .devices: DevicesView()
-        case .noopLimitations: NoopLimitationsView()
+        case .pulseLimitations: PulseLimitationsView()
         case .notifications: NotificationSettingsView()
         case .automation: AutomationsView()
         case .smartAlarm: SmartAlarmView()
@@ -507,7 +507,7 @@ struct RootView: View {
     }
 }
 
-/// The NOOP logo mark — an **open recovery ring** (~80% arc, round caps, starting at 12 o'clock)
+/// The Pulse logo mark — an **open recovery ring** (~80% arc, round caps, starting at 12 o'clock)
 /// with a **solid centre core dot** ("on-device core"), per the README logo system. Rendered in the
 /// gold gradient and kept deliberately flat / low-glow for the v3 Titanium & Gold restraint. Drawn
 /// purely from design tokens so it tracks the palette. Sized to optically x-height-match the wordmark.
@@ -570,7 +570,7 @@ private struct SidebarStatus: View {
             Spacer()
         }
         .padding(10)
-        .background(NoopPanelSurface(cornerRadius: 10))
+        .background(PulsePanelSurface(cornerRadius: 10))
     }
 
     // Shares LiveState.connectionStatus* with the Settings strap card so the two never disagree (#266):

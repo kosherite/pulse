@@ -11,7 +11,7 @@ import Foundation
 // Trust tiers (lower = more trusted), grounded in what a device MEASURES vs ESTIMATES (spec §1):
 //   0 — Direct dedicated sensor for this metric (WHOOP R-R for HRV; a wrist band's pedometer for
 //       steps; chest/PPG strap for avg/max/resting HR; ring/strap temp for skin temp).
-//   1 — Derived on-device from raw by NOOP (computed recovery/strain/sleep from strap streams).
+//   1 — Derived on-device from raw by Pulse (computed recovery/strain/sleep from strap streams).
 //   2 — Phone aggregate (Apple Health / Health Connect) of a declared-compatible quantity.
 //   3 — Estimate / proxy (a strap's STEP estimate; a calories estimate).
 //
@@ -74,7 +74,7 @@ public enum MetricArbitrationPolicy {
             switch source {
             case .whoopImport:   return 0   // direct dedicated sensor (R-R / PPG)
             case .xiaomiBand:    return 0   // dedicated wrist PPG
-            case .noopComputed:  return 1   // derived on-device from raw strap streams
+            case .pulseComputed:  return 1   // derived on-device from raw strap streams
             case .appleHealth:   return 2   // phone aggregate
             case .healthConnect: return 2
             case .nutritionCsv:  return 3
@@ -86,7 +86,7 @@ public enum MetricArbitrationPolicy {
             switch source {
             case .whoopImport:   return 0
             case .xiaomiBand:    return 0
-            case .noopComputed:  return 1
+            case .pulseComputed:  return 1
             case .appleHealth:   return 2
             case .healthConnect: return 2
             case .nutritionCsv:  return 3
@@ -100,16 +100,16 @@ public enum MetricArbitrationPolicy {
             case .appleHealth:   return 0   // phone pedometer — counts directly
             case .healthConnect: return 0
             case .whoopImport:   return 3   // strap step estimate is a last resort
-            case .noopComputed:  return 3   // NOOP step estimate from motion
+            case .pulseComputed:  return 3   // Pulse step estimate from motion
             case .nutritionCsv:  return 3
             case .localCache:    return 3
             }
 
         case .sleep:
-            // The best STAGER wins: imported WHOOP stages > NOOP-computed stages > phone sleep buckets.
+            // The best STAGER wins: imported WHOOP stages > Pulse-computed stages > phone sleep buckets.
             switch source {
             case .whoopImport:   return 0
-            case .noopComputed:  return 1
+            case .pulseComputed:  return 1
             case .xiaomiBand:    return 1   // a band with its own staging, below WHOOP's
             case .appleHealth:   return 2   // phone sleep buckets
             case .healthConnect: return 2
@@ -123,7 +123,7 @@ public enum MetricArbitrationPolicy {
             case .appleHealth:   return 2
             case .healthConnect: return 2
             case .whoopImport:   return 3
-            case .noopComputed:  return 3
+            case .pulseComputed:  return 3
             case .xiaomiBand:    return 3
             case .nutritionCsv:  return 3
             case .localCache:    return 3
@@ -134,7 +134,7 @@ public enum MetricArbitrationPolicy {
             switch source {
             case .whoopImport:   return 0
             case .xiaomiBand:    return 0
-            case .noopComputed:  return 1
+            case .pulseComputed:  return 1
             case .appleHealth:   return 2
             case .healthConnect: return 2
             case .nutritionCsv:  return 0   // its own single-source metric
@@ -144,13 +144,13 @@ public enum MetricArbitrationPolicy {
     }
 
     /// Stable tiebreak WITHIN a tier (lower wins). Mirrors the existing precedence baked into
-    /// `sourceCandidates`: imported WHOOP first, then NOOP-computed, then phone (Apple before Health
+    /// `sourceCandidates`: imported WHOOP first, then Pulse-computed, then phone (Apple before Health
     /// Connect, matching the #443 ordering), then a dedicated band, then single-source, then cache.
     /// Used only when two sources land on the SAME tier, so the resolver stays deterministic.
     public static func sourcePriority(_ source: FusionSource) -> Int {
         switch source {
         case .whoopImport:   return 0
-        case .noopComputed:  return 1
+        case .pulseComputed:  return 1
         case .appleHealth:   return 2
         case .healthConnect: return 3
         case .xiaomiBand:    return 4
@@ -167,11 +167,11 @@ public enum MetricArbitrationPolicy {
         switch (metric, source) {
         case (.steps, .xiaomiBand), (.steps, .appleHealth), (.steps, .healthConnect):
             return "counts directly"
-        case (.steps, .whoopImport), (.steps, .noopComputed):
+        case (.steps, .whoopImport), (.steps, .pulseComputed):
             return "step estimate"
         case (.sleep, .whoopImport):
             return "best stager"
-        case (.sleep, .noopComputed):
+        case (.sleep, .pulseComputed):
             return "computed stages"
         case (.sleep, .appleHealth), (.sleep, .healthConnect):
             return "phone sleep buckets"

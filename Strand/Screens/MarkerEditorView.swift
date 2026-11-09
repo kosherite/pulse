@@ -12,7 +12,7 @@ import WhoopStore
 // name + unit), then: value (numeric, the marker's canonical unit prefilled, a unit
 // switcher where sensible e.g. mmol/L↔mg/dL with the conversion shown transparently),
 // date/time taken, an optional note, and an OPTIONAL "reference range from my report"
-// free-text — NEVER a NOOP-shipped range. Blood pressure is a PAIRED marker (systolic +
+// free-text — NEVER a Pulse-shipped range. Blood pressure is a PAIRED marker (systolic +
 // diastolic entered together, stored as two keys) so it reads naturally.
 //
 // On save it hands the caller `[LabMarkerRow]` drafts (one row, or two for BP) under the
@@ -20,7 +20,7 @@ import WhoopStore
 // SELF-CONTAINED: no AppModel/Settings edits; the sheet owns all its state.
 //
 // NON-CLINICAL: this only captures what the user types. The reference field is theirs,
-// shown back verbatim — NOOP defines no ranges and asserts no normality.
+// shown back verbatim — Pulse defines no ranges and asserts no normality.
 
 struct MarkerEditorView: View {
     /// Persist the validated draft row(s). Async so the caller can write + refresh.
@@ -53,7 +53,7 @@ struct MarkerEditorView: View {
     var body: some View {
         ScreenScaffold(title: "Add a reading",
                        subtitle: "Type in a number from your own report. It stays on \(Platform.deviceNounPhrase).") {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                 markerSection
                 if selection != nil || addingCustom {
                     readingSection
@@ -77,9 +77,9 @@ struct MarkerEditorView: View {
     // MARK: - Marker picker
 
     private var markerSection: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Marker", overline: "what are you logging?")
-            NoopCard {
+            PulseCard {
                 VStack(alignment: .leading, spacing: 12) {
                     if addingCustom {
                         customMarkerFields
@@ -94,7 +94,7 @@ struct MarkerEditorView: View {
                         } label: {
                             Label("Add a custom marker", systemImage: "plus")
                         }
-                        .buttonStyle(.noopGhost)
+                        .buttonStyle(.pulseGhost)
                     }
                 }
             }
@@ -102,7 +102,7 @@ struct MarkerEditorView: View {
     }
 
     private var searchField: some View {
-        NoopLiquidGlassSearchField(text: $search,
+        PulseLiquidGlassSearchField(text: $search,
                                    prompt: String(localized: "Search markers (e.g. LDL, ferritin)"),
                                    accessibilityLabel: String(localized: "Search markers"))
     }
@@ -211,9 +211,9 @@ struct MarkerEditorView: View {
     // MARK: - Reading inputs
 
     private var readingSection: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Reading", overline: "your number, date and any note")
-            NoopCard {
+            PulseCard {
                 VStack(alignment: .leading, spacing: 14) {
                     if isBloodPressure {
                         bloodPressureFields
@@ -339,7 +339,7 @@ struct MarkerEditorView: View {
                 .foregroundStyle(StrandPalette.textSecondary)
             Spacer()
             Button("Save") { save() }
-                .buttonStyle(.noopPrimary)
+                .buttonStyle(.pulsePrimary)
                 .frame(maxWidth: 160)
                 .disabled(drafts.isEmpty || saving)
                 .accessibilityLabel("Save reading")

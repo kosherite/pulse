@@ -6,7 +6,7 @@
 /// leftover whole-percent units to the parts with the largest fractional remainders, so the results sum
 /// to exactly 100. Every call site reads the one result, so they agree with each other and add up.
 ///
-/// Kotlin twin: `com.noop.analytics.StagePercentages.wholePercentages` — byte-identical, including the
+/// Kotlin twin: `com.pulse.analytics.StagePercentages.wholePercentages` — byte-identical, including the
 /// leftover tie-break (larger remainder first, then lower index), so both platforms return the same ints.
 public enum StagePercentages {
 

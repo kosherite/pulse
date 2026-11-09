@@ -6,14 +6,14 @@
 # Mach-O so AltSign can provision the matching App IDs and shared App Group before re-signing.
 #
 # Usage:
-#   Tools/prepare-ios-sideload-app.sh path/to/NOOP.app
+#   Tools/prepare-ios-sideload-app.sh path/to/Pulse.app
 
 set -euo pipefail
 
-APP="${1:?usage: $0 path/to/NOOP.app}"
+APP="${1:?usage: $0 path/to/Pulse.app}"
 [ -d "$APP" ] || { echo "no such app bundle: $APP" >&2; exit 1; }
 
-WIDGET="$APP/PlugIns/NOOPWidgets.appex"
+WIDGET="$APP/PlugIns/PulseWidgets.appex"
 [ -d "$WIDGET" ] || { echo "widget extension missing: $WIDGET" >&2; exit 1; }
 
 APP_INFO="$APP/Info.plist"
@@ -27,7 +27,7 @@ WIDGET_GROUP=$(/usr/libexec/PlistBuddy -c 'Print :AppGroupIdentifier' "$WIDGET_I
   exit 1
 }
 
-ENTITLEMENTS_DIR=$(mktemp -d /tmp/noop-sideload-entitlements.XXXXXX)
+ENTITLEMENTS_DIR=$(mktemp -d /tmp/pulse-sideload-entitlements.XXXXXX)
 cleanup() {
   if [ -n "${ENTITLEMENTS_DIR:-}" ] && [ -d "$ENTITLEMENTS_DIR" ]; then
     rm -rf "$ENTITLEMENTS_DIR"

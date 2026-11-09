@@ -162,7 +162,7 @@ final class TestBundleAssemblerTests: XCTestCase {
         XCTAssertLessThanOrEqual(abs(cappedRaw.data.count - cappedIbi.data.count), 1)
     }
 
-    /// The bug this allocation exists to prevent (measured on `noop-master-iOS-v9.3.1-260809-0716.zip`):
+    /// The bug this allocation exists to prevent (measured on `pulse-master-iOS-v9.3.1-260809-0716.zip`):
     /// proportional-to-size handed 53.9 % of the budget to a bulk sidecar dump and left the raw wire capture
     /// — the only sidecar a protocol fact can be re-derived from — with 1.9 %, i.e. 8 min of an 8.4 h night.
     /// Max-min fair keeps a modest stream WHOLE and takes the bytes off the stream that is merely bulky.

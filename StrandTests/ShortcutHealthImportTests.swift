@@ -2,14 +2,14 @@ import XCTest
 import WhoopStore
 @testable import Strand
 
-/// PR #581 — the HealthKit-free Shortcuts IMPORT (`noop://import-health`). Pins the URL/base64 decode,
+/// PR #581 — the HealthKit-free Shortcuts IMPORT (`pulse://import-health`). Pins the URL/base64 decode,
 /// the line parse, and — the review's central concern — LOOP-FREEDOM: an imported value must land under
 /// the `apple-health` source, never the strap, so the #155 export (which reads the strap only) can never
 /// re-emit it and create an export→import→export cycle.
 final class ShortcutHealthImportTests: XCTestCase {
 
     private func url(payloadText: String, version: Int? = 1, host: String = "import-health",
-                     scheme: String = "noop") -> URL {
+                     scheme: String = "pulse") -> URL {
         let b64 = Data(payloadText.utf8).base64EncodedString()
         var c = URLComponents()
         c.scheme = scheme
@@ -42,7 +42,7 @@ final class ShortcutHealthImportTests: XCTestCase {
     func testRejectsForeignScheme() {
         let u = url(payloadText: "D,2026-06-01,1000", scheme: "https")
         guard case .failure = ShortcutHealthImport.decodePayload(from: u) else {
-            return XCTFail("a non-noop scheme must be rejected")
+            return XCTFail("a non-pulse scheme must be rejected")
         }
     }
 

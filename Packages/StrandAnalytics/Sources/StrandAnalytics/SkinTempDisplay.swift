@@ -7,7 +7,7 @@ import Foundation
 /// `VitalBands.isAbsoluteSkinTemp` (v ≥ 20) tells them apart. Deep timeline charts raw absolute
 /// samples, so a Today/Health tile that only shows −0.1 without saying "vs baseline" looks broken.
 ///
-/// Twin of `com.noop.analytics.SkinTempDisplay`. Pure — unit-tested. Localization of full titles
+/// Twin of `com.pulse.analytics.SkinTempDisplay`. Pure — unit-tested. Localization of full titles
 /// stays in the app layer; this package only supplies kind, unit symbol, and number formatting.
 public enum SkinTempDisplay {
 

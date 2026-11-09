@@ -7,7 +7,7 @@ import ZIPFoundation
 ///
 /// These exercise the SAME hardened core the picker import uses, via the injectable
 /// `DataBackup.restore(from:toDatabaseAt:)` seam (a throwaway DB path, never the user's live store):
-///  - a `.noopbak` ZIP backup round-trips: `writeBackupForTesting` then `restore` returns the same rows;
+///  - a `.pulsebak` ZIP backup round-trips: `writeBackupForTesting` then `restore` returns the same rows;
 ///  - a foreign-but-valid SQLite (Room / no `grdb_migrations`) is REJECTED and the live DB is intact;
 ///  - a corrupt (non-SQLite) file is REJECTED and the live DB is intact;
 ///  - a folder prune actually deletes the oldest files past keep-N (pure selection, applied to real files).
@@ -29,7 +29,7 @@ final class BackupSyncRoundTripTests: XCTestCase {
     }
 
     /// A suite-scoped UserDefaults for the settings half of a restore, so these tests NEVER write into
-    /// the test runner's `.standard` domain (which on a dev Mac is the developer's real NOOP profile).
+    /// the test runner's `.standard` domain (which on a dev Mac is the developer's real Pulse profile).
     private func freshDefaults() throws -> UserDefaults {
         let name = "backupsync-test-\(UUID().uuidString)"
         guard let d = UserDefaults(suiteName: name) else { throw TestError("no suite defaults") }
@@ -42,19 +42,19 @@ final class BackupSyncRoundTripTests: XCTestCase {
     func testBackupThenRestoreReturnsTheSameRows() throws {
         // A valid GRDB-origin source DB (carries `grdb_migrations`) with one data table + known rows.
         let sourceDB = tmp.appendingPathComponent("source.sqlite")
-        try makeNoopDatabase(at: sourceDB, deviceRows: ["my-whoop", "watch"])
+        try makePulseDatabase(at: sourceDB, deviceRows: ["my-whoop", "watch"])
 
-        // Write it into a `.noopbak` ZIP exactly as the folder/auto path does.
+        // Write it into a `.pulsebak` ZIP exactly as the folder/auto path does.
         let backup = tmp.appendingPathComponent(BackupSync.snapshotName(1_782_000_000_000))
         try DataBackup.writeBackupForTesting(databaseAt: sourceDB, to: backup)
-        XCTAssertTrue(isZip(backup), "Backup should be a ZIP container (.noopbak)")
+        XCTAssertTrue(isZip(backup), "Backup should be a ZIP container (.pulsebak)")
 
         // Restore into a DIFFERENT, throwaway live-DB path (so the user's real store is never touched).
         let liveDB = tmp.appendingPathComponent("live.sqlite")
         let result = DataBackup.restore(from: backup, toDatabaseAt: liveDB.path)
 
         guard case .imported = result else {
-            return XCTFail("Restore should succeed for a valid NOOP backup, got \(result)")
+            return XCTFail("Restore should succeed for a valid Pulse backup, got \(result)")
         }
         XCTAssertEqual(try deviceRows(in: liveDB), ["my-whoop", "watch"],
                        "Restored DB should hold exactly the backed-up rows")
@@ -64,10 +64,10 @@ final class BackupSyncRoundTripTests: XCTestCase {
 
     func testBackupWithSettingsRestoresSettingsAfterDbSwap() throws {
         let sourceDB = tmp.appendingPathComponent("source.sqlite")
-        try makeNoopDatabase(at: sourceDB, deviceRows: ["my-whoop"])
+        try makePulseDatabase(at: sourceDB, deviceRows: ["my-whoop"])
 
         // Export with the whitelisted settings payload (what a real device writes from its defaults).
-        let backup = tmp.appendingPathComponent("with-settings.noopbak")
+        let backup = tmp.appendingPathComponent("with-settings.pulsebak")
         try DataBackup.writeBackupForTesting(databaseAt: sourceDB, to: backup, settings: [
             "profile.age": 34,
             "profile.sex": "female",
@@ -100,8 +100,8 @@ final class BackupSyncRoundTripTests: XCTestCase {
     func testLegacySingleEntryZipStillRestoresAndAppliesNoSettings() throws {
         // A pre-#1000 backup: DB entry only (writeBackupForTesting with settings nil).
         let sourceDB = tmp.appendingPathComponent("source.sqlite")
-        try makeNoopDatabase(at: sourceDB, deviceRows: ["legacy-strap"])
-        let backup = tmp.appendingPathComponent("legacy.noopbak")
+        try makePulseDatabase(at: sourceDB, deviceRows: ["legacy-strap"])
+        let backup = tmp.appendingPathComponent("legacy.pulsebak")
         try DataBackup.writeBackupForTesting(databaseAt: sourceDB, to: backup)
 
         let defaults = try freshDefaults()
@@ -121,13 +121,13 @@ final class BackupSyncRoundTripTests: XCTestCase {
         // restore, so the settings must not leak through either ("apply AFTER the DB swap succeeds").
         let foreign = tmp.appendingPathComponent("foreign.sqlite")
         try makeForeignDatabase(at: foreign)
-        let backup = tmp.appendingPathComponent("foreign.noopbak")
+        let backup = tmp.appendingPathComponent("foreign.pulsebak")
         try DataBackup.writeBackupForTesting(databaseAt: foreign, to: backup,
                                              settings: ["profile.age": 99, "profile.weightKg": 40.0])
 
         let defaults = try freshDefaults()
         let liveDB = tmp.appendingPathComponent("live.sqlite")
-        try makeNoopDatabase(at: liveDB, deviceRows: ["original"])
+        try makePulseDatabase(at: liveDB, deviceRows: ["original"])
 
         let result = DataBackup.restore(from: backup, toDatabaseAt: liveDB.path, settingsDefaults: defaults)
         guard case .failure = result else {
@@ -148,7 +148,7 @@ final class BackupSyncRoundTripTests: XCTestCase {
 
         // Seed an existing live DB so we can prove it survives a rejected restore.
         let liveDB = tmp.appendingPathComponent("live.sqlite")
-        try makeNoopDatabase(at: liveDB, deviceRows: ["original"])
+        try makePulseDatabase(at: liveDB, deviceRows: ["original"])
         let before = try Data(contentsOf: liveDB)
 
         let result = DataBackup.restore(from: foreign, toDatabaseAt: liveDB.path)
@@ -163,11 +163,11 @@ final class BackupSyncRoundTripTests: XCTestCase {
     // MARK: - Corrupt file is rejected, live DB untouched
 
     func testCorruptFileIsRejectedAndLiveDbIntact() throws {
-        let corrupt = tmp.appendingPathComponent("corrupt.noopbak")
+        let corrupt = tmp.appendingPathComponent("corrupt.pulsebak")
         try Data("this is not a database or a zip".utf8).write(to: corrupt)
 
         let liveDB = tmp.appendingPathComponent("live.sqlite")
-        try makeNoopDatabase(at: liveDB, deviceRows: ["original"])
+        try makePulseDatabase(at: liveDB, deviceRows: ["original"])
         let before = try Data(contentsOf: liveDB)
 
         let result = DataBackup.restore(from: corrupt, toDatabaseAt: liveDB.path)
@@ -179,7 +179,7 @@ final class BackupSyncRoundTripTests: XCTestCase {
     }
 
     func testZipWithNonCanonicalSqliteEntryIsRejectedAndLiveDbIntact() throws {
-        let wrong = tmp.appendingPathComponent("wrong-entry.noopbak")
+        let wrong = tmp.appendingPathComponent("wrong-entry.pulsebak")
         let fake = tmp.appendingPathComponent("evil.sqlite")
         var bytes = Data("SQLite format 3".utf8)
         bytes.append(0)
@@ -189,12 +189,12 @@ final class BackupSyncRoundTripTests: XCTestCase {
         try archive.addEntry(with: "evil.sqlite", fileURL: fake)
 
         let liveDB = tmp.appendingPathComponent("live.sqlite")
-        try makeNoopDatabase(at: liveDB, deviceRows: ["original"])
+        try makePulseDatabase(at: liveDB, deviceRows: ["original"])
         let before = try Data(contentsOf: liveDB)
 
         let result = DataBackup.restore(from: wrong, toDatabaseAt: liveDB.path)
         guard case .failure = result else {
-            return XCTFail("A zip without noop-backup.sqlite must be rejected, got \(result)")
+            return XCTFail("A zip without pulse-backup.sqlite must be rejected, got \(result)")
         }
         XCTAssertEqual(try Data(contentsOf: liveDB), before,
                        "The live DB must be unchanged after a rejected restore")
@@ -203,7 +203,7 @@ final class BackupSyncRoundTripTests: XCTestCase {
     // MARK: - #1014: damaged-but-plausible backups are refused by the quick_check gate
 
     func testGarbageBehindSqliteMagicInsideZipIsRejectedAndLiveDbIntact() throws {
-        // 16 valid magic bytes + junk, zipped as a real `.noopbak`: passes the container check AND
+        // 16 valid magic bytes + junk, zipped as a real `.pulsebak`: passes the container check AND
         // the magic check AND the origin gate (no readable sqlite_master → `.unknown`, holds no
         // data) — before #1014 this sailed all the way through to the swap. Only SQLite's own
         // `PRAGMA quick_check` sees it for what it is.
@@ -212,12 +212,12 @@ final class BackupSyncRoundTripTests: XCTestCase {
         bytes.append(0x00)
         bytes.append(Data(repeating: 0x5A, count: 8192))
         try bytes.write(to: fake)
-        let backup = tmp.appendingPathComponent("damaged.noopbak")
+        let backup = tmp.appendingPathComponent("damaged.pulsebak")
         try DataBackup.writeBackupForTesting(databaseAt: fake, to: backup)
         XCTAssertTrue(isZip(backup), "precondition: the damaged payload rides in a real ZIP")
 
         let liveDB = tmp.appendingPathComponent("live.sqlite")
-        try makeNoopDatabase(at: liveDB, deviceRows: ["original"])
+        try makePulseDatabase(at: liveDB, deviceRows: ["original"])
         let before = try Data(contentsOf: liveDB)
 
         let result = DataBackup.restore(from: backup, toDatabaseAt: liveDB.path)
@@ -229,13 +229,13 @@ final class BackupSyncRoundTripTests: XCTestCase {
         XCTAssertEqual(try deviceRows(in: liveDB), ["original"])
     }
 
-    func testTruncatedNoopBackupIsRejectedAndLiveDbIntact() throws {
-        // A REAL NOOP database grown past one page, then truncated to its first page (the #1014
+    func testTruncatedPulseBackupIsRejectedAndLiveDbIntact() throws {
+        // A REAL Pulse database grown past one page, then truncated to its first page (the #1014
         // shape: a backup clipped mid-upload/mid-copy). Page 1 still reads perfectly — magic bytes
         // intact, `grdb_migrations` visible in sqlite_master — so the header and origin gates both
         // PASS. Only quick_check notices the file no longer holds the pages its header promises.
         let sourceDB = tmp.appendingPathComponent("big.sqlite")
-        try makeMultiPageNoopDatabase(at: sourceDB)
+        try makeMultiPagePulseDatabase(at: sourceDB)
         let fullSize = try XCTUnwrap(
             (try FileManager.default.attributesOfItem(atPath: sourceDB.path))[.size] as? NSNumber
         ).int64Value
@@ -248,7 +248,7 @@ final class BackupSyncRoundTripTests: XCTestCase {
         // Feed it through the legacy plain-SQLite path (truncation hits both container shapes the
         // same way; the ZIP shape is covered by the garbage test above).
         let liveDB = tmp.appendingPathComponent("live.sqlite")
-        try makeNoopDatabase(at: liveDB, deviceRows: ["original"])
+        try makePulseDatabase(at: liveDB, deviceRows: ["original"])
         let before = try Data(contentsOf: liveDB)
 
         let result = DataBackup.restore(from: sourceDB, toDatabaseAt: liveDB.path)
@@ -293,9 +293,9 @@ final class BackupSyncRoundTripTests: XCTestCase {
 
     // MARK: - SQLite fixtures (system SQLite3)
 
-    /// Build a minimal valid GRDB-origin NOOP DB: a `grdb_migrations` bookkeeping table (so the origin
+    /// Build a minimal valid GRDB-origin Pulse DB: a `grdb_migrations` bookkeeping table (so the origin
     /// gate accepts it as this app's backup) plus a `device` table holding the given identifiers.
-    private func makeNoopDatabase(at url: URL, deviceRows: [String]) throws {
+    private func makePulseDatabase(at url: URL, deviceRows: [String]) throws {
         var db: OpaquePointer?
         guard sqlite3_open(url.path, &db) == SQLITE_OK else {
             throw TestError("open failed: \(url.path)")
@@ -309,9 +309,9 @@ final class BackupSyncRoundTripTests: XCTestCase {
         }
     }
 
-    /// Build a valid GRDB-origin NOOP DB that spans MULTIPLE pages, so a truncation fixture can cut
+    /// Build a valid GRDB-origin Pulse DB that spans MULTIPLE pages, so a truncation fixture can cut
     /// real pages off while page 1 (magic + sqlite_master) stays perfectly readable (#1014).
-    private func makeMultiPageNoopDatabase(at url: URL) throws {
+    private func makeMultiPagePulseDatabase(at url: URL) throws {
         var db: OpaquePointer?
         guard sqlite3_open(url.path, &db) == SQLITE_OK else {
             throw TestError("open failed: \(url.path)")
@@ -326,7 +326,7 @@ final class BackupSyncRoundTripTests: XCTestCase {
         }
     }
 
-    /// Build a valid SQLite file that is NOT a NOOP/GRDB backup: it carries the Room marker and a
+    /// Build a valid SQLite file that is NOT a Pulse/GRDB backup: it carries the Room marker and a
     /// `device` table but no `grdb_migrations`, so the origin gate must reject it.
     private func makeForeignDatabase(at url: URL) throws {
         var db: OpaquePointer?

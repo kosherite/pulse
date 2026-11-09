@@ -14,7 +14,7 @@ import PackageDescription
 // The dataset is NEVER committed and is ALWAYS a command-line argument (`--dataset`). See README.md for
 // the download step and the licence attribution both the dataset and its companion code require.
 //
-// Nothing here reads or writes a NOOP database, and no health data of any wearer's lives in this repo.
+// Nothing here reads or writes a Pulse database, and no health data of any wearer's lives in this repo.
 let package = Package(
     name: "sleeppsg",
     platforms: [.macOS(.v13)],

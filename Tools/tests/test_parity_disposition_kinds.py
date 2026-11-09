@@ -60,7 +60,7 @@ class DispositionKindVocabularyTests(unittest.TestCase):
         self.assertNotIn("add-unpaired-propertie", self._required_kinds())
 
     def test_out_of_scope_twin_requires_excluded_swift_path(self) -> None:
-        identity = "kotlin\0android/app/src/main/java/com/noop/data/WhoopRepository.kt::hrUnionFingerprint/3#1"
+        identity = "kotlin\0android/app/src/main/java/com/pulse/data/WhoopRepository.kt::hrUnionFingerprint/3#1"
         item = {
             "type": "out_of_scope_twin",
             "kind": "add-unpaired-function",

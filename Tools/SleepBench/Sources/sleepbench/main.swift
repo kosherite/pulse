@@ -5,7 +5,7 @@ import WhoopProtocol
 // sleepbench — replay the sleep stagers over real recorded nights and score them against every
 // independent reference the database carries.
 //
-// USAGE:  sleepbench --db /path/to/whoop.sqlite [--device my-whoop-noop] [--pad 3600] [--csv out.csv]
+// USAGE:  sleepbench --db /path/to/whoop.sqlite [--device my-whoop-pulse] [--pad 3600] [--csv out.csv]
 //                     [--exclude <startTs,…>]
 //
 // The database is never written to and never lives in this repository. Pass a COPY; never point this at
@@ -14,7 +14,7 @@ import WhoopProtocol
 struct Args {
     var db = ""
     /// The `sleepSession.deviceId` whose nights are scored.
-    var device = "my-whoop-noop"
+    var device = "my-whoop-pulse"
     /// The `deviceId` the raw streams are stored under. These genuinely differ in a real database — the
     /// session rows carry the app's own device identity while the decoded streams carry the strap's — so
     /// the two are separate arguments rather than one assumed-shared value.
@@ -260,7 +260,7 @@ print("""
 C. AGREEMENT WITH THE STRAP'S OWN BAND sleep_state  (reference (b), n = \(banded.count) nights)
 ================================================================================
 The v18 @81 high nibble (0 wake / 1 still / 2 asleep / 3 up) is the strap's OWN scored verdict, not a
-re-derivation of NOOP's. It carries no light/deep/REM, so this is a sleep-vs-wake comparison only.
+re-derivation of Pulse's. It carries no light/deep/REM, so this is a sleep-vs-wake comparison only.
 STRICT maps band 2 -> sleep and band 0/3 -> wake, and EXCLUDES band 1 ("still", genuinely ambiguous).
 """)
 for (name, get) in [("V1", { (n: Night) in n.v1 }), ("V2", { (n: Night) in n.v2 }),

@@ -1,7 +1,7 @@
 import Foundation
 import WhoopProtocol
 
-// SleepAccel — read PhysioNet `sleep-accel` v1.0.0 and present each subject as the streams a NOOP stager
+// SleepAccel — read PhysioNet `sleep-accel` v1.0.0 and present each subject as the streams a Pulse stager
 // takes, plus the PSG hypnogram to score against.
 //
 //   Walch O, Huang Y, Forger D, Goldstein C. Sleep stage prediction with raw acceleration and photo-
@@ -12,7 +12,7 @@ import WhoopProtocol
 //
 // ── The mapping, and why each choice is the honest one ────────────────────────────────────────────────
 //
-// This dataset is an Apple Watch: a ~50 Hz raw accelerometer and a sparse PPG heart rate. NOOP's stager
+// This dataset is an Apple Watch: a ~50 Hz raw accelerometer and a sparse PPG heart rate. Pulse's stager
 // takes a 1 Hz gravity vector, a heart-rate stream, and R-R intervals. Three decisions bridge that, and
 // each one can bias a result, so each is stated rather than buried:
 //
@@ -33,7 +33,7 @@ import WhoopProtocol
 //     the PSG scoring grid exactly and no epoch is compared against a label it only half overlaps.
 //
 // The session window handed to the stager is the LABELLED span — first scored epoch to last, plus 30 s.
-// NOOP's own session detection is not exercised: this measures staging, which is the only thing
+// Pulse's own session detection is not exercised: this measures staging, which is the only thing
 // `SleepStagerV2` does (detection still comes from V1).
 
 /// One subject: the streams, the truth hypnogram on the same 30 s grid, and the window they share.
@@ -66,7 +66,7 @@ enum SleepAccel {
     /// up to a second. Floor is also the correct answer for the dataset's large negative times.
     static func wholeSecond(_ t: Double) -> Int { Int(t.rounded(.down)) }
 
-    /// AASM stage codes as scored in `labels/*_labeled_sleep.txt`, mapped onto NOOP's four classes.
+    /// AASM stage codes as scored in `labels/*_labeled_sleep.txt`, mapped onto Pulse's four classes.
     /// N1+N2 → light and N3(+N4) → deep is the standard four-class collapse; anything else — including the
     /// dataset's unscored marker — becomes `nil` and is dropped from the denominator.
     static func stageForCode(_ code: Int) -> String? {

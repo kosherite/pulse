@@ -158,7 +158,7 @@ final class BaselinesTests: XCTestCase {
         XCTAssertEqual(s.spread, Baselines.hrvCfg.floorSpread, accuracy: 1e-9)
     }
 
-    // MARK: - Manual recalibration epoch (noop.hrvBaselineEpoch)
+    // MARK: - Manual recalibration epoch (pulse.hrvBaselineEpoch)
 
     /// Day-keyed fold with a recalibration epoch must DROP every night before the epoch and re-seed
     /// from the first on-or-after night — so a high early baseline resets to the recent reality.
@@ -231,7 +231,7 @@ final class BaselinesTests: XCTestCase {
         XCTAssertEqual(reset.status, .calibrating)
     }
 
-    // MARK: - "Recalibrate Charge baseline" reset helper (noop.hrvBaselineEpoch + noop.recoveryBaselineEpoch)
+    // MARK: - "Recalibrate Charge baseline" reset helper (pulse.hrvBaselineEpoch + pulse.recoveryBaselineEpoch)
 
     /// An isolated UserDefaults suite so these tests never touch the real app domain.
     private func makeDefaults(_ fn: String = #function) -> UserDefaults {

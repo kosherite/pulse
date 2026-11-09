@@ -20,7 +20,7 @@ struct ImportedSleepFigures: Equatable {
 // Product surfaces (Compare, Insights, Stress, Explore, Today) historically read rows under the EXACT
 // requested source. That hid freshly-computed and Apple-compatible data that sat under a different
 // device id. `Repository.resolvedSeries` resolves a metric over an explicit source PRECEDENCE , imported
-// WHOOP wins, NOOP-computed fills the days it doesn't cover, and Apple Health only fills declared-
+// WHOOP wins, Pulse-computed fills the days it doesn't cover, and Apple Health only fills declared-
 // compatible vitals on days neither strap source has. These types model that resolution; the exact-source
 // reads (`series(key:source:)`) stay available for surfaces that must not mix sources.
 
@@ -71,14 +71,14 @@ struct ScoreInputProvider: Equatable, Sendable {
 /// where a vital came from without changing the stored data.
 enum DailyMetricSource: Equatable {
     case whoopImport
-    case noopComputed
+    case pulseComputed
     case appleHealth
     case localCache
 
     var vitalPriority: Int {
         switch self {
         case .whoopImport:  return 0
-        case .noopComputed: return 1
+        case .pulseComputed: return 1
         case .appleHealth:  return 2
         case .localCache:   return 3
         }
@@ -139,9 +139,9 @@ final class Repository: ObservableObject {
     /// Source id for on-device computed scores (recovery/strain/sleep derived from the raw strap
     /// streams by IntelligenceEngine). Merged UNDER the imported `deviceId` rows at read time, so a
     /// real WHOOP import always wins and the strap-only user still gets a populated dashboard.
-    private var computedDeviceId: String { deviceId + "-noop" }
+    private var computedDeviceId: String { deviceId + "-pulse" }
 
-    /// The CANONICAL imported/computed id ("my-whoop" + its "-noop" sibling). The WHOOP-IMPORT and the
+    /// The CANONICAL imported/computed id ("my-whoop" + its "-pulse" sibling). The WHOOP-IMPORT and the
     /// engine's computed write target stay STABLE here forever (they never follow the active strap), so a
     /// remove+re-add never orphans the history a prior import/score banked. `deviceId` follows the active
     /// strap so today's LIVE raw under a re-added strap's "whoop-<uuid>" id still surfaces (#814); reads
@@ -149,7 +149,7 @@ final class Repository: ObservableObject {
     /// When the active strap IS the canonical id (single-device install) the union collapses to one id and
     /// is byte-identical to the pre-union behaviour.
     private var canonicalDeviceId: String { Self.whoopSource }
-    private var canonicalComputedId: String { Self.whoopSource + "-noop" }
+    private var canonicalComputedId: String { Self.whoopSource + "-pulse" }
 
     /// The distinct IMPORTED/MEASURED source ids to union for a dashboard read: the active strap (live raw,
     /// #814) and the canonical imported id. Active strap FIRST so per-day dedup lets the measured/live row
@@ -157,7 +157,7 @@ final class Repository: ObservableObject {
     var importedReadIds: [String] {
         deviceId == canonicalDeviceId ? [deviceId] : [deviceId, canonicalDeviceId]
     }
-    /// The distinct COMPUTED ("-noop") source ids to union: the active strap's computed sibling and the
+    /// The distinct COMPUTED ("-pulse") source ids to union: the active strap's computed sibling and the
     /// canonical computed sibling. Same dedup rule as `importedReadIds`.
     var computedReadIds: [String] {
         computedDeviceId == canonicalComputedId ? [computedDeviceId] : [computedDeviceId, canonicalComputedId]
@@ -176,7 +176,7 @@ final class Repository: ObservableObject {
     /// mints every non-WHOOP id as "<idPrefix>-<uuid>", so the stored id's prefix IS its brand key. Read/UI
     /// side only — it lets the sleep surfaces name an Oura night's provenance "Oura" (a ring-PROVIDED
     /// hypnogram) instead of the generic "On-device", and flag the split as the ring's RAW on-device stages.
-    /// Not a stored value and never crosses `.noopbak`, so no Android twin is required.
+    /// Not a stored value and never crosses `.pulsebak`, so no Android twin is required.
     var activeDeviceIsOura: Bool { DeviceBrandCatalog.isOura(deviceId) }
     private var store: WhoopStore?
 
@@ -197,7 +197,7 @@ final class Repository: ObservableObject {
     /// Data Sources "Freshness Pipeline" card so the user can see imported vs computed vs Apple coverage.
     @Published private(set) var freshness: RepositoryFreshness = .empty
     /// Daily metric rows with source provenance, used by vital-sign surfaces that need honest
-    /// "WHOOP import / NOOP computed / Apple Health" captions instead of a silent merged row.
+    /// "WHOOP import / Pulse computed / Apple Health" captions instead of a silent merged row.
     @Published private(set) var vitalRows: [SourcedDailyMetric] = []
     /// Monotonic counter bumped on every successful `refresh()`. Intraday-updating views key their
     /// data load on this so they reload when fresh strap data lands , `today?.day` alone is a stable
@@ -286,7 +286,7 @@ final class Repository: ObservableObject {
     /// Every namespace the Workouts list reads a row out of, in read order, duplicates collapsed.
     ///
     /// Why this exists: the list unions many device ids while `deleteWorkout` deleted from exactly ONE,
-    /// the active strap. A row banked under any other namespace (a retained strap, a computed `-noop`
+    /// the active strap. A row banked under any other namespace (a retained strap, a computed `-pulse`
     /// sibling, Apple Health, an imported lifting session or activity file) was therefore VISIBLE BUT
     /// UNDELETABLE: the delete reported nothing, the reload re-read the row from the namespace the delete
     /// never touched, and it came straight back. Reported as workouts that ignore the delete button
@@ -314,7 +314,7 @@ final class Repository: ObservableObject {
     /// A `.manual` row, the only class the delete button is offered for, is written under a strap id, so
     /// this set is what a delete actually needs.
     nonisolated static func deletableWorkoutNamespaces(rawIds: [String]) -> [String] {
-        (rawIds + rawIds.map { $0.hasSuffix("-noop") ? $0 : $0 + "-noop" })
+        (rawIds + rawIds.map { $0.hasSuffix("-pulse") ? $0 : $0 + "-pulse" })
             .reduce(into: [String]()) { acc, id in
                 if !acc.contains(id) { acc.append(id) }
             }
@@ -332,7 +332,7 @@ final class Repository: ObservableObject {
     }
 
     private func rawComputedReadIds(store: WhoopStore) -> [String] {
-        rawPhysiologyReadIds(store: store).map { $0.hasSuffix("-noop") ? $0 : $0 + "-noop" }
+        rawPhysiologyReadIds(store: store).map { $0.hasSuffix("-pulse") ? $0 : $0 + "-pulse" }
     }
 
     // Each helper reads the SAME store query across `importedReadIds` (active strap + canonical "my-whoop")
@@ -422,7 +422,7 @@ final class Repository: ObservableObject {
     /// nothing downstream healed it — `mergeDaily` only bridges imported/computed/phone, never two straps.
     /// Columns that only mean something together move as a GROUP, whole and from one row, so a sleep total
     /// never sits beside another strap's stage minutes: the sleep block, and the raw red/IR PPG pair.
-    /// Across-bucket precedence (`mergeDaily`) is untouched. Ported from tanarchytan/noop @de370b85, reduced
+    /// Across-bucket precedence (`mergeDaily`) is untouched. Ported from tanarchytan/pulse @de370b85, reduced
     /// to the columns this DailyMetric carries. Byte-identical twin of Kotlin WhoopRepository.coalesceDay.
     nonisolated static func coalesceDay(_ winner: DailyMetric, _ filler: DailyMetric) -> DailyMetric {
         let sleepFromFiller = winner.totalSleepMin == nil && winner.efficiency == nil &&
@@ -478,7 +478,7 @@ final class Repository: ObservableObject {
         Self.dedupBlocks(await unionRawSleepBlocks(store: store, ids: rawPhysiologyReadIds(store: store), from: from, to: to, limit: limit))
     }
 
-    /// Computed ("-noop") daily-metric rows across the computed union, DEDUPED per day (active strap's
+    /// Computed ("-pulse") daily-metric rows across the computed union, DEDUPED per day (active strap's
     /// computed sibling wins over the canonical computed sibling).
     private func unionComputedDailyMetrics(store: WhoopStore, from: String, to: String) async -> [DailyMetric] {
         var byDay: [String: DailyMetric] = [:]
@@ -490,7 +490,7 @@ final class Repository: ObservableObject {
         return byDay.values.sorted { $0.day < $1.day }
     }
 
-    /// Computed ("-noop") sleep sessions across every registered WHOOP source, keeping ALL sessions per day
+    /// Computed ("-pulse") sleep sessions across every registered WHOOP source, keeping ALL sessions per day
     /// and collapsing near-identical nights recorded under different computed siblings.
     private func unionComputedSleepSessions(store: WhoopStore, from: Int, to: Int, limit: Int = 4000) async -> [CachedSleepSession] {
         Self.dedupBlocks(await unionRawSleepBlocks(store: store, ids: rawComputedReadIds(store: store), from: from, to: to, limit: limit))
@@ -712,14 +712,14 @@ final class Repository: ObservableObject {
     }
 
     /// Canonical source ids the resolver knows how to cross-reference. The strap's actual id is
-    /// `deviceId` (and its computed sibling `deviceId + "-noop"`); these are the FIXED ids.
+    /// `deviceId` (and its computed sibling `deviceId + "-pulse"`); these are the FIXED ids.
     static let whoopSource = "my-whoop"
     static let appleHealthSource = "apple-health"
     static let healthConnectSource = "health-connect"
     static let activityFileSource = "activity-file"
 
     /// Imported wearable-export sources whose DAILY aggregates (HRV / resting HR / sleep) can be scored
-    /// for a NOOP Charge/Rest on an import-only day, exactly like a live day (#823). These carry no raw HR
+    /// for a Pulse Charge/Rest on an import-only day, exactly like a live day (#823). These carry no raw HR
     /// stream, so the source-only fold in IntelligenceEngine scores them from the daily aggregate vs the
     /// person's own baseline. Matches `WearableBrand.sourceId` plus Health Connect (Android imports HC's
     /// daily metrics under the strap source, but a sideloaded/standalone HC source id is covered too).
@@ -985,7 +985,7 @@ final class Repository: ObservableObject {
             for p in need { fig[p.day, default: ImportedSleepFigures()].needMin = p.value }
             for p in debt { fig[p.day, default: ImportedSleepFigures()].debtMin = p.value }
             // H5 (#509): a night the user hand-edited (userEdited) must keep its corrected sleep figures even
-            // when a WHOOP/Apple import also covers that day. The computed ("-noop") session carries the edit,
+            // when a WHOOP/Apple import also covers that day. The computed ("-pulse") session carries the edit,
             // and IntelligenceEngine re-keys the computed DAILY row from it; collect those edited days so the
             // merge lets the computed row's SLEEP fields win there (imports still win on every un-edited day).
             let editedDays = Self.userEditedDays(compSleep)
@@ -1149,7 +1149,7 @@ final class Repository: ObservableObject {
     nonisolated private static func sourceRows(imported: [DailyMetric], computed: [DailyMetric],
                                    apple: [DailyMetric]) -> [SourcedDailyMetric] {
         (imported.map { SourcedDailyMetric(metric: $0, source: .whoopImport) }
-            + computed.map { SourcedDailyMetric(metric: $0, source: .noopComputed) }
+            + computed.map { SourcedDailyMetric(metric: $0, source: .pulseComputed) }
             + apple.map { SourcedDailyMetric(metric: $0, source: .appleHealth) })
             .sorted { lhs, rhs in
                 if lhs.metric.day == rhs.metric.day {
@@ -1362,7 +1362,7 @@ final class Repository: ObservableObject {
         return await unionSleepSessions(store: store, from: from, to: to, limit: limit)
     }
 
-    /// Computed ("-noop") sleep sessions for a ts range, oldest→newest by onset — the funnel/diagnostic
+    /// Computed ("-pulse") sleep sessions for a ts range, oldest→newest by onset — the funnel/diagnostic
     /// FALLBACK (#1150). A Bluetooth-only strap (no WHOOP/Apple-Health import) banks every night under the
     /// COMPUTED source, so the imported-only `sleepSessions(from:to:)` returns nothing and the funnel
     /// reported "no sleep session in the last 14 days to analyze" for a 4.0 user whose nights are all
@@ -1408,7 +1408,7 @@ final class Repository: ObservableObject {
     }
 
     /// The persisted per-epoch MOTION series for each of `starts` (detected session start keys), keyed by
-    /// start (#407). Motion is written ONLY under the computed ("-noop") source by the engine, so we read
+    /// start (#407). Motion is written ONLY under the computed ("-pulse") source by the engine, so we read
     /// there , and an imported-only night (no computed twin) simply has no motion (absent stays absent, an
     /// honest empty state, never a fabricated zero array). This does NOT resolve the night: the caller has
     /// already chosen the main-night GROUP (the 6.1.1 bridged group) and passes those blocks' starts; we
@@ -1429,7 +1429,7 @@ final class Repository: ObservableObject {
         // the importers, and the bounds read happens only if at least one such block is present.
         //
         // Provenance gives the SAME answer the probe does. The search takes the first id in
-        // `rawIds + computedIds` whose bounds match, then normalises it to its `-noop` twin, and
+        // `rawIds + computedIds` whose bounds match, then normalises it to its `-pulse` twin, and
         // `computedIds` is exactly `rawIds` mapped to that suffix. So a block read under a raw id and the
         // same block read under its computed one both resolve to that one computed source either way.
         // Disagreeing would take two DIFFERENT straps sharing a start and an end to the second, and
@@ -1461,7 +1461,7 @@ final class Repository: ObservableObject {
                     }
                 }
             }
-            let ownerComputed = owner.map { $0.hasSuffix("-noop") ? $0 : $0 + "-noop" }
+            let ownerComputed = owner.map { $0.hasSuffix("-pulse") ? $0 : $0 + "-pulse" }
             sourcesByStart[session.startTs] = ([ownerComputed].compactMap { $0 } + computedIds)
                 .reduce(into: [String]()) { if !$0.contains($1) { $0.append($1) } }
         }
@@ -1497,7 +1497,7 @@ final class Repository: ObservableObject {
 
     /// The user's learned habitual midsleep (local time-of-day seconds), or nil under
     /// `SleepStageTotals.habitualMinDays` of history (cold-start). Computed EXACTLY as
-    /// `IntelligenceEngine.computeHabitualSleep` does , the SAME raw imported + computed ("-noop")
+    /// `IntelligenceEngine.computeHabitualSleep` does , the SAME raw imported + computed ("-pulse")
     /// sleep-session union, one `HistoryBlock` per session (effective bounds, dayKey = the LOCAL calendar
     /// day of the midpoint), deferring to the SAME shared `SleepStageTotals.habitualMidsleepSec` pure
     /// function , so the Sleep tab's main-night pick aligns to the same value the analytics rollup used.
@@ -1882,7 +1882,7 @@ final class Repository: ObservableObject {
             case .motion: return String(localized: "Motion")
             // #175: the strap's OWN band sleep_state track (0 wake/1 still/2 asleep/3 up), shown as a
             // distinct stepped track alongside the derived hypnogram. This is the band's reported state,
-            // NOT a stage NOOP trusts as truth — the pill names it "Band Sleep State" so it can't be
+            // NOT a stage Pulse trusts as truth — the pill names it "Band Sleep State" so it can't be
             // mistaken for the derived stages.
             case .bandSleepState: return String(localized: "Band Sleep State")
             // The Oura ring's OWN per-window motion: seconds of movement in each ~30 s window (0x47,
@@ -1941,7 +1941,7 @@ final class Repository: ObservableObject {
     /// 208 `dc_raw` rows land in that band — so they are not contamination. But real SpO2 CANNOT exceed
     /// 100 %, and open_oura's own pipeline clamps its computed SpO2 to [85, 100]
     /// (`docs/spo2-calibration.md`, tag `0x8b` path). So a smooth distribution peaking at 103–104 points
-    /// at an un-modelled offset/transform in NOOP's `0x6F` decode, NOT at real overshoot. Clamping here
+    /// at an un-modelled offset/transform in Pulse's `0x6F` decode, NOT at real overshoot. Clamping here
     /// would HIDE that discrepancy behind a flat line at 100; keeping the bound at 110 leaves it visible
     /// while still excluding the mis-scaled channel. Revisit once the `0x6F` scale is pinned — see
     /// OURA_PROTOCOL.md §6.5.
@@ -2249,7 +2249,7 @@ final class Repository: ObservableObject {
     /// Product-facing daily series for a metric across every COMPATIBLE source, freshest-wins. Use this
     /// on surfaces where the user expects the best available signal (Compare/Insights/Stress/Explore/
     /// Today); use `series(key:source:)` where a single source must be honoured verbatim. Precedence is
-    /// explicit per `sourceCandidates`: imported WHOOP > NOOP-computed > declared-compatible Apple Health.
+    /// explicit per `sourceCandidates`: imported WHOOP > Pulse-computed > declared-compatible Apple Health.
     /// #833/v7.7.2: `fullHistory` forces the full recordable epoch ("0000-01-01" ... "9999-12-31")
     /// regardless of `days`; false (the default) honours `days` exactly as before, so existing callers are
     /// byte-identical.
@@ -2289,7 +2289,7 @@ final class Repository: ObservableObject {
     }
 
     /// Resolve a displayed score back to the provider that supplied its inputs. Direct imported points
-    /// already name their provider. A `-noop` point is looked up in the dedicated metric-level provenance
+    /// already name their provider. A `-pulse` point is looked up in the dedicated metric-level provenance
     /// cache; missing legacy metadata returns nil rather than falsely claiming its parent device.
     func scoreInputProvider(
         resolvedSource: String,
@@ -2299,7 +2299,7 @@ final class Repository: ObservableObject {
         guard let store = await ensureStore() else { return nil }
         let registry = DeviceRegistryStore(dbQueue: store.registryWriter)
         let sourceId: String
-        if resolvedSource.hasSuffix("-noop") {
+        if resolvedSource.hasSuffix("-pulse") {
             guard let cached = try? await store.scoreInputSource(
                 deviceId: resolvedSource,
                 day: day,
@@ -2317,7 +2317,7 @@ final class Repository: ObservableObject {
     /// not interpret the value as a device id; `vo2max_est` uses it for its `nes` / `uth` estimator id.
     /// Missing metadata is an honest legacy-unknown result, never reconstructed from the current profile.
     func scoreProvenanceTag(resolvedSource: String, day: String, metricKey: String) async -> String? {
-        guard resolvedSource.hasSuffix("-noop"), let store = await ensureStore() else { return nil }
+        guard resolvedSource.hasSuffix("-pulse"), let store = await ensureStore() else { return nil }
         return try? await store.scoreInputSource(deviceId: resolvedSource, day: day, key: metricKey)
     }
 
@@ -2348,7 +2348,7 @@ final class Repository: ObservableObject {
 
     /// The candidate (source, key) pairs to try for `key`, in precedence order, given the user's
     /// `preferredSource`. The strap's real id is `actualWhoopSource` (`deviceId`), so the computed
-    /// sibling is `actualWhoopSource + "-noop"`.
+    /// sibling is `actualWhoopSource + "-pulse"`.
     ///  • strap-preferred → [imported strap, computed strap, compatible Apple] (Apple only for vitals
     ///    that have a declared 1:1 mapping);
     ///  • Apple-preferred → [Apple] (+ computed strap ONLY for steps/active_kcal, which the strap
@@ -2356,7 +2356,7 @@ final class Repository: ObservableObject {
     ///  • any other source → itself only (nutrition/mood are single-source by design).
     static func sourceCandidates(forKey key: String, preferredSource: String,
                                  actualWhoopSource: String) -> [MetricSourceCandidate] {
-        let computedSource = actualWhoopSource + "-noop"
+        let computedSource = actualWhoopSource + "-pulse"
         func uniqued(_ cs: [MetricSourceCandidate]) -> [MetricSourceCandidate] {
             var seen = Set<MetricSourceCandidate>(); var out: [MetricSourceCandidate] = []
             for c in cs where !seen.contains(c) { seen.insert(c); out.append(c) }
@@ -2367,9 +2367,9 @@ final class Repository: ObservableObject {
             // Active strap first (live/measured wins per day), then the CANONICAL "my-whoop" import, THEN
             // the computed siblings, so history banked under the canonical id before a re-add still
             // resolves (the union model) and imports outrank computed estimates — the documented
-            // `imported WHOOP > NOOP-computed` order. The computed sibling used to sit ahead of the
+            // `imported WHOOP > Pulse-computed` order. The computed sibling used to sit ahead of the
             // canonical import, so after a device re-add (active != canonical) the new strap's computed
-            // estimates shadowed richer imported my-whoop history (Swift twin of the ryanbr/noop#240
+            // estimates shadowed richer imported my-whoop history (Swift twin of the kosherite/pulse#240
             // precedence fix). `uniqued` collapses these to one pair per source on a single-device
             // install (active == canonical), so that path is byte-identical. Apple is the final
             // cross-source fallback.
@@ -2377,7 +2377,7 @@ final class Repository: ObservableObject {
                 MetricSourceCandidate(source: actualWhoopSource, key: key),
                 MetricSourceCandidate(source: whoopSource, key: key),
                 MetricSourceCandidate(source: computedSource, key: key),
-                MetricSourceCandidate(source: whoopSource + "-noop", key: key),
+                MetricSourceCandidate(source: whoopSource + "-pulse", key: key),
             ]
             if let appleKey = appleCompatibleKey(forWhoopKey: key) {
                 candidates.append(MetricSourceCandidate(source: appleHealthSource, key: appleKey))
@@ -2391,7 +2391,7 @@ final class Repository: ObservableObject {
             // byte-identical to Android's, where it makes a Health-Connect-only weight history resolve in
             // Compare (#443). A real Apple export still wins per day; HC fills the rest.
             candidates.append(MetricSourceCandidate(source: healthConnectSource, key: key))
-            if noopComputedCanFillAppleMetric(key) {
+            if pulseComputedCanFillAppleMetric(key) {
                 candidates.append(MetricSourceCandidate(source: computedSource, key: key))
             }
             return uniqued(candidates)
@@ -2414,9 +2414,9 @@ final class Repository: ObservableObject {
         }
     }
 
-    /// Whether the NOOP-computed strap source may fill an Apple-preferred metric. Only the two daily
+    /// Whether the Pulse-computed strap source may fill an Apple-preferred metric. Only the two daily
     /// totals the strap genuinely estimates (steps, calories) , never a derived WHOOP score.
-    private static func noopComputedCanFillAppleMetric(_ key: String) -> Bool {
+    private static func pulseComputedCanFillAppleMetric(_ key: String) -> Bool {
         switch key {
         case "steps", "active_kcal": return true
         default:                     return false
@@ -2433,7 +2433,7 @@ final class Repository: ObservableObject {
     ///  3. the merged daily metrics (`self.days`, imported ∪ computed) for keys with a DailyMetric
     ///     column , the same key→column map InsightsView.dailyOutcome / Android's dailyPick use,
     ///     extended to the full daily column set.
-    /// Any OTHER source (apple-health / nutrition-csv / noop-mood) reads only its own series, unchanged.
+    /// Any OTHER source (apple-health / nutrition-csv / pulse-mood) reads only its own series, unchanged.
     /// #833/v7.7.2: `fullHistory` forces the full recordable epoch ("0000-01-01" ... "9999-12-31")
     /// regardless of `days`; false (the default) honours `days` exactly as before, so existing callers are
     /// byte-identical. The flag is forwarded to the non-strap `series(...)` delegation below so every source
@@ -2651,9 +2651,9 @@ final class Repository: ObservableObject {
     /// `source` column (PK is (deviceId, day, question)), so writing native answers under the
     /// imported `deviceId` would let a CSV re-import silently overwrite them , and clears could
     /// then delete imported rows. A separate device id keeps the two streams independent.
-    static let journalDeviceId = "noop-journal"
+    static let journalDeviceId = "pulse-journal"
 
-    /// Logged behaviours (imported WHOOP journal ∪ native noop-journal) for correlation insights.
+    /// Logged behaviours (imported WHOOP journal ∪ native pulse-journal) for correlation insights.
     func journalEntries(days: Int = 4000) async -> [JournalEntry] {
         guard let store = await ensureStore() else { return [] }
         let now = Date()
@@ -2700,7 +2700,7 @@ final class Repository: ObservableObject {
     }
 
     /// Distinct local-day keys (yyyy-MM-dd) in the inclusive range [from, to] that carry at least one
-    /// NATIVE journal entry (the "noop-journal" device id only — matching the Android widget's
+    /// NATIVE journal entry (the "pulse-journal" device id only — matching the Android widget's
     /// `repo.journal(JOURNAL_DEVICE_ID, from, to)`). Backs the #627 Today journal widget's completion
     /// strip. Read-only.
     func nativeJournalDays(from: String, to: String) async -> Set<String> {
@@ -2774,7 +2774,7 @@ final class Repository: ObservableObject {
         // dedup below only collapses strap-vs-Apple twins, not a row present in two strap namespaces).
         var rows: [WorkoutRow] = []
         // Every namespace in one list, shared with `deleteWorkout` so the two cannot disagree about where a
-        // row lives. Covers each raw id, its computed `-noop` sibling, Apple Health, imported lifting
+        // row lives. Covers each raw id, its computed `-pulse` sibling, Apple Health, imported lifting
         // sessions (Hevy / Liftosaur) and imported activity FILES (#29: FIT / GPX / TCX, or a successful
         // file import never appears here at all). HR is reconciled from the strap trace at the end.
         for id in Self.workoutNamespaces(rawIds: rawPhysiologyReadIds(store: store)) {
@@ -2809,7 +2809,7 @@ final class Repository: ObservableObject {
     /// changes the number but not the trace, so the average no longer matches the graph/zones/effort
     /// (#499). Here the stored field defers to the trace whenever the trace is present:
     ///
-    ///  - STRAP-NATIVE rows (`manual` / detected `<id>-noop`) are charted/zoned/scored straight from this
+    ///  - STRAP-NATIVE rows (`manual` / detected `<id>-pulse`) are charted/zoned/scored straight from this
     ///    strap trace, so their Avg HR is ALWAYS recomputed as the true mean of those samples (and Max →
     ///    true peak) , a manual edit can no longer drift them out of agreement with the graph.
     ///  - IMPORTED rows (Apple Health / Health Connect / Whoop CSV) carry their OWN avg/max; we only FILL
@@ -2875,7 +2875,7 @@ final class Repository: ObservableObject {
                     let cls = WorkoutSource.classify(rows[idx].source)
                     let wantStrain = (cls == .manual || cls == .detected) && rows[idx].strain == nil
                     // #510: read HR under the workout's OWN recording strap, not a single active id. A detected
-                    // row's `source` IS its computed strap id ("<base>-noop"), so a bout auto-detected on a 2nd
+                    // row's `source` IS its computed strap id ("<base>-pulse"), so a bout auto-detected on a 2nd
                     // WHOOP reads "<base>" instead of the active strap's empty window. Resolved on the main actor;
                     // only the resulting Sendable String crosses into the task.
                     let hrIds = Self.workoutHrDeviceIds(source: rows[idx].source, activeStrapId: deviceId,
@@ -2939,10 +2939,10 @@ final class Repository: ObservableObject {
 
     /// #510 (Kotlin twin: `WhoopRepository.workoutHrDeviceIds`). The device ids whose `hrSample` rows back a
     /// workout's Avg HR / Effort reconcile. A DETECTED row's own `source` IS its computed strap id
-    /// ("<base>-noop"), so strip the suffix to read HR under the raw "<base>" — a bout auto-detected on a
+    /// ("<base>-pulse"), so strip the suffix to read HR under the raw "<base>" — a bout auto-detected on a
     /// SECOND WHOOP no longer reads the active strap's empty window (which blanked its reconcile). MANUAL and
     /// IMPORTED rows carry no strap id in `source`, so they reconcile against the active strap [activeStrapId]
-    /// as before; on a single-device install a detected "<base>-noop" strips to the active id, so the read is
+    /// as before; on a single-device install a detected "<base>-pulse" strips to the active id, so the read is
     /// byte-identical. (#836: the Kotlin twin used to key MANUAL rows on their stored deviceId instead —
     /// a minor, display-only divergence from this file — but now reads the same active union Swift always
     /// has, so a manual session recorded on a re-added/second strap reconciles correctly on both platforms.)
@@ -2960,7 +2960,7 @@ final class Repository: ObservableObject {
     nonisolated static func workoutHrDeviceIds(source: String, activeStrapId: String,
                                                importedIds: [String]) -> [String] {
         guard WorkoutSource.classify(source) == .detected else { return importedIds }
-        return [source.hasSuffix("-noop") ? String(source.dropLast(5)) : source]
+        return [source.hasSuffix("-pulse") ? String(source.dropLast(5)) : source]
     }
 
     // MARK: - Workout editing (manual add/edit · relabel · dismiss · delete)

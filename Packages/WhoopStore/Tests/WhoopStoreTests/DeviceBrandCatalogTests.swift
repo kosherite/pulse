@@ -86,7 +86,7 @@ final class DeviceBrandCatalogTests: XCTestCase {
         XCTAssertFalse(DeviceBrandCatalog.isOura("garmin-1234"))
         XCTAssertFalse(DeviceBrandCatalog.isOura("strap-1234"))
         XCTAssertFalse(DeviceBrandCatalog.isOura("huami-1234"))
-        XCTAssertFalse(DeviceBrandCatalog.isOura("some-noop"))
+        XCTAssertFalse(DeviceBrandCatalog.isOura("some-pulse"))
         XCTAssertFalse(DeviceBrandCatalog.isOura(""))
         // Prefix must be delimited: a bare "oura" with no "-" (or an unrelated id) is not a registry ring id.
         XCTAssertFalse(DeviceBrandCatalog.isOura("oura"))

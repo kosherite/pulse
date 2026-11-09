@@ -86,7 +86,7 @@ final class ImportCoordinatorTests: XCTestCase {
     /// wearable importer (which would then report a misleading "not an Oura/Fitbit/Garmin export").
     /// detectAndImport falls through to the wearable importer ONLY for the notAZipOrFolder case.
     func testDetectAndImportMissingFileThrowsFileNotFound() {
-        let missing = URL(fileURLWithPath: "/nonexistent/noop/import/definitely-not-here.json")
+        let missing = URL(fileURLWithPath: "/nonexistent/pulse/import/definitely-not-here.json")
         XCTAssertThrowsError(try ImportCoordinator().detectAndImport(from: missing)) { error in
             guard case ImportError.fileNotFound = error else {
                 return XCTFail("expected ImportError.fileNotFound, got \(error)")

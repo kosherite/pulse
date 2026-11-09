@@ -1,0 +1,129 @@
+import Foundation
+import PulseLocalAccessCore
+
+@main
+enum PulseLocalAccessMain {
+    static func main() {
+        var args = Array(CommandLine.arguments.dropFirst())
+        let command = args.first ?? "mcp"
+        if !args.isEmpty { args.removeFirst() }
+
+        switch command {
+        case "mcp":
+            runMCP(configuration: .environment())
+        case "query":
+            runQuery(arguments: args)
+        case "codex-config":
+            print(codexConfig(arguments: args))
+        case "--help", "-h", "help":
+            print(helpText)
+        default:
+            fputs("Unknown command: \(command)\n\n\(helpText)\n", stderr)
+            Foundation.exit(64)
+        }
+    }
+
+    private static func runQuery(arguments: [String]) {
+        if arguments == ["--help"] || arguments == ["-h"] {
+            print(helpText)
+            return
+        }
+        do {
+            let request = try PulseCLIQuery.parse(arguments: arguments)
+            let payload = try PulseCLIQuery.dispatch(request)
+            FileHandle.standardOutput.write(try PulseCLIQuery.encodeLine(payload))
+        } catch let error as PulseCLIQueryError {
+            fputs("[pulse-local-access] \(error)\n", stderr)
+            Foundation.exit(error.exitCode)
+        } catch let error as LocalAccessError {
+            let message: String
+            if case .databaseUnavailable = error {
+                message = "Pulse database is unavailable"
+            } else {
+                message = error.description
+            }
+            fputs("[pulse-local-access] \(message)\n", stderr)
+            Foundation.exit(1)
+        } catch {
+            fputs("[pulse-local-access] runtime error\n", stderr)
+            Foundation.exit(1)
+        }
+    }
+
+    private static func runMCP(configuration: LocalAccessConfiguration) {
+        let server = PulseMCPServer(configuration: configuration)
+        while let line = readLine(strippingNewline: true) {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { continue }
+            let response = server.handleLine(trimmed)
+            guard response != .null else { continue }
+            write(response)
+        }
+    }
+
+    private static func write(_ value: JSONValue) {
+        do {
+            let data = try JSONEncoder().encode(value)
+            FileHandle.standardOutput.write(data)
+            FileHandle.standardOutput.write(Data("\n".utf8))
+        } catch {
+            fputs("[pulse-local-access] failed to encode response: \(error)\n", stderr)
+        }
+    }
+
+    private static func codexConfig(arguments: [String]) -> String {
+        let executable = URL(fileURLWithPath: CommandLine.arguments[0]).standardizedFileURL.path
+        var dbPath: String?
+        var iterator = arguments.makeIterator()
+        while let arg = iterator.next() {
+            if arg == "--db-path" {
+                dbPath = iterator.next()
+            }
+        }
+
+        var lines = [
+            "[mcp_servers.pulse]",
+            "command = \"\(toml(executable))\"",
+            "args = [\"mcp\"]",
+            "startup_timeout_sec = 10",
+            "tool_timeout_sec = 60",
+            "default_tools_approval_mode = \"prompt\"",
+        ]
+        if let dbPath, !dbPath.isEmpty {
+            lines.append("")
+            lines.append("[mcp_servers.pulse.env]")
+            lines.append("PULSE_DB_PATH = \"\(toml(dbPath))\"")
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private static func toml(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+    }
+
+    private static let helpText = """
+    Usage:
+      pulse-local-access mcp
+      pulse-local-access query <tool> [flags]
+      pulse-local-access codex-config [--db-path /absolute/path/to/whoop.sqlite]
+
+    Query tools:
+      health_snapshot [--days N]
+      metric_series --key KEY [--source SOURCE] [--days N] [--from-day YYYY-MM-DD] [--to-day YYYY-MM-DD] [--limit N]
+      data_freshness
+      sleep_summary [--days N]
+      workout_summary [--days N]
+
+    Query options:
+      --db-path PATH    Explicit Pulse SQLite path. Otherwise PULSE_DB_PATH or the official app container is used.
+
+    Environment:
+      PULSE_DB_PATH    Explicit Pulse SQLite path. Optional; otherwise the official macOS app container is used.
+      PULSE_BUNDLE_ID  Optional non-default bundle id. Not needed for the official app.
+      PULSE_DEVICE_ID  Optional source id. Defaults to my-whoop.
+
+    The MCP server is read-only, stdio-based, and exposes bounded local Pulse data tools.
+    """
+}

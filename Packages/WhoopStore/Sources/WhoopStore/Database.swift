@@ -302,7 +302,7 @@ extension WhoopStore {
         }
 
         // v16: stable per-strap identity for multi-WHOOP support. `peripheralId` holds the BLE
-        // CBPeripheral.identifier.uuidString (iOS/Mac) so NOOP can tell physical straps apart and
+        // CBPeripheral.identifier.uuidString (iOS/Mac) so Pulse can tell physical straps apart and
         // map a connected peripheral back to its registry row. Additive + nullable: the seeded
         // 'my-whoop' row keeps peripheralId NULL (it still connects to "any WHOOP" today; it adopts
         // its peripheral id later). New straps get id "whoop-<peripheralId>". Old readers that don't
@@ -319,7 +319,7 @@ extension WhoopStore {
         // no existing row touched, so an old reader is unaffected.
         //
         // NON-CLINICAL: holds ONLY user-entered values + an OPTIONAL user-entered `referenceText`
-        // (their own report's range, shown back verbatim). NOOP ships no reference-range tables and
+        // (their own report's range, shown back verbatim). Pulse ships no reference-range tables and
         // never asserts normality.
         //
         // `id` is a client-generated stable identifier (so a single reading can be edited/deleted by id
@@ -508,7 +508,7 @@ extension WhoopStore {
 
         // v26 (Oura efficiency unit heal): the Oura API importer (OuraApiParser.swift) wrote Oura's
         // native 0-100 integer `efficiency` straight into sleepSession.efficiency / dailyMetric.efficiency,
-        // but NOOP's own sleep pipeline (StrandAnalytics) stores that shared column as a 0-1 FRACTION
+        // but Pulse's own sleep pipeline (StrandAnalytics) stores that shared column as a 0-1 FRACTION
         // everywhere it computes it (asleep ÷ in-bed) — same column, two scales for oura-api rows written
         // before the importer fix. UPDATE-only, NO schema change: divides `efficiency` by 100 for every
         // row where it's > 1.5 — a threshold no genuine fraction can exceed (the column's convention
@@ -583,7 +583,7 @@ extension WhoopStore {
 
         // #423: WHOOP 5/MG raw-IMU offload capture (100 Hz 6-axis). `samples` is a packed i16 LE BLOB of
         // the six wire columns (ax…az,gx…gz). Twin of the Android `rawImuSample` table (MIGRATION_20_21);
-        // same column order + PK so a `.noopbak` round-trips byte-for-byte.
+        // same column order + PK so a `.pulsebak` round-trips byte-for-byte.
         //
         // Historical rolling cache. Its opt-in writer retained at most 3,600 one-second rows, but no analytics,
         // UI or export consumed them. v41 retires those legacy rows after file-backed capture replaces the cache.
@@ -596,13 +596,13 @@ extension WhoopStore {
             }
         }
 
-        // v29: provenance for NOOP-computed headline scores. This is deliberately separate from
+        // v29: provenance for Pulse-computed headline scores. This is deliberately separate from
         // `dayOwnership`: ownership controls which device is allowed to supply a day's raw inputs,
         // while this table records which source actually supplied each persisted computed metric.
         // Metric-level keys keep mixed-source days honest and make missing legacy metadata explicit.
         migrator.registerMigration("v29-score-input-provenance") { db in
             try db.create(table: "scoreInputProvenance") { t in
-                t.column("deviceId", .text).notNull()   // computed "-noop" namespace
+                t.column("deviceId", .text).notNull()   // computed "-pulse" namespace
                 t.column("day", .text).notNull()
                 t.column("key", .text).notNull()
                 t.column("sourceId", .text).notNull()
@@ -638,12 +638,12 @@ extension WhoopStore {
         //
         // `extractHistoricalStreams` is a narrow funnel — a field the Interpreter decodes but the funnel
         // does not name is computed and dropped one line later. That drop is PERMANENT: the strap trims
-        // its banked history as soon as NOOP acks the offload, so the seconds are not re-fetchable. The
+        // its banked history as soon as Pulse acks the offload, so the seconds are not re-fetchable. The
         // four channels below have been decoded (and pinned by the cross-platform decoder oracle) since
         // the v18 layout was mapped, and stored nowhere.
         //
         //   gravitySample.dynAccel    `dynamic_acceleration@41` (f32 g) — the strap's OWN gravity-removed
-        //                             motion magnitude, computed on-device from the full-rate IMU. NOOP's
+        //                             motion magnitude, computed on-device from the full-rate IMU. Pulse's
         //                             motion spine instead derives stillness from `gravityDeltas`, the L2
         //                             distance between consecutive 1 Hz gravity vectors. That proxy sees
         //                             orientation CHANGE at 1 Hz, not acceleration, so the two are not the
@@ -814,7 +814,7 @@ extension WhoopStore {
             // otherwise lean on SQLite's affinity coercion rather than being explicit.
             try db.execute(sql: "UPDATE rrInterval SET tsSuspect = 1 WHERE ts > CAST(strftime('%s','now') AS INTEGER)")
         }
-        // v36 (#548): drop calibrated SpO₂ from WHOOP registry capabilities. Live NOOP never fills
+        // v36 (#548): drop calibrated SpO₂ from WHOOP registry capabilities. Live Pulse never fills
         // spo2Pct from the strap (import-only / experimental @82 candidate); advertising `spo2` made
         // an empty Blood Oxygen tile look broken. Data-only UPDATE — no schema change. Twin of Room
         // MIGRATION_29_30. Decode-time strip in DeviceRegistryStore is the belt; this is the suspenders.
@@ -911,7 +911,7 @@ extension WhoopStore {
         // streamed turns can share to the second) so replay order is exact. `provider` isn't filtered
         // on for v1 (a conversation is a conversation across a provider switch) but is carried so a
         // future per-provider view/filter doesn't need another migration. Never added to the
-        // `.noopbak` backup whitelist (a separate, deliberate decision — CLAUDE.md's backup contract).
+        // `.pulsebak` backup whitelist (a separate, deliberate decision — CLAUDE.md's backup contract).
         migrator.registerMigration("v43-coach-messages") { db in
             try db.create(table: "coachMessage", options: [.ifNotExists]) { t in
                 t.column("id", .text).primaryKey()
@@ -943,7 +943,7 @@ extension WhoopStore {
         }
         // v46-lift-log: the in-app strength log — saved programs and the sessions run from them.
         //
-        // NOOP can already IMPORT a lifting history (Hevy CSV / Liftosaur JSON via LiftingImporter), but
+        // Pulse can already IMPORT a lifting history (Hevy CSV / Liftosaur JSON via LiftingImporter), but
         // that path collapses each workout to a session summary — volume load, set count, top set —
         // because there has never been anywhere to put an individual set. These five tables are that
         // place. A logged session still lands in `workout` like any other (so Workouts / Today / Effort
@@ -976,7 +976,7 @@ extension WhoopStore {
         // Pinned in schema_oracle.json as `ios_only` with a stated reason: the Room twin is a follow-up,
         // not part of this change.
         migrator.registerMigration("v46-lift-log") { db in
-            // The user's own exercise vocabulary. NOOP ships NO exercise catalogue: an exercise is
+            // The user's own exercise vocabulary. Pulse ships NO exercise catalogue: an exercise is
             // whatever the user typed, and it is remembered here the first time they use it so it can
             // be offered back later with the muscle group they gave it. That consistency is what makes
             // a per-muscle-group rollup honest — the same name always resolves to the same group,

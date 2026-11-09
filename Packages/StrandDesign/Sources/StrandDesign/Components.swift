@@ -5,12 +5,12 @@ import SwiftUI
 // Every screen composes ONLY these. Fixed dimensions + one spacing scale guarantee
 // the uniform, instrument-grade look from the reference. Do not invent ad-hoc cards.
 
-public enum NoopMetrics {
-    public static let cardRadius: CGFloat = NoopVisualStyle.cardRadius
-    public static let cardPadding: CGFloat = NoopVisualStyle.cardPadding
-    public static let gap: CGFloat = NoopVisualStyle.itemGap
-    public static let sectionGap: CGFloat = NoopVisualStyle.sectionGap
-    public static let screenPadding: CGFloat = NoopVisualStyle.pagePadding
+public enum PulseMetrics {
+    public static let cardRadius: CGFloat = PulseVisualStyle.cardRadius
+    public static let cardPadding: CGFloat = PulseVisualStyle.cardPadding
+    public static let gap: CGFloat = PulseVisualStyle.itemGap
+    public static let sectionGap: CGFloat = PulseVisualStyle.sectionGap
+    public static let screenPadding: CGFloat = PulseVisualStyle.pagePadding
     public static let tileHeight: CGFloat = 96   // Design Reset: tighter metric tile
     // Key Metrics grid: one fixed height every tile snaps to, so a sparkline-and-caption tile and a
     // plain value tile read the same. maxHeight: .infinity can't equalise them inside a LazyVGrid (the
@@ -67,9 +67,9 @@ public enum NoopMetrics {
 
     // MARK: Named layout constants — the canonical margins/heights screens compose with.
     /// Horizontal page margin (the gutter on the left/right edge of a screen). Use via `.screenPadding()`.
-    public static let screenHPadding: CGFloat = NoopVisualStyle.pagePadding
+    public static let screenHPadding: CGFloat = PulseVisualStyle.pagePadding
     /// Vertical gap between top-level page sections.
-    public static let sectionSpacing: CGFloat = NoopVisualStyle.sectionGap
+    public static let sectionSpacing: CGFloat = PulseVisualStyle.sectionGap
     /// Interior padding inside a card's content (matches `cardPadding`).
     public static let cardInnerPadding: CGFloat = 16
     /// Vertical gap between stacked elements INSIDE a card.
@@ -90,7 +90,7 @@ public enum NoopMetrics {
     /// Canonical thickness for compact horizontal indicator tracks.
     public static let indicatorTrackHeight: CGFloat = 8
     /// Fully-rounded corner radius — pills, chips, capsule buttons.
-    public static let pillRadius: CGFloat = NoopVisualStyle.pillRadius
+    public static let pillRadius: CGFloat = PulseVisualStyle.pillRadius
     /// Minimum desktop size for a navigation-based customization sheet.
     public static let editorSheetMinWidth: CGFloat = 440
     public static let editorSheetMinHeight: CGFloat = 600
@@ -99,11 +99,11 @@ public enum NoopMetrics {
 // MARK: - Screen padding
 
 public extension View {
-    /// Apply the canonical horizontal page gutter (`NoopMetrics.screenHPadding`). The single
+    /// Apply the canonical horizontal page gutter (`PulseMetrics.screenHPadding`). The single
     /// source of truth for left/right screen margins — use this instead of a literal padding so
     /// every screen lines up to the same edge.
     func screenPadding() -> some View {
-        self.padding(.horizontal, NoopMetrics.screenHPadding)
+        self.padding(.horizontal, PulseMetrics.screenHPadding)
     }
 }
 
@@ -116,7 +116,7 @@ public extension View {
     /// NOT receive this, so the helper is iOS-only and call sites stay shared via #if.
     /// `largeFirst == false` opens at .medium with .large reachable by dragging up (short
     /// forms); `true` opens full-height (long scrolls).
-    func noopSheetPresentation(largeFirst: Bool) -> some View {
+    func pulseSheetPresentation(largeFirst: Bool) -> some View {
         self
             .presentationDragIndicator(.visible)
             .presentationDetents(largeFirst ? [.large] : [.medium, .large])
@@ -129,14 +129,14 @@ public extension View {
 /// The one card surface — now the Bevel frosted card. PUBLIC API is unchanged
 /// (padding + content); an optional `tint` was ADDED (defaulted) so callers can opt
 /// into a per-domain accent wash without breaking existing call sites.
-public struct NoopCard<Content: View>: View {
+public struct PulseCard<Content: View>: View {
     private let padding: CGFloat
     private let tint: Color?
     @ViewBuilder private let content: () -> Content
     #if os(macOS)
     @State private var hover = false
     #endif
-    public init(padding: CGFloat = NoopMetrics.cardPadding, tint: Color? = nil, @ViewBuilder content: @escaping () -> Content) {
+    public init(padding: CGFloat = PulseMetrics.cardPadding, tint: Color? = nil, @ViewBuilder content: @escaping () -> Content) {
         self.padding = padding; self.tint = tint; self.content = content
     }
     public var body: some View {
@@ -157,15 +157,15 @@ public struct NoopCard<Content: View>: View {
     // count on every card, which multiplies across long scrolling lists. macOS adds the
     // hover emphasis border on top (with the #104 animation scoping) unchanged.
     @ViewBuilder private var cardSurface: some View {
-        let shape = RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: PulseMetrics.cardRadius, style: .continuous)
         #if os(macOS)
-        FrostedCardSurface(tint: tint, cornerRadius: NoopMetrics.cardRadius)
+        FrostedCardSurface(tint: tint, cornerRadius: PulseMetrics.cardRadius)
             .overlay(
                 shape.strokeBorder(StrandPalette.hairlineStrong, lineWidth: 1).opacity(hover ? 1 : 0)
             )
             .animation(.easeOut(duration: 0.16), value: hover)
         #else
-        FrostedCardSurface(tint: tint, cornerRadius: NoopMetrics.cardRadius)
+        FrostedCardSurface(tint: tint, cornerRadius: PulseMetrics.cardRadius)
         #endif
     }
 }
@@ -219,7 +219,7 @@ public struct StatTile<Accessory: View>: View {
     public var body: some View {
         // The tile borrows its accent as a faint card wash, so each metric tile reads as
         // part of its colour world while staying legible on the deep blue-black.
-        NoopCard(padding: 14, tint: accent) {
+        PulseCard(padding: 14, tint: accent) {
             VStack(alignment: .leading, spacing: 0) {
                 // Header row: the metric label, and (right-aligned) the optional accessory laid out in
                 // flow so it reserves its own space rather than floating over the value below (#495).
@@ -252,11 +252,11 @@ public struct StatTile<Accessory: View>: View {
         }
         // A FLOOR, not a fixed height: a sparkline tile's content exceeds the 96pt base and must be
         // allowed to grow rather than clip. maxHeight: .infinity lets a caller that DOES hand this tile a
-        // bounded height (e.g. the Key Metrics grid pins every cell to NoopMetrics.keyMetricTileHeight)
+        // bounded height (e.g. the Key Metrics grid pins every cell to PulseMetrics.keyMetricTileHeight)
         // stretch it to fill; in an unbounded parent it resolves to the content's own height, unchanged.
         // Note: inside a LazyVGrid the cell only offers content height, so equal heights come from the
         // caller pinning a fixed height, not from maxHeight: .infinity alone.
-        .frame(minHeight: NoopMetrics.tileHeight, maxHeight: .infinity)
+        .frame(minHeight: PulseMetrics.tileHeight, maxHeight: .infinity)
         // One VoiceOver stop per tile (label, value, caption, delta) instead of up
         // to four fragmented stops; the decorative sparkline is hidden above.
         .accessibilityElement(children: .combine)
@@ -315,13 +315,13 @@ public struct ChartCard<ChartBody: View, Footer: View>: View {
     let title: LocalizedStringKey
     var subtitle: String? = nil
     var trailing: String? = nil
-    var height: CGFloat = NoopMetrics.chartHeight
+    var height: CGFloat = PulseMetrics.chartHeight
     var tint: Color? = nil
     @ViewBuilder let chart: () -> ChartBody
     @ViewBuilder let footer: () -> Footer
 
     public init(title: LocalizedStringKey, subtitle: String? = nil, trailing: String? = nil,
-                height: CGFloat = NoopMetrics.chartHeight, tint: Color? = nil,
+                height: CGFloat = PulseMetrics.chartHeight, tint: Color? = nil,
                 @ViewBuilder chart: @escaping () -> ChartBody,
                 @ViewBuilder footer: @escaping () -> Footer = { EmptyView() }) {
         self.title = title; self.subtitle = subtitle; self.trailing = trailing
@@ -329,7 +329,7 @@ public struct ChartCard<ChartBody: View, Footer: View>: View {
     }
 
     public var body: some View {
-        NoopCard(tint: tint) {
+        PulseCard(tint: tint) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 2) {
@@ -388,7 +388,7 @@ public struct InsightCard: View {
         let hue = tint ?? statusColor
         // Apple-flat: a plain flat card. Identity comes from the COLOURED status headline alone — no extra
         // hue-gradient wash, no border (so it reads identical to every other card on the page).
-        return NoopCard(padding: 18, tint: hue) {
+        return PulseCard(padding: 18, tint: hue) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(category).strandOverline()
                     .padding(.trailing, titleTrailingInset)
@@ -482,21 +482,21 @@ public struct SegmentedPillControl<T: Hashable>: View {
                         .frame(minWidth: equalWidth ? nil : 26,
                                maxWidth: equalWidth ? .infinity : nil,
                                maxHeight: .infinity)
-                        .padding(.horizontal, equalWidth ? NoopMetrics.space1 : 9)
+                        .padding(.horizontal, equalWidth ? PulseMetrics.space1 : 9)
                         .background {
                             if sel {
                                 let selectedShape = RoundedRectangle(cornerRadius: 10, style: .continuous)
                                 selectedShape
                                     .fill(
                                         LinearGradient(
-                                            colors: [NoopVisualStyle.surfaceTop, NoopVisualStyle.surface],
+                                            colors: [PulseVisualStyle.surfaceTop, PulseVisualStyle.surface],
                                             startPoint: .top,
                                             endPoint: .bottom
                                         )
                                     )
                                     .overlay(
                                         selectedShape.strokeBorder(
-                                            NoopVisualStyle.borderHighlight.opacity(0.62),
+                                            PulseVisualStyle.borderHighlight.opacity(0.62),
                                             lineWidth: 0.75
                                         )
                                     )
@@ -520,7 +520,7 @@ public struct SegmentedPillControl<T: Hashable>: View {
             trackShape
                 .fill(
                     LinearGradient(
-                        colors: [NoopVisualStyle.inset, NoopVisualStyle.canvas.opacity(0.78)],
+                        colors: [PulseVisualStyle.inset, PulseVisualStyle.canvas.opacity(0.78)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -528,7 +528,7 @@ public struct SegmentedPillControl<T: Hashable>: View {
                 .overlay(
                     trackShape.strokeBorder(
                         LinearGradient(
-                            colors: [NoopVisualStyle.borderHighlight.opacity(0.48), NoopVisualStyle.border],
+                            colors: [PulseVisualStyle.borderHighlight.opacity(0.48), PulseVisualStyle.border],
                             startPoint: .top,
                             endPoint: .bottom
                         ),
@@ -549,7 +549,7 @@ public struct SourceBadge: View {
         // because the Android twin pinned the same 18 with `heightIn` applied to the label itself, which
         // top-aligns — same number, different render. That one is matched to this, not the reverse.
         Text(text).font(StrandFont.inter(11, .semibold))
-            .padding(.horizontal, 9).frame(height: NoopMetrics.sourceBadgeHeight)
+            .padding(.horizontal, 9).frame(height: PulseMetrics.sourceBadgeHeight)
             .background(tint.opacity(0.16), in: Capsule(style: .continuous))
             .foregroundStyle(tint)
             .overlay(Capsule(style: .continuous).strokeBorder(tint.opacity(0.34), lineWidth: 1))
@@ -594,11 +594,11 @@ public extension View {
 // MARK: - Buttons (Titanium & Gold) — ADDED additively, no existing API touched.
 //
 // Three house button styles for primary actions, secondary chrome and ghost/gold
-// CTAs. Drop in via `.buttonStyle(.noopPrimary)` etc. on any `Button`. All read off
+// CTAs. Drop in via `.buttonStyle(.pulsePrimary)` etc. on any `Button`. All read off
 // the new gold tokens so they match Apple ⇄ Android. Pressed = subtle dim + scale.
 
 /// Primary call-to-action: gold-gradient fill, dark gold-deep ink (700), rounded 13.
-public struct NoopPrimaryButtonStyle: ButtonStyle {
+public struct PulsePrimaryButtonStyle: ButtonStyle {
     public init() {}
     public func makeBody(configuration: Configuration) -> some View {
         let pressed = configuration.isPressed
@@ -622,7 +622,7 @@ public struct NoopPrimaryButtonStyle: ButtonStyle {
 }
 
 /// Secondary: inset well + 1px white-12 border + primary text. Quieter than gold.
-public struct NoopSecondaryButtonStyle: ButtonStyle {
+public struct PulseSecondaryButtonStyle: ButtonStyle {
     public init() {}
     public func makeBody(configuration: Configuration) -> some View {
         let pressed = configuration.isPressed
@@ -642,7 +642,7 @@ public struct NoopSecondaryButtonStyle: ButtonStyle {
 }
 
 /// Ghost / gold: transparent + 1px gold@.3 hairline + gold text. Tertiary CTA.
-public struct NoopGhostButtonStyle: ButtonStyle {
+public struct PulseGhostButtonStyle: ButtonStyle {
     public init() {}
     public func makeBody(configuration: Configuration) -> some View {
         let pressed = configuration.isPressed
@@ -660,17 +660,17 @@ public struct NoopGhostButtonStyle: ButtonStyle {
     }
 }
 
-public extension ButtonStyle where Self == NoopPrimaryButtonStyle {
+public extension ButtonStyle where Self == PulsePrimaryButtonStyle {
     /// Gold-gradient primary CTA.
-    static var noopPrimary: NoopPrimaryButtonStyle { .init() }
+    static var pulsePrimary: PulsePrimaryButtonStyle { .init() }
 }
-public extension ButtonStyle where Self == NoopSecondaryButtonStyle {
+public extension ButtonStyle where Self == PulseSecondaryButtonStyle {
     /// Inset secondary button.
-    static var noopSecondary: NoopSecondaryButtonStyle { .init() }
+    static var pulseSecondary: PulseSecondaryButtonStyle { .init() }
 }
-public extension ButtonStyle where Self == NoopGhostButtonStyle {
+public extension ButtonStyle where Self == PulseGhostButtonStyle {
     /// Transparent gold-outline ghost button.
-    static var noopGhost: NoopGhostButtonStyle { .init() }
+    static var pulseGhost: PulseGhostButtonStyle { .init() }
 }
 
 // MARK: - Score state pill (SOLID / BUILDING / CALIBRATING / LIVE)
@@ -738,10 +738,10 @@ private struct PulseDot: View {
     var size: CGFloat
     @State private var animate = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    /// Low Power Mode / "Reduce motion in NOOP". This halo is a `repeatForever` loop that never
+    /// Low Power Mode / "Reduce motion in Pulse". This halo is a `repeatForever` loop that never
     /// settles and is on screen for long stretches — a connected strap in Settings, a backfill on
     /// every scaffolded screen — so it belongs behind the same gate as the liquid surfaces.
-    @ObservedObject private var motion = NoopMotionState.shared
+    @ObservedObject private var motion = PulseMotionState.shared
     private var poseStill: Bool { motion.poseStill(reduceMotion) }
     @Environment(\.colorScheme) private var scheme
     var body: some View {

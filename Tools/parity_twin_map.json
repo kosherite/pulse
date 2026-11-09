@@ -10,11 +10,11 @@
       "Packages/OuraProtocol/Sources"
     ],
     "kotlin_roots": [
-      "android/app/src/main/java/com/noop/analytics",
-      "android/app/src/main/java/com/noop/ingest",
-      "android/app/src/main/java/com/noop/data",
-      "android/app/src/main/java/com/noop/protocol",
-      "android/app/src/main/java/com/noop/oura"
+      "android/app/src/main/java/com/pulse/analytics",
+      "android/app/src/main/java/com/pulse/ingest",
+      "android/app/src/main/java/com/pulse/data",
+      "android/app/src/main/java/com/pulse/protocol",
+      "android/app/src/main/java/com/pulse/oura"
     ]
   },
   "authority": {

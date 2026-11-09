@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-      NOOP is offline by default. It talks to the strap over BLE and stores everything
+      Pulse is offline by default. It talks to the strap over BLE and stores everything
       locally (Room). INTERNET supports only explicit opt-ins: the bring-your-own-key
       AI Coach and Experimental one-way push to a user-owned endpoint. No account,
-      NOOP server, telemetry, or network dependency is introduced by this permission.
+      Pulse server, telemetry, or network dependency is introduced by this permission.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -20,7 +20,7 @@
     <uses-permission
         android:name="android.permission.BLUETOOTH_CONNECT"
         tools:targetApi="s" />
-    <!-- Android 12+ (API 31+): broadcasting NOOP's live HR back out as a standard BLE Heart Rate
+    <!-- Android 12+ (API 31+): broadcasting Pulse's live HR back out as a standard BLE Heart Rate
          peripheral (0x180D) so gym kit can read it needs the advertise permission. Opt-in only:
          the "Broadcast heart rate" toggle in Data Sources is OFF by default, and the permission is
          requested at runtime right before the broadcast starts (see rememberRequestAdvertise). -->
@@ -57,7 +57,7 @@
          must be granted at runtime. Requested in MainActivity alongside the BLE permissions. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Optional call alerts. Requested only when the user enables "Phone calls"; NOOP does not
+    <!-- Optional call alerts. Requested only when the user enables "Phone calls"; Pulse does not
          request READ_CALL_LOG and never reads incoming numbers, contacts, or call history. -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
@@ -77,7 +77,7 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <!-- Re-arm the guaranteed alarm after a reboot so an overnight restart can't silently drop it. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- Sideload-only (Play restricts this; NOOP doesn't ship there): the Settings "Keep NOOP alive
+    <!-- Sideload-only (Play restricts this; Pulse doesn't ship there): the Settings "Keep Pulse alive
          overnight" prompt uses it to pop the one-tap battery-optimisation whitelist dialog, so the
          overnight foreground service + 15-min re-score tick aren't killed on aggressive-OEM phones (#386).
          The prompt is shown only on those vendors and only until the grant lands — Android offers no
@@ -104,8 +104,8 @@
     <uses-permission android:name="android.permission.health.READ_SLEEP" />
     <uses-permission android:name="android.permission.health.READ_OXYGEN_SATURATION" />
     <uses-permission android:name="android.permission.health.READ_RESPIRATORY_RATE" />
-    <!-- Health Connect writeback (optional, opt-in, default OFF): lets NOOP contribute its
-         on-device computed nightly metrics so other apps can read them. Only what NOOP itself
+    <!-- Health Connect writeback (optional, opt-in, default OFF): lets Pulse contribute its
+         on-device computed nightly metrics so other apps can read them. Only what Pulse itself
          computed from the strap is written — imported data is never echoed back. -->
     <uses-permission android:name="android.permission.health.WRITE_RESTING_HEART_RATE" />
     <uses-permission android:name="android.permission.health.WRITE_HEART_RATE_VARIABILITY" />
@@ -130,10 +130,10 @@
          the standard Health Connect permission dialog — it is granted in Settings or via the
          ExerciseRouteRequestContract dialog. Declaring it here lets a user who has granted it in
          Settings import routes alongside their workouts; without it, the route is gracefully skipped
-         and the workout still imports with its distance/HR. Read-only; NOOP never writes routes. -->
+         and the workout still imports with its distance/HR. Read-only; Pulse never writes routes. -->
     <uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTES" />
     <!-- Water logged in other apps (#949), so drinks tracked by a dedicated hydration app or a smart
-         bottle don't have to be entered twice. Read-only; NOOP never writes water back. MUST be
+         bottle don't have to be entered twice. Read-only; Pulse never writes water back. MUST be
          declared or Health Connect silently drops the runtime request (same trap as #412 above). -->
     <uses-permission android:name="android.permission.health.READ_HYDRATION" />
 
@@ -156,7 +156,7 @@
     </queries>
 
     <application
-        android:name=".NoopApplication"
+        android:name=".PulseApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false"
@@ -165,7 +165,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NOOP"
+        android:theme="@style/Theme.Pulse"
         tools:targetApi="34">
 
         <!--
@@ -177,15 +177,15 @@
           activity stays exported so the enabled alias can target it. (#v3-titanium-gold)
         -->
         <activity
-            android:name="com.noop.ui.MainActivity"
+            android:name="com.pulse.ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.NOOP">
+            android:theme="@style/Theme.Pulse">
             <!-- Health Connect permissions-rationale route for Android 13 and below (#226). The standalone
                  Health Connect APK on API ≤33 DISCOVERS + lists compatible apps by this intent-filter, so
                  the action name must be the legacy `androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE`.
                  The previous `androidx.health.connect.action.SHOW_PERMISSIONS_RATIONALE` is neither the
-                 API-33 nor API-34 form, so an Android-13 HC APK never enumerated NOOP — it was absent from
+                 API-33 nor API-34 form, so an Android-13 HC APK never enumerated Pulse — it was absent from
                  Health Connect's "App permissions" entirely and permissions couldn't be granted. Android 14+
                  (HC in the platform) uses the `ViewPermissionUsageActivity` alias below instead. -->
             <intent-filter>
@@ -201,8 +201,8 @@
           one home-screen entry point. Toggling them is what re-paints the launcher icon at runtime.
         -->
         <activity-alias
-            android:name="com.noop.IconDefault"
-            android:targetActivity="com.noop.ui.MainActivity"
+            android:name="com.pulse.IconDefault"
+            android:targetActivity="com.pulse.ui.MainActivity"
             android:exported="true"
             android:enabled="true"
             android:icon="@mipmap/ic_launcher"
@@ -215,8 +215,8 @@
         </activity-alias>
 
         <activity-alias
-            android:name="com.noop.IconNavy"
-            android:targetActivity="com.noop.ui.MainActivity"
+            android:name="com.pulse.IconNavy"
+            android:targetActivity="com.pulse.ui.MainActivity"
             android:exported="true"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_navy"
@@ -232,7 +232,7 @@
         <activity-alias
             android:name="ViewPermissionUsageActivity"
             android:exported="true"
-            android:targetActivity="com.noop.ui.MainActivity"
+            android:targetActivity="com.pulse.ui.MainActivity"
             android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
@@ -244,17 +244,17 @@
              started/stopped only from within the app, gated by the "Keep connected in the
              background" Settings toggle. -->
         <service
-            android:name="com.noop.ble.WhoopConnectionService"
+            android:name="com.pulse.ble.WhoopConnectionService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice|location" />
 
-        <!-- Wrist alerts: this is what makes NOOP appear in Android's Notification Access list. The
+        <!-- Wrist alerts: this is what makes Pulse appear in Android's Notification Access list. The
              system binds it (guarded by BIND_NOTIFICATION_LISTENER_SERVICE) only after the user grants
              access; it reads which app posted a notification — never the content — to buzz the strap,
              gated by the Notifications-screen settings. Does nothing until access is granted + enabled. -->
         <service
-            android:name="com.noop.notif.NoopNotificationListener"
-            android:label="NOOP wrist alerts"
+            android:name="com.pulse.notif.PulseNotificationListener"
+            android:label="Pulse wrist alerts"
             android:exported="false"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
@@ -266,7 +266,7 @@
              required so the launcher can deliver APPWIDGET_UPDATE; it renders only from our own
              SharedPreferences snapshot. -->
         <receiver
-            android:name="com.noop.widget.NoopWidgetReceiver"
+            android:name="com.pulse.widget.PulseWidgetReceiver"
             android:exported="true"
             android:label="@string/app_name">
             <intent-filter>
@@ -274,13 +274,13 @@
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/noop_widget_info" />
+                android:resource="@xml/pulse_widget_info" />
         </receiver>
 
         <!-- Compact home-screen widget, offered as a separate picker entry so the existing 2x2 widget
              remains available unchanged. -->
         <receiver
-            android:name="com.noop.widget.NoopCompactWidgetReceiver"
+            android:name="com.pulse.widget.PulseCompactWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_compact_name">
             <intent-filter>
@@ -288,13 +288,13 @@
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/noop_compact_widget_info" />
+                android:resource="@xml/pulse_compact_widget_info" />
         </receiver>
 
         <!-- Heart-rate widget (#1957): live bpm with the last three hours as a trace. Same snapshot
              source as the score widgets; the trace is a Bitmap because Glance cannot draw one. -->
         <receiver
-            android:name="com.noop.widget.HrWidgetReceiver"
+            android:name="com.pulse.widget.HrWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_hr_name">
             <intent-filter>
@@ -308,7 +308,7 @@
         <!-- Stress widget (#2040): today's intraday stress as the curve the Stress screen draws.
              Same snapshot source as its siblings; the curve is a Bitmap because Glance cannot draw. -->
         <receiver
-            android:name="com.noop.widget.StressWidgetReceiver"
+            android:name="com.pulse.widget.StressWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_stress_name">
             <intent-filter>
@@ -322,7 +322,7 @@
         <!-- K10: Coach brief home-screen widget. Shows the stored morning brief (generated on a
              schedule by CoachBriefScheduler, K5) — never live-networked. Tap → opens the app. -->
         <receiver
-            android:name="com.noop.widget.CoachBriefWidgetReceiver"
+            android:name="com.pulse.widget.CoachBriefWidgetReceiver"
             android:exported="true"
             android:label="Coach Brief">
             <intent-filter>
@@ -337,7 +337,7 @@
              and never reads the incoming-number extra. Delivery is gated by the Notifications screen
              settings and by the just-in-time READ_PHONE_STATE runtime permission. -->
         <receiver
-            android:name="com.noop.notif.PhoneCallReceiver"
+            android:name="com.pulse.notif.PhoneCallReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />
@@ -349,13 +349,13 @@
              full-screen alarm notification with sound + vibration. Not exported — only our own
              PendingIntent triggers it — but it survives the app being killed so the wake is reliable. -->
         <receiver
-            android:name="com.noop.alarm.SmartAlarmReceiver"
+            android:name="com.pulse.alarm.SmartAlarmReceiver"
             android:exported="false" />
 
         <!-- Re-arms the persisted hard-deadline alarm after a reboot so an overnight restart can't
              silently drop the user's wake. -->
         <receiver
-            android:name="com.noop.alarm.SmartAlarmBootReceiver"
+            android:name="com.pulse.alarm.SmartAlarmBootReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -366,7 +366,7 @@
         <!-- Wind-down nudge (non-critical): the daily evening reminder fires this receiver, which
              raises a low-key notification. Not exported. -->
         <receiver
-            android:name="com.noop.alarm.WindDownReceiver"
+            android:name="com.pulse.alarm.WindDownReceiver"
             android:exported="false" />
 
         <!-- Shares the strap log (a cache file) for bug reports. Not exported; read access is granted

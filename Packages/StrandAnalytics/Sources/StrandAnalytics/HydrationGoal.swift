@@ -6,14 +6,14 @@ import Foundation
 // target in ml. It is a plain, transparent guide built from a sex baseline plus a small bump scaled by
 // the day's Effort (strain) — NEVER medical advice and never an invented measurement. The whole formula
 // lives here so it is headless and unit-tested, and is BYTE-IDENTICAL to the Android twin
-// (com.noop.analytics.HydrationGoal): same Int constants, same round-then-clamp, same integer rounding.
+// (com.pulse.analytics.HydrationGoal): same Int constants, same round-then-clamp, same integer rounding.
 // Do not change a constant or a rule on one platform without the other.
 //
 //   GOAL(ml) = roundToNearest( sexBaseline + effortBump, 50 )
 //     sexBaseline : male 3700, female 2700, unspecified/other 3200 ml
 //     effortBump  : clamp(round(effort/100 · 700), 0…700); 0 when no Effort is available
 //
-// `effort` is the day's Effort/strain score on NOOP's native 0…100 scale (the value stored as
+// `effort` is the day's Effort/strain score on Pulse's native 0…100 scale (the value stored as
 // `DailyMetric.strain`). The bump is intentionally modest (≤ 0.7 L) so a hard day nudges the target up
 // without ever turning the guide into a hard rule.
 public enum HydrationGoal {

@@ -1,4 +1,4 @@
-# NOOP v5 — Insights & Correlation Engine design
+# Pulse v5 — Insights & Correlation Engine design
 
 **Pillar:** A personal **n-of-1 correlation / effect engine** — "what actually moves *your* recovery" —
 plus the headline sub-feature: a personalised **alcohol / caffeine dose-response** model and an evening
@@ -7,7 +7,7 @@ plus the headline sub-feature: a personalised **alcohol / caffeine dose-response
 **Status:** Design only. Not approved. 2026-06-19.
 
 **One-line framing:** Competitors (WHOOP Journal / Behaviors, Oura Tags) show **population** averages —
-"alcohol typically lowers recovery." NOOP computes the effect **on your own data, on-device**, ranks the
+"alcohol typically lowers recovery." Pulse computes the effect **on your own data, on-device**, ranks the
 behaviours *you* log by their real lag-aware effect on next-day Charge / HRV / Rest, gives each one an
 effect size + confidence + lead/lag, fits a personal dose curve that shrinks toward a population prior
 until you have enough days, and — at night, when it can still change the outcome — tells you what *one
@@ -16,9 +16,9 @@ or a causal/diagnostic claim.
 
 ---
 
-## Goal & differentiation (why only NOOP)
+## Goal & differentiation (why only Pulse)
 
-| Capability | WHOOP | Oura | Garmin / Apple | **NOOP v5** |
+| Capability | WHOOP | Oura | Garmin / Apple | **Pulse v5** |
 |---|---|---|---|---|
 | Behaviour → recovery effect | Population averages ("Behaviors") | Population tag insights | None / generic | **Per-user effect size, ranked, on-device** |
 | Lead/lag awareness (today's drink → *tomorrow's* recovery) | Implicit, fixed | No | No | **Explicit D+1/D+2 lag search per behaviour** |
@@ -27,17 +27,17 @@ or a causal/diagnostic claim.
 | Honest subjective-vs-biometric disconnect | No | "readiness" only | No | **Flags when your mood/readiness diverges from your body** |
 | Runs with no account / no cloud / no subscription | No | No | No | **Yes — fully local** |
 
-The differentiation is **not** a new statistic. It is that NOOP already *owns the raw daily series on-device*
+The differentiation is **not** a new statistic. It is that Pulse already *owns the raw daily series on-device*
 (Charge / HRV / Rest / RHR from `IntelligenceEngine`, the journal yes/no tags, the mood check-ins, the
 workout tags) and already ships a tested correlation/effect substrate (`BehaviorInsights`,
 `ActivityCostEngine`, `CorrelationEngine`, `ComparisonEngine`). v5's job is to **unify those into one
 ranked "what moves you" engine**, add the **lag search** and the **dose-response curve + evening forecast**,
 and present it honestly. No competitor can match the evening forecast without (a) on-device per-user data
-and (b) an on-device recovery model — NOOP has both.
+and (b) an on-device recovery model — Pulse has both.
 
 **Honesty is the product.** Where the population says "drinking is bad" but *your* eight logged drink-nights
-show no Charge dip, NOOP says so ("we can't see an effect in your data yet"). Where your subjective readiness
-or mood says "great" but HRV/RHR say otherwise, NOOP surfaces the **disconnect** rather than picking a side.
+show no Charge dip, Pulse says so ("we can't see an effect in your data yet"). Where your subjective readiness
+or mood says "great" but HRV/RHR say otherwise, Pulse surfaces the **disconnect** rather than picking a side.
 
 ---
 
@@ -48,9 +48,9 @@ or mood says "great" but HRV/RHR say otherwise, NOOP surfaces the **disconnect**
   strap-only fallback, exactly as `InsightsView.load()` already does):
   - `recovery` (Charge 0–100), `hrv` (ms), `sleep_performance` (Rest 0–100), `rhr` (bpm).
 - **Journal behaviour tags** — `JournalEntry (deviceId, day, question, answeredYes)`. Native answers under
-  `noop-journal`, imported (WHOOP export) under `my-whoop`; merged with native-wins. Starter catalog already
+  `pulse-journal`, imported (WHOOP export) under `my-whoop`; merged with native-wins. Starter catalog already
   includes "Did you drink any alcohol?" and "Did you have caffeine late in the day?".
-- **Mood check-ins** — `MoodStore` / `noop-mood`, key `mood`, 1–5 per local day (the subjective signal).
+- **Mood check-ins** — `MoodStore` / `pulse-mood`, key `mood`, 1–5 per local day (the subjective signal).
 - **Workout tags** — `WorkoutRow (sport, startTs…)`, already shaped into `[sport: Set<day>]` for
   `ActivityCostEngine`.
 - **Engines:** `BehaviorInsights` (Welch t-test, Cohen's d, ranking, plain-English sentence),
@@ -74,7 +74,7 @@ or mood says "great" but HRV/RHR say otherwise, NOOP surfaces the **disconnect**
 5. **A subjective-vs-objective disconnect read** (`DisconnectDetector`) — when the user's mood/readiness
    percentile diverges from their HRV/RHR percentile beyond a threshold over a window, flag it honestly.
 
-No new raw sensor work — this pillar is pure derived analytics over series NOOP already computes.
+No new raw sensor work — this pillar is pure derived analytics over series Pulse already computes.
 
 ---
 
@@ -135,14 +135,14 @@ For a dosed behaviour (alcohol drinks; caffeine = a "late-caffeine intensity" pr
 - Below the gate (`n_user < minDoseDays`, ≈ 5) the card says **"based mostly on typical patterns, not yet
   yours"** and shows the prior explicitly.
 - When the **personal** slope contradicts the prior with enough data (e.g. your drink-nights show *no* dip),
-  NOOP says **"in your data so far, this doesn't move your Charge"** — population is not allowed to override
+  Pulse says **"in your data so far, this doesn't move your Charge"** — population is not allowed to override
   the person once the person has spoken.
 - Caffeine "dose" is a **timing** proxy (later = stronger), not mg; copy is explicit about that.
 
 ### 3. Evening Damage Forecast (`DamageForecast`)
 
 **Approach:** compose the existing `RecoveryForecaster` (tonight's Charge point + band from baseline mean/SD
-/ slope + strain debt + planned sleep) with the dose-response Δs. This is a *what-if on a number NOOP already
+/ slope + strain debt + planned sleep) with the dose-response Δs. This is a *what-if on a number Pulse already
 forecasts*, not a new model.
 
 `forecast(base: RecoveryForecast, pending: [(behaviour, fromDose, toDose)]) -> DamageForecast`:
@@ -191,17 +191,17 @@ Insights screen. No rewrites of `BehaviorInsights` / `CorrelationEngine` / `Acti
 Tests (mirror the existing one-test-per-engine layout under `Tests/StrandAnalyticsTests/`):
 `EffectRankerTests`, `DoseResponseEngineTests`, `DamageForecastTests`, `DisconnectDetectorTests`.
 
-### Kotlin twin — `android/app/src/main/java/com/noop/analytics/`
+### Kotlin twin — `android/app/src/main/java/com/pulse/analytics/`
 Line-for-line ports: `EffectRanker.kt`, `DoseResponseEngine.kt`, `DoseResponsePriors.kt`, `DamageForecast.kt`,
-`DisconnectDetector.kt`, with JVM tests under `android/app/src/test/java/com/noop/analytics/` mirroring the
+`DisconnectDetector.kt`, with JVM tests under `android/app/src/test/java/com/pulse/analytics/` mirroring the
 Swift cases (the established cross-platform parity discipline). All engines already have Kotlin twins
 (`ActivityCostEngine.kt`, `RecoveryForecast.kt`, `ScoreConfidence.kt`, etc.) so the call sites exist.
 
 ### Dose storage (back-compatible)
 The journal natural key is `(deviceId, day, question)` with a boolean `answeredYes` — **unchanged**. Dose is
-stored as a **separate, optional** `metricSeries` row under a dedicated source `noop-journal-dose`, key =
+stored as a **separate, optional** `metricSeries` row under a dedicated source `pulse-journal-dose`, key =
 the question's normalised key, value = the dose integer (mirrors how `MoodStore` parks mood in `metricSeries`
-under `noop-mood`). This means:
+under `pulse-mood`). This means:
 - Existing yes/no history needs no migration: a logged "yes" with no dose row ⇒ dose = 1.
 - A CSV/Health re-import can never overwrite a dose (separate source id — same isolation rule the journal and
   mood already use).
@@ -214,8 +214,8 @@ under `noop-mood`). This means:
   Effects" to read from `EffectRanker` (so each card shows the best lag + confidence), **add** a Dose-Response
   card (alcohol/caffeine curve), and surface the **Damage Forecast** on `Strand/Screens/TodayView.swift` in
   the evening. Disconnect read sits in the Mind/Insights neutral zone.
-- **Kotlin:** mirror in `android/app/src/main/java/com/noop/ui/InsightsScreen.kt` + `TodayScreen` evening card,
-  reusing `NoopCard`/`StatTile`/`SectionHeader`/`JournalChip`.
+- **Kotlin:** mirror in `android/app/src/main/java/com/pulse/ui/InsightsScreen.kt` + `TodayScreen` evening card,
+  reusing `PulseCard`/`StatTile`/`SectionHeader`/`JournalChip`.
 - **iOS:** the Swift package + non-excluded `Strand/` SwiftUI files cover iOS automatically (shared package +
   shared screens), per the cross-platform parity rule — no separate iOS port beyond verifying the build.
 
@@ -226,7 +226,7 @@ under `noop-mood`). This means:
 1. **Engines first, both platforms, test-locked.** Write `EffectRanker` / `DoseResponseEngine` /
    `DamageForecast` / `DisconnectDetector` in Swift with tests; port to Kotlin with mirrored JVM tests;
    confirm identical outputs on shared fixtures (the parity discipline that caught the v2.6.0 integration bugs).
-2. **Dose storage** added to both repositories under `noop-journal-dose` with identical keys.
+2. **Dose storage** added to both repositories under `pulse-journal-dose` with identical keys.
 3. **UI** wired per platform (mac/iOS share the Swift screens; Android Compose mirror).
 4. **Central build-verify all three** once (mac universal, iOS via app-build CI, Android clean assemble) —
    agents don't each run gradle. Back out any half-done lane to keep parity if a wave fails.
@@ -302,7 +302,7 @@ range") rather than the forecast.
   confidence = min(forecast, dose) tier; clamps at 0/100.
 - **`DisconnectDetector`:** synthetic series where mood runs high while HRV runs low triggers the flag;
   aligned series do not; window edges handled.
-- **Dose storage:** a dose row round-trips under `noop-journal-dose`; a yes/no "yes" with no dose row reads as
+- **Dose storage:** a dose row round-trips under `pulse-journal-dose`; a yes/no "yes" with no dose row reads as
   dose = 1; a CSV re-import does not touch dose rows.
 - **Cross-platform parity:** Swift and Kotlin produce byte-identical engine outputs on shared fixtures (the
   standing parity gate).

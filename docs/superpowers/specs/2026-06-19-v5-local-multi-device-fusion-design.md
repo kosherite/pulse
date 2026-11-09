@@ -1,9 +1,9 @@
-# NOOP v5 — Local Multi-Device Fusion ("One Honest Health Record")
+# Pulse v5 — Local Multi-Device Fusion ("One Honest Health Record")
 
 **Codename:** Strand · **Pillar:** Local multi-device fusion · **Status:** Design (not approved) ·
 **Date:** 2026-06-19
 
-> One thesis line: **NOOP fuses every band you own — WHOOP, Mi Band, Apple Health, Health Connect (and
+> One thesis line: **Pulse fuses every band you own — WHOOP, Mi Band, Apple Health, Health Connect (and
 > planned Polar / Garmin / Oura) — into one record ON YOUR DEVICE, picking the best signal per metric and
 > showing you exactly where each number came from. The privacy-respecting inverse of cloud aggregators.**
 
@@ -13,24 +13,24 @@ the work is policy, a new read-only fusion view, honest conflict UX, and a Kotli
 
 ---
 
-## Goal & differentiation (why only NOOP)
+## Goal & differentiation (why only Pulse)
 
 Everyone with a WHOOP also has a phone (Apple Health / Health Connect) and often a second band (a Mi Band
 for steps, a Polar for workout HR, an Oura for sleep). Today those sit in walled gardens. The market splits
-two ways and **NOOP is the only thing in the third corner**:
+two ways and **Pulse is the only thing in the third corner**:
 
 | Approach | Who | What they do | The catch |
 |---|---|---|---|
 | **Single-vendor lock-in** | WHOOP, Oura, Garmin, Ultrahuman | One band, one app, one cloud | Won't read a competitor's band; your Mi Band steps are invisible |
 | **Cloud aggregators** | Spike, Terra, Rook, Tryterra | Normalise many vendors' data | **Your raw biometrics flow through their servers** — the privacy cost of "one record" |
-| **Local fusion (NOOP)** | — | Fuse many bands, best-signal-wins, **on device** | — |
+| **Local fusion (Pulse)** | — | Fuse many bands, best-signal-wins, **on device** | — |
 
-**Why only NOOP can do this honestly:** the fusion runs entirely on the phone/Mac. Nothing leaves the
+**Why only Pulse can do this honestly:** the fusion runs entirely on the phone/Mac. Nothing leaves the
 device — no account, no server normalisation tier, no third-party seeing your R-R intervals. We already
 import WHOOP exports, Apple Health, Health Connect and Xiaomi/Mi Band **locally**; v5 turns those parallel
 silos into **one resolved record with visible provenance and honest conflict handling**. A cloud aggregator
 structurally cannot offer "nothing leaves the device" — that's their whole business model. A single-vendor
-app structurally won't read the other bands. NOOP sits in the gap.
+app structurally won't read the other bands. Pulse sits in the gap.
 
 **The honest promise (and its limits, stated up front):**
 - ✅ Best *available* signal per metric, with the source named on every number.
@@ -54,10 +54,10 @@ app structurally won't read the other bands. NOOP sits in the gap.
 - **The cross-source resolver** — `Repository.resolvedSeries` / `Repository.sourceCandidates` /
   `appleCompatibleKey` (`Strand/Data/Repository.swift` ~L547–656) and its **byte-identical Kotlin twin**
   in `WhoopRepository.kt` (~L572–745). This is the *existing* per-metric precedence engine: imported WHOOP
-  > NOOP-computed > declared-compatible Apple Health / Health Connect. **v5 generalises this from a
+  > Pulse-computed > declared-compatible Apple Health / Health Connect. **v5 generalises this from a
   hardcoded waterfall into a capability-driven policy** (below).
 - **`DailyMetricSource` + `vitalPriority` + `SourcedDailyMetric`** (Repository.swift L61–82) — per-row
-  provenance tags (`whoopImport / noopComputed / appleHealth / localCache`) already drive the source-aware
+  provenance tags (`whoopImport / pulseComputed / appleHealth / localCache`) already drive the source-aware
   vital cards. v5 extends the enum to cover every source and surfaces it in the new fused view.
 - **`DayOwnerResolver`** (`Packages/StrandAnalytics/.../DayOwnerResolver.swift`) — already picks the single
   device that *owns* a day's scored metrics (invariant: scores never mix sources). v5 reuses this verbatim
@@ -95,17 +95,17 @@ Trust tiers (lower = more trusted), grounded in what each device actually measur
 | Tier | Meaning | Examples |
 |---|---|---|
 | 0 | **Direct dedicated sensor** for this metric | WHOOP R-R for HRV; a wrist-PPG band's steps; chest-strap HR for avg/max HR; ring temp for skin temp |
-| 1 | **Derived on-device from raw** by NOOP | NOOP-computed recovery/strain/sleep from strap streams |
+| 1 | **Derived on-device from raw** by Pulse | Pulse-computed recovery/strain/sleep from strap streams |
 | 2 | **Phone aggregate** (Apple Health / Health Connect) of a declared-compatible quantity | phone resting HR, asleep_min |
 | 3 | **Estimate / proxy** | strap step *estimate*; calories estimate |
 
 The rule mirrors the metric-specific intuition already baked into the current code:
 - **Steps** → the device that *actually counts them* wins (a wrist band's pedometer over the strap's
-  estimate; today `noopComputedCanFillAppleMetric` already encodes "strap step estimate is a last resort").
+  estimate; today `pulseComputedCanFillAppleMetric` already encodes "strap step estimate is a last resort").
 - **HR (avg/max/resting)** → a chest strap or PPG wins; cross-validate against phone.
 - **Skin temp** → redundancy: prefer the source with the finer scale; today's `skin_temp` daily column
   already exists.
-- **Sleep** → the **best stager** wins. Imported WHOOP stages > NOOP-computed stages > phone sleep
+- **Sleep** → the **best stager** wins. Imported WHOOP stages > Pulse-computed stages > phone sleep
   buckets (`asleep_min/deep_min/rem_min/core_min` aliases already in `appleCompatibleKey`).
 
 Implementation = **extend, don't replace**: `sourceCandidates(forKey:preferredSource:)` keeps its exact
@@ -121,7 +121,7 @@ the winning value and classify:
 - **minorDelta** — outside tolerance but within a "plausible measurement spread" band → show both, no
   alarm.
 - **conflict** — large divergence (e.g. one band says 2 h sleep, another says 7 h) → flag prominently;
-  **never silently merge.** The user picks, or NOOP keeps the higher-trust source and labels it.
+  **never silently merge.** The user picks, or Pulse keeps the higher-trust source and labels it.
 
 Tolerances live in the same policy table (per-metric, both platforms read the same constants). This is a
 threshold comparison — deterministic, explainable, no statistics beyond a clamp and a percentage. The
@@ -168,7 +168,7 @@ New, pure, dependency-free files (sit alongside `DayOwnerResolver.swift`, `Vital
 + `FusionResolver` (keeping their public signatures and current behaviour for WHOOP/Apple). The new
 "Your Data, Fused" read model (`FusedRecord`) is built in `Repository` from rows it already loads.
 
-### Kotlin twin — `android/app/src/main/java/com/noop/analytics/`
+### Kotlin twin — `android/app/src/main/java/com/pulse/analytics/`
 - **`MetricArbitrationPolicy.kt`**, **`FusionResolver.kt`**, **`FusionTypes.kt`** — value-for-value ports.
 - `WhoopRepository.sourceCandidates` (currently L690) is refactored to delegate to the policy, exactly as
   the Swift side does, preserving the existing `#443` Health-Connect-weight behaviour and all current tests.
@@ -176,7 +176,7 @@ New, pure, dependency-free files (sit alongside `DayOwnerResolver.swift`, `Vital
 ### UI (per platform — not shared)
 - **macOS/iOS:** a new **"Your Data, Fused"** screen (`Strand/Screens/FusedRecordView.swift`), reachable
   from Data Sources and Today. Reuses `StatePill`, the existing card chrome, `ScreenScaffold`.
-- **Android:** `android/app/src/main/java/com/noop/ui/FusedRecordScreen.kt`, mirroring it; surfaced from
+- **Android:** `android/app/src/main/java/com/pulse/ui/FusedRecordScreen.kt`, mirroring it; surfaced from
   `DevicesScreen` / Data Sources.
 - Both surface provenance via the existing pill/caption components — we extend, not replace.
 
@@ -224,7 +224,7 @@ HRV             68 ms      ● from WHOOP        (no second source)
   when "best signal" needs justifying ("counts directly", "best stager").
 - **Agreement inline:** `agree` → quiet parenthetical; `minorDelta` → both values, neutral; `conflict` →
   ⚠ chip + "tap to compare" opening a small sheet showing every source's value side by side and which one
-  NOOP is using and *why* (its trust tier). User can **pin a preferred source per metric** (stored as a
+  Pulse is using and *why* (its trust tier). User can **pin a preferred source per metric** (stored as a
   lightweight override; the resolver already has a per-day lock concept via `DayOwnerResolver` to model on).
 - **Day badge:** "Today's record owned by WHOOP" via `DayOwnerResolver` — so scores' single-owner is
   honest.
@@ -258,7 +258,7 @@ active source** with its day count. Add an entry point to "Your Data, Fused".
 This pillar is **higher legal risk than most** because "one health record" + "cross-validation" can *sound*
 diagnostic. Hard guardrails on shipped copy and behaviour:
 
-- **Wellness, not medical.** NOOP is a wellness and self-knowledge tool. It does **not** diagnose, treat,
+- **Wellness, not medical.** Pulse is a wellness and self-knowledge tool. It does **not** diagnose, treat,
   cure, or monitor any condition. Aligns with the existing `DISCLAIMER.md` / `TERMS.md` posture.
 - **"Best signal" ≠ "accurate" / "correct" / "clinical".** We say a source is *higher-trust for this
   metric* with a plain reason; we never assert a measurement is true or medically valid.
@@ -271,8 +271,8 @@ diagnostic. Hard guardrails on shipped copy and behaviour:
   introduces no new collection. Nothing leaves the device — reinforce this on the screen ("Everything
   stays on this device", matching the Data Sources subtitle).
 - **Provenance protects the user and us.** Always naming the source means we never launder one vendor's
-  reading as NOOP's clinical claim.
-- A short on-screen note: *"NOOP picks the best-sourced number and shows you where each came from. It's for
+  reading as Pulse's clinical claim.
+- A short on-screen note: *"Pulse picks the best-sourced number and shows you where each came from. It's for
   wellness and curiosity — it doesn't diagnose or replace medical advice."*
 
 ---
@@ -301,7 +301,7 @@ fixtures).
 correctly end-to-end; `DayOwnerResolver` still single-owns scored days.
 
 **No UI snapshot tests on mac (headless XCTest can't run UI)** — verify the screen via the SwiftUI preview +
-Android JVM mirror per `reference_noop_build_test_env.md`.
+Android JVM mirror per `reference_pulse_build_test_env.md`.
 
 ---
 
@@ -314,7 +314,7 @@ Android JVM mirror per `reference_noop_build_test_env.md`.
 4. **"Your Data, Fused"** read-only screen (mac/iOS + Android), pills + inline agreement + conflict sheet.
 5. Generalise `RepositoryFreshness` and the Devices/Data Sources additions (capabilities line, per-source
    coverage).
-6. Sources covered at MVP = the ones that already import: **WHOOP · NOOP-computed · Apple Health · Health
+6. Sources covered at MVP = the ones that already import: **WHOOP · Pulse-computed · Apple Health · Health
    Connect · Mi Band/Xiaomi** (+ nutrition/lifting as single-source passthroughs).
 
 **Later:**

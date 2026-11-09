@@ -2,7 +2,7 @@ import XCTest
 @testable import PolarProtocol
 
 /// Pins the clean-room Polar PMD decode against hand-built frames in the documented byte layout. Pure —
-/// no CoreBluetooth, no strap; the Kotlin twin (`com.noop.polar.PmdDecoderTest`) asserts the same vectors.
+/// no CoreBluetooth, no strap; the Kotlin twin (`com.pulse.polar.PmdDecoderTest`) asserts the same vectors.
 final class PmdDecoderTests: XCTestCase {
 
     /// Little-endian bytes for the 8-byte PMD frame timestamp 0x0102030405060708.
@@ -27,7 +27,7 @@ final class PmdDecoderTests: XCTestCase {
     }
 
     func testHeaderRejectsUnknownMeasurementType() {
-        // 0x7F is not a type NOOP recognises → no wrong guess.
+        // 0x7F is not a type Pulse recognises → no wrong guess.
         XCTAssertNil(PolarPmdDecoder.header([0x7F] + tsBytes + [0x00]))
     }
 

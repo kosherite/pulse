@@ -46,38 +46,38 @@ SWIFT_GLOBS = (
     "Packages/OuraProtocol/Sources/**/*.swift",
 )
 KOTLIN_GLOBS = (
-    "android/app/src/main/java/com/noop/analytics/**/*.kt",
-    "android/app/src/main/java/com/noop/ingest/**/*.kt",
-    "android/app/src/main/java/com/noop/data/**/*.kt",
-    "android/app/src/main/java/com/noop/protocol/**/*.kt",
-    "android/app/src/main/java/com/noop/oura/**/*.kt",
+    "android/app/src/main/java/com/pulse/analytics/**/*.kt",
+    "android/app/src/main/java/com/pulse/ingest/**/*.kt",
+    "android/app/src/main/java/com/pulse/data/**/*.kt",
+    "android/app/src/main/java/com/pulse/protocol/**/*.kt",
+    "android/app/src/main/java/com/pulse/oura/**/*.kt",
 )
 SWIFT_EXCLUDED_GLOBS = (
-    "Packages/NoopLocalAccess/Sources/**/*.swift",
+    "Packages/PulseLocalAccess/Sources/**/*.swift",
     "Packages/PolarProtocol/Sources/**/*.swift",
     "Packages/StrandDesign/Sources/**/*.swift",
     "Strand/**/*.swift",
     "StrandiOS*/**/*.swift",
-    "NOOPWatch*/**/*.swift",
+    "PulseWatch*/**/*.swift",
 )
 KOTLIN_EXCLUDED_GLOBS = (
-    "android/app/src/main/java/com/noop/*.kt",
-    "android/app/src/main/java/com/noop/ai/**/*.kt",
-    "android/app/src/main/java/com/noop/alarm/**/*.kt",
-    "android/app/src/main/java/com/noop/ble/**/*.kt",
-    "android/app/src/main/java/com/noop/location/**/*.kt",
-    "android/app/src/main/java/com/noop/notif/**/*.kt",
-    "android/app/src/main/java/com/noop/polar/**/*.kt",
-    "android/app/src/main/java/com/noop/testcentre/**/*.kt",
-    "android/app/src/main/java/com/noop/ui/**/*.kt",
-    "android/app/src/main/java/com/noop/update/**/*.kt",
-    "android/app/src/main/java/com/noop/widget/**/*.kt",
+    "android/app/src/main/java/com/pulse/*.kt",
+    "android/app/src/main/java/com/pulse/ai/**/*.kt",
+    "android/app/src/main/java/com/pulse/alarm/**/*.kt",
+    "android/app/src/main/java/com/pulse/ble/**/*.kt",
+    "android/app/src/main/java/com/pulse/location/**/*.kt",
+    "android/app/src/main/java/com/pulse/notif/**/*.kt",
+    "android/app/src/main/java/com/pulse/polar/**/*.kt",
+    "android/app/src/main/java/com/pulse/testcentre/**/*.kt",
+    "android/app/src/main/java/com/pulse/ui/**/*.kt",
+    "android/app/src/main/java/com/pulse/update/**/*.kt",
+    "android/app/src/main/java/com/pulse/widget/**/*.kt",
 )
 PRODUCTION_GLOBS = (
     "Packages/**/Sources/**/*.swift",
     "Strand/**/*.swift",
     "StrandiOS*/**/*.swift",
-    "NOOPWatch*/**/*.swift",
+    "PulseWatch*/**/*.swift",
     "android/app/src/main/java/**/*.kt",
 )
 TEST_GLOBS = (
@@ -91,7 +91,7 @@ REFERENCE_GLOBS = (
     "Strand/**/*.swift",
     "StrandTests/**/*.swift",
     "StrandiOS*/**/*.swift",
-    "NOOPWatch*/**/*.swift",
+    "PulseWatch*/**/*.swift",
     "android/**/*.kt",
 )
 
@@ -101,7 +101,7 @@ REFERENCE_GLOBS = (
 CONSTANT_NON_TWIN_PAIRS = frozenset({
     (
         "Packages/WhoopStore/Sources/WhoopStore/WhoopStore.swift::schemaVersion",
-        "android/app/src/main/java/com/noop/data/WhoopDatabase.kt::SCHEMA_VERSION",
+        "android/app/src/main/java/com/pulse/data/WhoopDatabase.kt::SCHEMA_VERSION",
     ),
 })
 
@@ -1116,7 +1116,7 @@ def _target(raw: str) -> tuple[str, str | None] | None:
     name = pieces[-1].split("(", 1)[0]
     owner = pieces[-2] if len(pieces) > 1 else None
     if len(pieces) > 2 and all(piece[:1].islower() for piece in pieces[:-1]):
-        owner = None  # package-qualified type, e.g. com.noop.protocol.DeviceConfigWriteGate
+        owner = None  # package-qualified type, e.g. com.pulse.protocol.DeviceConfigWriteGate
     elif name[:1].isupper():
         owner = None  # module/type-qualified type, not an Owner.member reference
     return name, owner
@@ -2375,7 +2375,7 @@ def scan(root: Path, twin_map: dict) -> ScanResult:
     day_string = [item for item in all_functions if item.name == "dayString"]
     ui_pearson = [
         item for item in all_functions
-        if item.language == "kotlin" and item.name == "pearson" and item.path.startswith("android/app/src/main/java/com/noop/ui/")
+        if item.language == "kotlin" and item.name == "pearson" and item.path.startswith("android/app/src/main/java/com/pulse/ui/")
     ]
     resting = [item for item in sw_funcs + kt_funcs if item.name in {"restingHR", "sessionRestingHR"}]
     for declaration in day_string:
@@ -2537,7 +2537,7 @@ BASELINE_REASONS = {
 
 def _finding_domain(path: str) -> str:
     pieces = path.split("/")
-    if path.startswith("android/app/src/main/java/com/noop/") and len(pieces) > 7:
+    if path.startswith("android/app/src/main/java/com/pulse/") and len(pieces) > 7:
         return f"android/{pieces[7]}"
     if path.startswith("Packages/") and len(pieces) > 1:
         return f"Packages/{pieces[1]}"

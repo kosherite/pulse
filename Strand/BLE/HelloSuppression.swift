@@ -24,7 +24,7 @@ import WhoopProtocol
 /// give-up over five more refusals. The latch is dropped by a genuine bond (it demonstrably works now) or
 /// by forgetting the strap, which are the two events that are actually evidence about this device.
 ///
-/// Kotlin twin: `com.noop.ble.shouldSendClientHello`.
+/// Kotlin twin: `com.pulse.ble.shouldSendClientHello`.
 func shouldSendClientHello(suppressedForDevice: Bool, userInitiated: Bool) -> Bool {
     !suppressedForDevice || userInitiated
 }
@@ -33,7 +33,7 @@ func shouldSendClientHello(suppressedForDevice: Bool, userInitiated: Bool) -> Bo
 ///
 /// The flat 5 was argued for the AUTH-REFUSAL branch and only makes sense there: the pairing hint shows at
 /// 2, the hint asks the user to do something (close the official app, free a stale phone pairing), and the
-/// extra cycles are the time to do it before NOOP stops hammering.
+/// extra cycles are the time to do it before Pulse stops hammering.
 ///
 /// An unanswered handshake gives the user nothing to act on. The write vanishes, the strap is not refusing
 /// anything it could be talked out of, and the outcome — suppress the hello and keep streaming live HR —
@@ -44,14 +44,14 @@ func shouldSendClientHello(suppressedForDevice: Bool, userInitiated: Bool) -> Bo
 /// transient would latch a PERSISTED verdict with no margin at all. 3 keeps one cycle of margin and still
 /// takes roughly 40% off the churn.
 ///
-/// Kotlin twin: `com.noop.ble.UNANSWERED_GIVE_UP_THRESHOLD`.
+/// Kotlin twin: `com.pulse.ble.UNANSWERED_GIVE_UP_THRESHOLD`.
 let unansweredGiveUpThreshold = 3
 
 /// The give-up threshold for the refusal in hand. Keyed on the same `authRefusal` that decides whether the
 /// give-up suppresses or pauses (`giveUpSuppressesHello`), so the two can never disagree about which branch
 /// a refusal belongs to.
 ///
-/// Kotlin twin: `com.noop.ble.giveUpThresholdFor`.
+/// Kotlin twin: `com.pulse.ble.giveUpThresholdFor`.
 func giveUpThresholdFor(authRefusal: Bool, pauseThreshold: Int) -> Int {
     authRefusal ? pauseThreshold : unansweredGiveUpThreshold
 }
@@ -70,7 +70,7 @@ func giveUpThresholdFor(authRefusal: Bool, pauseThreshold: Int) -> Int {
 /// Splitting them is the whole point: before this, both ended in the same pause, so the strap that could
 /// still deliver HR was treated exactly like the one that could not.
 ///
-/// Kotlin twin: `com.noop.ble.giveUpSuppressesHello`.
+/// Kotlin twin: `com.pulse.ble.giveUpSuppressesHello`.
 func giveUpSuppressesHello(authRefusal: Bool) -> Bool { !authRefusal }
 
 /// Does this disconnect count as the strap refusing to bond?
@@ -85,7 +85,7 @@ func giveUpSuppressesHello(authRefusal: Bool) -> Bool { !authRefusal }
 /// separately, so the user-facing guidance can stay honest about which was observed. An auth refusal
 /// supports naming a cause; an unanswered handshake does not.
 ///
-/// Pure so the rule is unit-tested without a radio. Kotlin twin: `com.noop.ble.countsAsBondRefusal`.
+/// Pure so the rule is unit-tested without a radio. Kotlin twin: `com.pulse.ble.countsAsBondRefusal`.
 func countsAsBondRefusal(
     isAuthRefusalStatus: Bool,
     helloUnacked: Bool,
@@ -108,12 +108,12 @@ func countsAsBondRefusal(
 /// twin so the two are recognisably the same latch; the value that goes into it is not the same kind of
 /// identifier, and deliberately so.
 ///
-/// Kotlin twin: `com.noop.ble.helloSuppressionPrefKey`.
+/// Kotlin twin: `com.pulse.ble.helloSuppressionPrefKey`.
 func helloSuppressionPrefKey(_ peripheralId: String?) -> String? {
     guard let raw = peripheralId?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
         return nil
     }
-    return "noop.helloUnanswered.\(raw.lowercased())"
+    return "pulse.helloUnanswered.\(raw.lowercased())"
 }
 
 /// Read/write the per-strap hello-suppression latch. Kept beside the key helper so no caller hand-rolls

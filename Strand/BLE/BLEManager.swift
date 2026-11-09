@@ -12,13 +12,13 @@ import AppKit
 #endif
 
 /// Detects a marginal Bluetooth radio that can't sustain the WHOOP 4 R10/R11 raw realtime stream
-/// (#80). On a flaky radio (2016 Mac / OpenCore) the link dies the *instant* NOOP arms that
+/// (#80). On a flaky radio (2016 Mac / OpenCore) the link dies the *instant* Pulse arms that
 /// high-bandwidth burst, then the auto-rescan reconnects, re-arms, and dies again — an endless loop.
 ///
 /// The tell is a CONNECTION TIMEOUT that lands shortly after we armed realtime: arm → die → rescan →
 /// arm → die. We don't trip on a single drop (links die for benign reasons), but on >= `tripThreshold`
 /// CONSECUTIVE arm-then-quick-timeout cycles. Once tripped, the caller skips arming R10/R11 on the next
-/// connect and relies on the independent low-bandwidth 0x2A37 standard HR profile, which NOOP already
+/// connect and relies on the independent low-bandwidth 0x2A37 standard HR profile, which Pulse already
 /// subscribes — live HR survives on a radio that otherwise couldn't, and even if 0x2A37 stays silent the
 /// arm/die loop stops. Pure + value-typed so the decision is unit-testable without a CoreBluetooth seam.
 struct MarginalRadioDetector {
@@ -557,7 +557,7 @@ public final class BLEManager: NSObject, ObservableObject {
     static let disManufacturerChar = CBUUID(string: "2A29") // Manufacturer Name String
     static let disModelNumberChar  = CBUUID(string: "2A24") // Model Number String
     static let disSwRevChar     = CBUUID(string: "2A28") // Software Revision String
-    /// Every DIS characteristic NOOP reads, in ONE place. The failure reporter tests membership here, so
+    /// Every DIS characteristic Pulse reads, in ONE place. The failure reporter tests membership here, so
     /// a characteristic added beside these cannot go silently unreported — the exact "a refused read is
     /// indistinguishable from one never issued" gap the reporter exists to close. Kotlin twin: DIS_CHARS.
     static let disChars: Set<CBUUID> = [
@@ -1644,7 +1644,7 @@ public final class BLEManager: NSObject, ObservableObject {
     func connectFromSystem(model: WhoopModel = .persisted) {
         // #1881: the gate belongs HERE, not in the shared `connectCore`. This file already draws the line
         // the fix needs — `connect()` is the user's explicit Connect button, and every system-initiated
-        // path "MUST use connectFromSystem()" — and the report's complaint is only ever about NOOP acting
+        // path "MUST use connectFromSystem()" — and the report's complaint is only ever about Pulse acting
         // on its own. Gating the shared core instead would have made the Connect button silently dead
         // while the Devices screen showed a "Reconnecting…" toast.
         guard whoopConnectAllowed("connect-from-system") else { return }
@@ -1723,8 +1723,8 @@ public final class BLEManager: NSObject, ObservableObject {
             log("Found existing \(model.displayName) connection \(p.identifier) — attaching")
             preparePeripheral(p)
             // Attach OUR OWN session even when CoreBluetooth reports the strap .connected. On Apple
-            // platforms an LE link is shared system-wide, so a strap held by the WHOOP app, a prior NOOP
-            // session, or the OS itself reads .connected while NOOP has NO session of its own yet. The old
+            // platforms an LE link is shared system-wide, so a strap held by the WHOOP app, a prior Pulse
+            // session, or the OS itself reads .connected while Pulse has NO session of its own yet. The old
             // .connected branch flipped state.connected = true and jumped straight to discovery + live
             // notifications, which then silently delivered nothing: the UI claimed "connected" but no data
             // ever flowed (#689). Routing through connect(_:) instead fires didConnect almost immediately
@@ -1791,11 +1791,11 @@ public final class BLEManager: NSObject, ObservableObject {
     }
 
     /// #78: fully RELEASE a strap when the user removes it from the Devices screen. Archiving the registry
-    /// row alone left the strap connected — NOOP kept re-grabbing it (the 3s disconnect→reconnect timer, the
+    /// row alone left the strap connected — Pulse kept re-grabbing it (the 3s disconnect→reconnect timer, the
     /// targeted-connect pin, and iOS state restoration ALL still pointed at it), so it stayed connected and
     /// the user could never put it into pairing mode to re-pair (the #78 deadlock: a WHOOP that's connected
     /// can't show its blue pairing LEDs). Stop auto-reconnect, drop the live link, and clear the targeting +
-    /// restoration references that point at this strap so NOOP lets go for good — until the user deliberately
+    /// restoration references that point at this strap so Pulse lets go for good — until the user deliberately
     /// reconnects (which clears `intentionalDisconnect` again via connect()).
     public func forgetDevice(_ peripheralId: String?) {
         let target = peripheralId.flatMap { UUID(uuidString: $0) }
@@ -2665,12 +2665,12 @@ public final class BLEManager: NSObject, ObservableObject {
     /// type-43 flood, which extractStreams ignores — the data comes from the next periodic offload.
     /// Stop an offload that is part-way through, at the user's request.
     ///
-    /// NOOP has been able to START a drain since day one (`sendHistoricalData`) with no way to stop it:
+    /// Pulse has been able to START a drain since day one (`sendHistoricalData`) with no way to stop it:
     /// a session ran to HISTORY_COMPLETE, the backfill timeout, or a dropped link. On a strap with a
     /// large banked history that is a long time to be stuck, and the only escape was walking out of
     /// Bluetooth range.
     ///
-    /// NOTHING IS LOST. The strap frees banked records when NOOP acks a HISTORY_END, so records already
+    /// NOTHING IS LOST. The strap frees banked records when Pulse acks a HISTORY_END, so records already
     /// acked are persisted and records not yet acked stay in flash and re-offload on the next sync. This
     /// is a stop, not a trim, and no cursor moves.
     ///
@@ -2851,7 +2851,7 @@ public final class BLEManager: NSObject, ObservableObject {
                                                                kind: "lastWriteOkAt")
             let whoStalled = LastSyncAttribution.writeHealthPrefKey(peripheralId: peripheral?.identifier.uuidString,
                                                                     kind: "lastWriteStalledAt")
-            // The global keys are STILL written, deliberately, exactly as `noop.lastFirmware` still is
+            // The global keys are STILL written, deliberately, exactly as `pulse.lastFirmware` still is
             // (FrameRouter). DebugDataDiagnostics.strapStateLines is sync and prefs-only by contract, so it
             // cannot resolve per device — and dropping the global write would not make that line
             // per-device, it would freeze it at whatever it held before the upgrade and then read "no rows
@@ -2931,7 +2931,7 @@ public final class BLEManager: NSObject, ObservableObject {
             }
             // Stamped against the strap that actually completed this offload, never globally: the single
             // key reported one strap's sync on another's screen, and it read as reassuring rather than
-            // wrong — see LastSyncAttribution. Kotlin twin: NoopPrefs.setLastSyncAtFor.
+            // wrong — see LastSyncAttribution. Kotlin twin: PulsePrefs.setLastSyncAtFor.
             if let key = LastSyncAttribution.prefKey(peripheralId: peripheral?.identifier.uuidString) {
                 UserDefaults.standard.set(state.lastSyncedAt, forKey: key)
             }
@@ -3248,7 +3248,7 @@ public final class BLEManager: NSObject, ObservableObject {
     /// #324/#928: the post-sync banner for a strap whose clock is set in the FUTURE. Unlike the
     /// "clock lost / not banking" case (`bankedNothing`), this strap DOES bank records every pass — but
     /// its RTC relatched to a future base, so every banked timestamp reads ahead of the wall clock and
-    /// NOOP won't import them (importing would misfile the night days or years ahead). The existing
+    /// Pulse won't import them (importing would misfile the night days or years ahead). The existing
     /// clock-lost banner is gated on empty syncs and never fires here, so this failure mode was silent
     /// (#324). Returns the user-facing string when the strap-reported newest record is future-dated
     /// beyond the 48 h skew allowance (`BackfillContinuation.isFutureDatedNewest`), else nil. Pure and
@@ -3534,7 +3534,7 @@ public final class BLEManager: NSObject, ObservableObject {
     /// feature flags and report, per key, the value the strap actually stores afterwards.
     ///
     /// **Why this exists.** The Settings copy has promised since #174 that the R22 unlock is "reversible",
-    /// and that was true about the hardware and false about the app: NOOP shipped an enable button and no
+    /// and that was true about the hardware and false about the app: Pulse shipped an enable button and no
     /// way back, so the only routes out were the official WHOOP app or a factory reset. This closes that.
     ///
     /// **Why it is staged rather than sixteen writes.** `'0'` is the confirmed off value in the
@@ -3927,7 +3927,7 @@ public final class BLEManager: NSObject, ObservableObject {
     }
 
     /// Restart the connected strap (REBOOT_STRAP / opcode 29, empty body). Non-destructive: the strap keeps
-    /// its stored data and re-advertises after boot, but the BLE link drops and NOOP auto-reconnects. Gated
+    /// its stored data and re-advertises after boot, but the BLE link drops and Pulse auto-reconnects. Gated
     /// to a connected + bonded strap; user-initiated and confirmation-gated at the call site (DevicesView).
     ///
     /// Emits a full debug trail to the strap log so a reboot is diagnosable end to end:
@@ -3961,12 +3961,12 @@ public final class BLEManager: NSObject, ObservableObject {
     /// landing (or the no-reply timeout). The result dialog shows a "waiting…" line for this value.
     public static let extendedBatteryProbeWaiting = "__waiting__"
     private static let extendedBatteryProbeTimeout: TimeInterval = 8
-    private static let extendedBatteryPrevPayloadKey = "noop.592.prevPayload"
+    private static let extendedBatteryPrevPayloadKey = "pulse.592.prevPayload"
 
     // #690 body-location probe (twins of the #592 constants above).
     public static let bodyLocationProbeWaiting = "__waiting__"
     private static let bodyLocationProbeTimeout: TimeInterval = 8
-    private static let bodyLocationPrevPayloadKey = "noop.690.prevPayload"
+    private static let bodyLocationPrevPayloadKey = "pulse.690.prevPayload"
 
     /// #592 opcode probe: send the read-only GET_EXTENDED_BATTERY_INFO(98) and surface the strap's reply
     /// (raw hex + payload triage + capture diff) on `LiveState.extendedBatteryProbe` for the Devices dialog.
@@ -4053,7 +4053,7 @@ public final class BLEManager: NSObject, ObservableObject {
     /// `START_FF_KEY_EXCHANGE(117)` for the count, then `SEND_NEXT_FF(118)` repeatedly (its body is a
     /// cursor, not an index) until the strap's own end marker. NOTHING is written: no `SET_FF_VALUE(120)`,
     /// no `SET_DEVICE_CONFIG_VALUE(119)`, no value of any kind — this writes command frames purely to read,
-    /// exactly like the Oura `spo2_status` / `realsteps_status` probes NOOP already ships
+    /// exactly like the Oura `spo2_status` / `realsteps_status` probes Pulse already ships
     /// (`Packages/OuraProtocol/…/Commands.swift`). `GET_FF_VALUE(128)` is deliberately NOT sent (its reply's
     /// value field is reported unreliable — see `FeatureFlagProbe`).
     ///
@@ -4140,7 +4140,7 @@ public final class BLEManager: NSObject, ObservableObject {
     ///
     /// NOTHING is written: no `SET_FF_VALUE(120)`, no `SET_DEVICE_CONFIG_VALUE(119)`, no value of any
     /// kind — this writes command frames purely to read, exactly like the Oura `spo2_status` /
-    /// `realsteps_status` probes NOOP already ships (`Packages/OuraProtocol/…/Commands.swift`).
+    /// `realsteps_status` probes Pulse already ships (`Packages/OuraProtocol/…/Commands.swift`).
     ///
     /// **Both target opcodes may simply be unimplemented.** The probe spends one round-trip per verb
     /// establishing that before it does anything else, and a clean "neither verb is served" is a useful
@@ -4384,7 +4384,7 @@ public final class BLEManager: NSObject, ObservableObject {
     /// `nonisolated` because it is a pure function of its argument and touches no actor state. Without
     /// it the key derivation inherits the type's main-actor isolation, which makes it uncallable from a
     /// synchronous test and says something untrue about what it needs.
-    nonisolated static func ecgRunningKey(_ deviceId: String) -> String { "noopEcgMayBeRunning.\(deviceId)" }
+    nonisolated static func ecgRunningKey(_ deviceId: String) -> String { "pulseEcgMayBeRunning.\(deviceId)" }
 
     /// The conditions an ECG action needs, checked BEFORE a run is opened so a rejected action leaves no
     /// "waiting…" sheet sitting for the length of the listen window. `send()` re-checks independently —
@@ -4991,13 +4991,13 @@ public final class BLEManager: NSObject, ObservableObject {
     }
 
     /// When the iOS "Sync Strap" shortcut asked for a sync while no strap link was ready. The connect
-    /// handshake's own on-connect kick consumes it (`connectSyncTrigger`), so a request made while NOOP was
+    /// handshake's own on-connect kick consumes it (`connectSyncTrigger`), so a request made while Pulse was
     /// still launching and reconnecting in the background runs as soon as the link can serve, at the
     /// un-floored `.manual` tier the user's tap deserves, instead of being lost. Bounded by
     /// `pendingManualSyncTTL` so a stale request cannot fire an offload long after anyone asked.
     ///
     /// Persisted, not in-memory: iOS may end the background process the shortcut launched and relaunch
-    /// NOOP later through CoreBluetooth state restoration when the strap reconnects. A request held only in
+    /// Pulse later through CoreBluetooth state restoration when the strap reconnects. A request held only in
     /// memory would not survive that, and the relaunch is exactly the path that completes the connect.
     private var pendingManualSyncRequestedAt: Date? {
         get { (UserDefaults.standard.object(forKey: Self.pendingManualSyncKey) as? Double).map(Date.init(timeIntervalSince1970:)) }
@@ -5445,7 +5445,7 @@ public final class BLEManager: NSObject, ObservableObject {
     /// path doesn't re-set it (wire observation; mirrors Android WhoopBleClient.armStrapAlarm).
     /// The WHOOP 4.0 strap buzzes at `date` even if the app is backgrounded or force-quit
     /// (event STRAP_DRIVEN_ALARM_EXECUTED=57). The 5/MG path intends the same behavior but remains
-    /// experimental. This is the only strap-alarm path; NOOP has no light-sleep early-wake layer.
+    /// experimental. This is the only strap-alarm path; Pulse has no light-sleep early-wake layer.
     ///
     /// EXPERIMENTAL on 5/MG (same posture as the Android client): the rev-4 frame has been ACKed, and
     /// one full wake chain HAS been captured on an MG, STRAP_DRIVEN_ALARM_EXECUTED (57) then
@@ -5521,7 +5521,7 @@ public final class BLEManager: NSObject, ObservableObject {
         // evening short-horizon arm (same code path, same commands, no day/night branch anywhere in this
         // function) did not. One firmware-side explanation that would fit every reported case: the
         // physical alarm haptic might only fire while the strap's OWN sleep/rest detection considers the
-        // wearer sleep-adjacent, independent of anything NOOP sends. This doesn't prove or fix that — it's
+        // wearer sleep-adjacent, independent of anything Pulse sends. This doesn't prove or fix that — it's
         // a free read of state already tracked live, logged so the next reported failure (ideally an
         // evening one) can be compared against the resting HR of the successful arms already on file. `nil`
         // (no key written) means no HR had streamed yet at arm time, not zero.
@@ -5793,7 +5793,7 @@ extension BLEManager: @preconcurrency CBCentralManagerDelegate {
         unauthorizedSettleWork = nil
         guard central.state == .poweredOn else {
             // #280: a non-poweredOn radio state used to be a SILENT return — the strap log showed only
-            // "Central state: 3" and the UI just read "not connected", so a user whose Mac had denied NOOP
+            // "Central state: 3" and the UI just read "not connected", so a user whose Mac had denied Pulse
             // Bluetooth (.unauthorized == raw 3) had nothing explaining why no strap was ever found. This is
             // the #280 case: an unsigned universal rebuild (8.4.0) gets a new code identity, so the earlier
             // macOS Bluetooth TCC grant no longer applied and CoreBluetooth reported .unauthorized before
@@ -6228,7 +6228,7 @@ extension BLEManager: @preconcurrency CBCentralManagerDelegate {
             }
             if state.reconnectGuide == nil {
                 state.reconnectGuide = """
-                Your strap keeps connecting and then dropping a second later. This is almost always a stale Bluetooth pairing - usually after a WHOOP firmware update, or the official WHOOP app holding the strap. NOOP works fine once it's re-paired:
+                Your strap keeps connecting and then dropping a second later. This is almost always a stale Bluetooth pairing - usually after a WHOOP firmware update, or the official WHOOP app holding the strap. Pulse works fine once it's re-paired:
 
                 1. Quit the official WHOOP app (or turn off Bluetooth on that phone).
                 2. Open System Settings → Bluetooth and Forget your WHOOP if it's listed.
@@ -6421,7 +6421,7 @@ extension BLEManager: @preconcurrency CBCentralManagerDelegate {
         // The strap wiped its bond (a firmware update, or the official WHOOP app re-bonding it). macOS keeps
         // re-presenting the now-stale pairing key, so every reconnect loops on this same error with no
         // recovery and no user guidance. Surface an actionable re-pair guide instead of failing silently —
-        // NOOP itself works fine on the new firmware once the stale bond is cleared. (5/MG firmware reset, 2026-06)
+        // Pulse itself works fine on the new firmware once the stale bond is cleared. (5/MG firmware reset, 2026-06)
         // Connection test mode: a failed connect is part of the reconnect churn the tester is chasing.
         // Gated zero-cost; diagnostic only - the backoff/guide logic below is unchanged.
         if TestCentre.active(.connection) {
@@ -6451,7 +6451,7 @@ extension BLEManager: @preconcurrency CBCentralManagerDelegate {
         // close the gap with a name match. Kotlin twin: `StaleBondRemoval.kt`.
         if let cbErr = error as? CBError, cbErr.code == .peerRemovedPairingInformation {
             state.reconnectGuide = """
-            Your strap's Bluetooth pairing was reset - usually by a WHOOP firmware update, or the official WHOOP app reconnecting. NOOP works fine on the new firmware; you just need to re-pair:
+            Your strap's Bluetooth pairing was reset - usually by a WHOOP firmware update, or the official WHOOP app reconnecting. Pulse works fine on the new firmware; you just need to re-pair:
 
             1. Quit the official WHOOP app (or turn off Bluetooth on that phone).
             2. Open System Settings → Bluetooth and Forget “WHOOP MG” if it's listed.
@@ -7155,7 +7155,7 @@ extension BLEManager: @preconcurrency CBPeripheralDelegate {
     static func dataRangeNewestUnix(from frame: [UInt8],
                                     wallNowUnix: Int = Int(Date().timeIntervalSince1970)) -> Int? {
         // #286 follow-up: delegate to the pure, twin-tested WhoopProtocol.DataRange (byte-identical to the
-        // Kotlin com.noop.protocol.DataRange) so this parity-critical read — it gates auto-sync via
+        // Kotlin com.pulse.protocol.DataRange) so this parity-critical read — it gates auto-sync via
         // isFutureDatedNewest → BackfillPolicy — is CI-pinned on BOTH platforms, not the Kotlin side only.
         DataRange.newestUnix(from: frame, wallNowUnix: wallNowUnix,
                              futureSkewSeconds: BackfillContinuation.defaultFutureSkewSeconds)
@@ -7363,7 +7363,7 @@ extension BLEManager: @preconcurrency CBPeripheralDelegate {
                 // its own comment concedes - so `perDevice` always resolved nil and iOS fell back to a
                 // global value that is wrong the moment a second strap exists. This site DOES have the
                 // peripheral, so it is the one place that can attribute a firmware honestly. Kotlin twin:
-                // NoopPrefs.setFirmwareFor beside the same publish.
+                // PulsePrefs.setFirmwareFor beside the same publish.
                 if let key = FirmwareAttribution.prefKey(peripheralId: peripheral.identifier.uuidString),
                    let fw = disFirmware {
                     UserDefaults.standard.set(fw, forKey: key)

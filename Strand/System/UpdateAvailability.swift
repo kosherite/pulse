@@ -1,7 +1,7 @@
 import Foundation
 import WhoopProtocol
 
-/// When may NOOP look for a newer release on its own, and when is that worth telling the user about?
+/// When may Pulse look for a newer release on its own, and when is that worth telling the user about?
 ///
 /// The manual "Check for updates" button has always been deliberately user-initiated (see `UpdateChecker`).
 /// This adds the automatic half, for the reason #1659 asks for it: on iOS there is NO auto-update to fall
@@ -13,7 +13,7 @@ import WhoopProtocol
 /// already has, which means no new surface and no interruption: the bell picks up an unread row, the same
 /// way What's New does after an update.
 ///
-/// Kotlin twin: `com.noop.update.UpdateAvailability`.
+/// Kotlin twin: `com.pulse.update.UpdateAvailability`.
 enum UpdateAvailability {
 
     /// ON by default (maintainer's call, #1659).
@@ -65,7 +65,7 @@ enum UpdateAvailability {
 
     /// Has the install CAUGHT UP with a version we previously announced?
     ///
-    /// The row says "NOOP 10.7.0 is available". Once the user actually installs 10.7.0 that sentence is
+    /// The row says "Pulse 10.7.0 is available". Once the user actually installs 10.7.0 that sentence is
     /// false, and it sits in the inbox directly beside the What's New row for the same version — an app
     /// telling you to get something you already have. Nothing else prunes it, because the row carries no
     /// version field of its own; the persisted `lastPostedVersion` is what makes this answerable without
@@ -104,7 +104,7 @@ enum UpdateAvailability {
 /// Drives the #1659 automatic check: decide, fetch, post, remember. Kept out of `UpdateAvailability` so
 /// that stays pure — every rule this obeys is tested there without a network or a clock.
 ///
-/// Kotlin twin: `com.noop.update.UpdateWatch`.
+/// Kotlin twin: `com.pulse.update.UpdateWatch`.
 enum UpdateWatch {
 
     enum Keys {

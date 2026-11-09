@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-/// When NOOP's Live HR banner reads the values it shows.
+/// When Pulse's Live HR banner reads the values it shows.
 ///
 /// WHY THIS EXISTS. The banner shows AppModel's smoothed rate (`bpm`), a ten-second rolling median `AppModel.ingestHR`
 /// keeps from the live heart rate and R-R. The banner used to observe the heart rate and the link but never `bpm`

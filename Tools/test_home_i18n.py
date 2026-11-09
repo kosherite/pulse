@@ -24,22 +24,22 @@ ROOT = Path(__file__).resolve().parents[1]
 # AppRoot is deliberately handled separately below: most of that file is the unrelated
 # More/navigation UI, while only its Today tab and quick-action resources belong here.
 ANDROID_HOME_FILES = {
-    "android/app/src/main/java/com/noop/ui/TodayScreen.kt",
-    "android/app/src/main/java/com/noop/ui/TodayDayNav.kt",
-    "android/app/src/main/java/com/noop/ui/TodayLayoutPrefs.kt",
-    "android/app/src/main/java/com/noop/ui/TodayMetricsLogic.kt",
-    "android/app/src/main/java/com/noop/ui/TodayProvenance.kt",
-    "android/app/src/main/java/com/noop/ui/TodayScoring.kt",
-    "android/app/src/main/java/com/noop/ui/AutoWorkoutNudge.kt",
-    "android/app/src/main/java/com/noop/ui/JournalReminder.kt",
-    "android/app/src/main/java/com/noop/ui/CycleTrackerDialog.kt",
-    "android/app/src/main/java/com/noop/ui/KeyMetricPrefs.kt",
-    "android/app/src/main/java/com/noop/ui/DashboardCards.kt",
-    "android/app/src/main/java/com/noop/analytics/ReadinessEngine.kt",
-    "android/app/src/main/java/com/noop/analytics/StepsEstimateEngine.kt",
-    "android/app/src/main/java/com/noop/analytics/RecoveryDrivers.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayScreen.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayDayNav.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayLayoutPrefs.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayMetricsLogic.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayProvenance.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayScoring.kt",
+    "android/app/src/main/java/com/pulse/ui/AutoWorkoutNudge.kt",
+    "android/app/src/main/java/com/pulse/ui/JournalReminder.kt",
+    "android/app/src/main/java/com/pulse/ui/CycleTrackerDialog.kt",
+    "android/app/src/main/java/com/pulse/ui/KeyMetricPrefs.kt",
+    "android/app/src/main/java/com/pulse/ui/DashboardCards.kt",
+    "android/app/src/main/java/com/pulse/analytics/ReadinessEngine.kt",
+    "android/app/src/main/java/com/pulse/analytics/StepsEstimateEngine.kt",
+    "android/app/src/main/java/com/pulse/analytics/RecoveryDrivers.kt",
 }
-ANDROID_SHELL_FILE = "android/app/src/main/java/com/noop/ui/AppRoot.kt"
+ANDROID_SHELL_FILE = "android/app/src/main/java/com/pulse/ui/AppRoot.kt"
 
 # Both selectable Today implementations, their Today-only editor/metadata, the shared
 # day picker that they render, and the iPhone shell/icon actions that enter Home.
@@ -68,22 +68,22 @@ APPLE_HOME_SHELL_CATALOG_KEYS = {
 # data-flow back from Text(variable).  Scan every literal in them conservatively.  The
 # allowlist contains only persistence/source identifiers and date formats, never copy.
 ANDROID_DISPLAY_HELPERS = {
-    "android/app/src/main/java/com/noop/ui/TodayLayoutPrefs.kt",
-    "android/app/src/main/java/com/noop/ui/TodayMetricsLogic.kt",
-    "android/app/src/main/java/com/noop/ui/TodayProvenance.kt",
-    "android/app/src/main/java/com/noop/ui/TodayScoring.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayLayoutPrefs.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayMetricsLogic.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayProvenance.kt",
+    "android/app/src/main/java/com/pulse/ui/TodayScoring.kt",
 }
 
 # These producers feed strings into Home through fields/lambdas, so the general Android scanner cannot
 # see the eventual Text(variable). Only stable wire ids, preference keys, units and format specs belong
 # in the allowlist; every human phrase must become a semantic/resource contract.
 ANDROID_INDIRECT_COPY_FILES = {
-    "android/app/src/main/java/com/noop/analytics/ReadinessEngine.kt",
-    "android/app/src/main/java/com/noop/analytics/StepsEstimateEngine.kt",
-    "android/app/src/main/java/com/noop/ui/AutoWorkoutNudge.kt",
-    "android/app/src/main/java/com/noop/ui/KeyMetricPrefs.kt",
-    "android/app/src/main/java/com/noop/ui/DashboardCards.kt",
-    "android/app/src/main/java/com/noop/analytics/RecoveryDrivers.kt",
+    "android/app/src/main/java/com/pulse/analytics/ReadinessEngine.kt",
+    "android/app/src/main/java/com/pulse/analytics/StepsEstimateEngine.kt",
+    "android/app/src/main/java/com/pulse/ui/AutoWorkoutNudge.kt",
+    "android/app/src/main/java/com/pulse/ui/KeyMetricPrefs.kt",
+    "android/app/src/main/java/com/pulse/ui/DashboardCards.kt",
+    "android/app/src/main/java/com/pulse/analytics/RecoveryDrivers.kt",
 }
 ANDROID_INDIRECT_NON_UI_LITERALS = {
     # Engine keys, metric units and numeric format specs.
@@ -125,7 +125,7 @@ ANDROID_HELPER_NON_UI_LITERALS = {
     "9999-12-31", "d MMM", "24h", "12h", "6h", "3h", "1h",
     "<1m", "${secs / 60}m", "${secs / 3600}h", "${secs / 86_400}d",
     # TodayProvenance source ids and metric dictionary keys.
-    "-noop", "recovery", "strain", "sleep_performance", "oura-import", "oura-api",
+    "-pulse", "recovery", "strain", "sleep_performance", "oura-import", "oura-api",
     "fitbit-import", "garmin-import", "xiaomi-band",
 }
 
@@ -219,7 +219,7 @@ class HomeLocalizationTest(unittest.TestCase):
         self.assertEqual([], findings, "Raw indirect Android Home copy:\n" + _format_findings(findings))
 
     def test_android_today_runtime_producer_copy_is_resource_backed(self) -> None:
-        relative = "android/app/src/main/java/com/noop/ui/TodayScreen.kt"
+        relative = "android/app/src/main/java/com/pulse/ui/TodayScreen.kt"
         findings = [
             (relative, line, literal)
             for line, literal in _all_kotlin_literals(ROOT / relative)
@@ -228,30 +228,30 @@ class HomeLocalizationTest(unittest.TestCase):
         self.assertEqual([], findings, "Raw Today runtime producer copy:\n" + _format_findings(findings))
 
     def test_android_score_section_label_is_resolved_at_ui_boundary(self) -> None:
-        relative = "android/app/src/main/java/com/noop/ui/ScoringGuideScreen.kt"
+        relative = "android/app/src/main/java/com/pulse/ui/ScoringGuideScreen.kt"
         source = audit._mask_comments((ROOT / relative).read_text(encoding="utf-8"))
         self.assertNotRegex(source, r"val\s+label\s*:\s*String", "ScoreSection must expose a resource contract")
 
     def test_android_home_score_labels_and_explain_copy_are_resource_backed(self) -> None:
-        today_relative = "android/app/src/main/java/com/noop/ui/TodayScreen.kt"
+        today_relative = "android/app/src/main/java/com/pulse/ui/TodayScreen.kt"
         today = audit._mask_comments((ROOT / today_relative).read_text(encoding="utf-8"))
         self.assertNotIn("domain.label", today, "Home score names must be resolved from Android resources")
 
-        guide_relative = "android/app/src/main/java/com/noop/ui/ScoringGuideScreen.kt"
+        guide_relative = "android/app/src/main/java/com/pulse/ui/ScoringGuideScreen.kt"
         findings = [
             (guide_relative, line, literal)
             for line, literal in _all_kotlin_literals(ROOT / guide_relative)
             if _is_helper_copy(literal)
             and literal not in {
                 "${(sampleFraction * 100).roundToInt()}",
-                "noop_scoring_guide_prefs",
+                "pulse_scoring_guide_prefs",
                 "scoringGuideCardSeen",
             }
         ]
         self.assertEqual([], findings, "Raw Android score-explainer copy:\n" + _format_findings(findings))
 
     def test_android_home_score_labels_and_empty_states_fit_localized_copy(self) -> None:
-        source = (ROOT / "android/app/src/main/java/com/noop/ui/TodayScreen.kt").read_text(encoding="utf-8")
+        source = (ROOT / "android/app/src/main/java/com/pulse/ui/TodayScreen.kt").read_text(encoding="utf-8")
         self.assertIn("text = domainLabel.uppercase()", source)
         self.assertIn(".padding(horizontal = Metrics.space16)", source)
         self.assertIn("minScale = 0.7f", source)
@@ -262,22 +262,22 @@ class HomeLocalizationTest(unittest.TestCase):
         self.assertNotIn("private fun RingNoData()", source)
 
     def test_android_section_header_trailing_copy_does_not_squeeze_title(self) -> None:
-        source = (ROOT / "android/app/src/main/java/com/noop/ui/Components.kt").read_text(encoding="utf-8")
+        source = (ROOT / "android/app/src/main/java/com/pulse/ui/Components.kt").read_text(encoding="utf-8")
         section_header = source.split("fun SectionHeader(", 1)[1].split("// MARK: - StrandTone", 1)[0]
         self.assertIn("if (overline != null || trailing != null)", section_header)
-        self.assertIn("Text(title, style = NoopType.title2", section_header)
+        self.assertIn("Text(title, style = PulseType.title2", section_header)
         self.assertLess(section_header.index("if (trailing != null)"), section_header.index("Text(title"))
 
     def test_android_today_source_counts_use_two_plural_resources(self) -> None:
-        relative = "android/app/src/main/java/com/noop/ui/TodayScreen.kt"
+        relative = "android/app/src/main/java/com/pulse/ui/TodayScreen.kt"
         source = audit._mask_comments((ROOT / relative).read_text(encoding="utf-8"))
         self.assertIn("R.plurals.today_source_days", source)
         self.assertIn("R.plurals.today_source_workouts", source)
         self.assertNotIn("R.string.today_source_counts", source)
 
     def test_android_analytics_stays_free_of_ui_resources(self) -> None:
-        source = (ROOT / "android/app/src/main/java/com/noop/analytics/ReadinessEngine.kt").read_text(encoding="utf-8")
-        self.assertNotIn("com.noop.R", source)
+        source = (ROOT / "android/app/src/main/java/com/pulse/analytics/ReadinessEngine.kt").read_text(encoding="utf-8")
+        self.assertNotIn("com.pulse.R", source)
         self.assertNotIn("androidx.annotation.StringRes", source)
         self.assertIn("enum class Copy", source)
 
@@ -325,7 +325,7 @@ class HomeLocalizationTest(unittest.TestCase):
         self.assertEqual({}, {key: (strings.get(key), value) for key, value in expected.items() if strings.get(key) != value})
 
     def test_android_today_chrome_and_click_labels_are_resource_backed(self) -> None:
-        relative = "android/app/src/main/java/com/noop/ui/TodayScreen.kt"
+        relative = "android/app/src/main/java/com/pulse/ui/TodayScreen.kt"
         source = audit._mask_comments((ROOT / relative).read_text(encoding="utf-8"))
         patterns = {
             "raw SectionHeader/Overline": re.compile(r"\b(?:SectionHeader|Overline)\s*\(\s*\""),
@@ -341,7 +341,7 @@ class HomeLocalizationTest(unittest.TestCase):
 
     def test_android_home_display_formatting_is_not_pinned_to_us_locale(self) -> None:
         display_files = ANDROID_INDIRECT_COPY_FILES | ANDROID_DISPLAY_HELPERS | {
-            "android/app/src/main/java/com/noop/ui/TodayScreen.kt",
+            "android/app/src/main/java/com/pulse/ui/TodayScreen.kt",
         }
         findings = []
         for relative in sorted(display_files):

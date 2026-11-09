@@ -18,7 +18,7 @@ A per-version notes file docs/releases/v<VER>.md may carry a YAML front-matter b
         pt-PT: "..."
         zh: "..."
     ---
-    # NOOP v<VER>
+    # Pulse v<VER>
     <the full release notes — the GitHub release body; the front-matter is stripped there>
 
 Running `Tools/appchangelog-gen.py docs/releases/v8.2.2.md` prepends the generated Release entry to
@@ -47,7 +47,7 @@ import pathlib
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-KT = ROOT / "android/app/src/main/java/com/noop/ui/AppChangelog.kt"
+KT = ROOT / "android/app/src/main/java/com/pulse/ui/AppChangelog.kt"
 SW = ROOT / "Strand/System/AppChangelog.swift"
 RES = ROOT / "android/app/src/main/res"
 

@@ -190,7 +190,7 @@ final class HealthWritebackTests: XCTestCase {
     /// stranded every prior record in Apple Health as unreachable duplicates after a re-pair.
     func testVitalKeyHasNoDeviceIdSegment() {
         let key = HealthWriteback.appleHealthVitalKey(metricId: "restingHeartRate", day: "2026-08-27")
-        XCTAssertEqual(key, "noop:restingHeartRate:2026-08-27")
+        XCTAssertEqual(key, "pulse:restingHeartRate:2026-08-27")
         // The key must be STABLE — no strap id, no hash, nothing that changes on a re-pair.
         XCTAssertFalse(key.contains("my-whoop"),
                        "the vital key must not embed a device id (#1503)")
@@ -199,7 +199,7 @@ final class HealthWritebackTests: XCTestCase {
     func testSleepKeyHasNoDeviceIdSegment() {
         let startTs = 1_700_000_000
         let key = HealthWriteback.appleHealthSleepKey(startTs: startTs)
-        XCTAssertEqual(key, "noop:sleep:1700000000")
+        XCTAssertEqual(key, "pulse:sleep:1700000000")
         XCTAssertFalse(key.contains("my-whoop"),
                        "the sleep key must not embed a device id (#1503)")
     }
@@ -207,7 +207,7 @@ final class HealthWritebackTests: XCTestCase {
     func testWorkoutKeyHasNoDeviceIdSegment() {
         let startTs = 1_700_000_000
         let key = HealthWriteback.appleHealthWorkoutKey(startTs: startTs)
-        XCTAssertEqual(key, "noop:workout:1700000000")
+        XCTAssertEqual(key, "pulse:workout:1700000000")
         XCTAssertFalse(key.contains("my-whoop"),
                        "the workout key must not embed a device id (#1503)")
     }
@@ -221,7 +221,7 @@ final class HealthWritebackTests: XCTestCase {
                         .hasPrefix(HealthWriteback.appleHealthWorkoutKeyPrefix))
         XCTAssertTrue(HealthWriteback.appleHealthWorkoutKey(startTs: 0)
                         .hasPrefix(HealthWriteback.appleHealthWorkoutKeyPrefix))
-        XCTAssertEqual(HealthWriteback.appleHealthWorkoutKeyPrefix, "noop:workout:")
+        XCTAssertEqual(HealthWriteback.appleHealthWorkoutKeyPrefix, "pulse:workout:")
     }
 
     /// The prefix must NOT match a sleep or vitals key, or the reconciliation would treat those as

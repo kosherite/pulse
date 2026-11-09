@@ -51,13 +51,13 @@ struct AsleepDurationCard: View {
     var body: some View {
         let pts = data.points
         let avg = data.typicalTotalMin.map { $0 / 60.0 }
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Asleep duration", overline: "Trend")
             ChartCard(
                 title: "Hours asleep",
                 subtitle: String(localized: "Per night, trailing 30 days"),
                 trailing: avg.map { String(localized: "\(String(format: "%.1f", $0)) h avg") },
-                height: NoopMetrics.chartHeight,
+                height: PulseMetrics.chartHeight,
                 tint: StrandPalette.restColor,
                 chart: {
                     if pts.count >= 2 {
@@ -65,7 +65,7 @@ struct AsleepDurationCard: View {
                                    gradient: StrandPalette.restGradient,
                                    valueRange: Self.trendRange(pts),
                                    showsBars: true,
-                                   height: NoopMetrics.chartHeight,
+                                   height: PulseMetrics.chartHeight,
                                    valueFormat: { String(format: "%.1f h", $0) },
                                    accessibilityLabel: String(localized: "Hours asleep trend"))
                     } else {
@@ -100,7 +100,7 @@ struct AsleepDurationCard: View {
             .font(StrandFont.subhead)
             .foregroundStyle(StrandPalette.textTertiary)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .background(NoopPanelSurface(tint: StrandPalette.restColor, cornerRadius: 12))
+            .background(PulsePanelSurface(tint: StrandPalette.restColor, cornerRadius: 12))
     }
 
     /// Recent-half mean minus earlier-half mean (verbatim of `SleepView.durationTrendChange`). Direction
@@ -122,7 +122,7 @@ struct AsleepDurationCard: View {
             let sign = $0 >= 0 ? "+" : "−"
             return "\(sign)\(String(format: "%.1f h", abs($0)))"
         }
-        VStack(alignment: .leading, spacing: NoopMetrics.spaceHalf) {
+        VStack(alignment: .leading, spacing: PulseMetrics.spaceHalf) {
             Text("Trend")
                 .font(StrandFont.footnote)
                 .foregroundStyle(StrandPalette.textTertiary)

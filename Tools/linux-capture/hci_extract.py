@@ -1,10 +1,10 @@
 """Extract WHOOP BLE frames from a phone's Bluetooth HCI capture → capture.json.
 
-    btsnoop_hci.log / .pklg  →  hci_extract.py  →  capture.json  →  whoop-decode / correlate_ground_truth.py
+    btspulse_hci.log / .pklg  →  hci_extract.py  →  capture.json  →  whoop-decode / correlate_ground_truth.py
 
 Issue #103 asks 5/MG owners for an HCI capture of the OFFICIAL app doing a full history sync
-(iOS PacketLogger → `.pklg`, or Android Developer Options → Bluetooth HCI snoop log →
-`btsnoop_hci.log`). This tool turns such a capture into the same `capture.json` format that
+(iOS PacketLogger → `.pklg`, or Android Developer Options → Bluetooth HCI spulse log →
+`btspulse_hci.log`). This tool turns such a capture into the same `capture.json` format that
 `whoop_capture.py` writes, so the existing decode pipeline (`whoop-decode`, the parity tests,
 `correlate_ground_truth.py`) works on official-app traffic unchanged.
 
@@ -14,7 +14,7 @@ the output. (The input HCI log still contains them; share the JSON, not the log,
 
 Stdlib-only, like whoop_frame.py. Usage:
 
-    python3 hci_extract.py btsnoop_hci.log --out capture.json
+    python3 hci_extract.py btspulse_hci.log --out capture.json
     python3 hci_extract.py sync.pklg --family whoop5 --out capture.json
 """
 
@@ -28,8 +28,8 @@ import whoop_frame as wf
 
 # --- HCI log container parsing ---------------------------------------------------------------------
 
-# btsnoop timestamps are µs since year 0; this is the µs delta to the unix epoch (Wireshark's value).
-BTSNOOP_EPOCH_DELTA_US = 0x00E03AB44A676000
+# btspulse timestamps are µs since year 0; this is the µs delta to the unix epoch (Wireshark's value).
+BTSPULSE_EPOCH_DELTA_US = 0x00E03AB44A676000
 
 # HCI H4 packet-type bytes (prefixed on datalink 1002; synthesised from flags on 1001).
 H4_ACL = 0x02
@@ -39,18 +39,18 @@ PKLG_ACL_SENT = 0x02
 PKLG_ACL_RECV = 0x03
 
 
-def parse_btsnoop(data: bytes):
-    """Yield (ts_ms, direction, acl_bytes) for every ACL packet in a btsnoop file.
+def parse_btspulse(data: bytes):
+    """Yield (ts_ms, direction, acl_bytes) for every ACL packet in a btspulse file.
 
     direction: "tx" = host→controller (the phone app sending), "rx" = controller→host.
     Handles datalink 1001 (raw H1, type inferred from the flags word) and 1002 (H4, type byte
     prefixed). Command/event packets are skipped — frames ride on ACL only.
     """
-    if len(data) < 16 or data[:8] != b"btsnoop\x00":
-        raise ValueError("not a btsnoop file (bad magic)")
+    if len(data) < 16 or data[:8] != b"btspulse\x00":
+        raise ValueError("not a btspulse file (bad magic)")
     _version, datalink = struct.unpack(">II", data[8:16])
     if datalink not in (1001, 1002):
-        raise ValueError(f"unsupported btsnoop datalink {datalink}")
+        raise ValueError(f"unsupported btspulse datalink {datalink}")
     off = 16
     while off + 24 <= len(data):
         _orig, incl, flags, _drops, ts = struct.unpack(">IIIIq", data[off:off + 24])
@@ -59,7 +59,7 @@ def parse_btsnoop(data: bytes):
             break                                   # truncated capture — keep what we have
         pkt = data[off:off + incl]
         off += incl
-        ts_ms = (ts - BTSNOOP_EPOCH_DELTA_US) // 1000
+        ts_ms = (ts - BTSPULSE_EPOCH_DELTA_US) // 1000
         direction = "rx" if (flags & 1) else "tx"
         if datalink == 1002:
             if not pkt or pkt[0] != H4_ACL:
@@ -111,8 +111,8 @@ def load_hci(path: str):
     """Sniff the container format at `path` and yield (ts_ms, direction, acl_bytes)."""
     with open(path, "rb") as f:
         data = f.read()
-    if data[:8] == b"btsnoop\x00":
-        return parse_btsnoop(data)
+    if data[:8] == b"btspulse\x00":
+        return parse_btspulse(data)
     return parse_pklg(data)
 
 
@@ -282,8 +282,8 @@ def extract(packets, family: str):
 
 def main():
     p = argparse.ArgumentParser(
-        description="Extract WHOOP frames from an HCI capture (btsnoop / PacketLogger) to capture.json.")
-    p.add_argument("input", help="btsnoop_hci.log or .pklg file")
+        description="Extract WHOOP frames from an HCI capture (btspulse / PacketLogger) to capture.json.")
+    p.add_argument("input", help="btspulse_hci.log or .pklg file")
     p.add_argument("--family", choices=["whoop4", "whoop5"], default="whoop5",
                    help="strap generation for framing/CRC rules (default: whoop5)")
     p.add_argument("--out", default="capture.json", help="output JSON (default: capture.json)")

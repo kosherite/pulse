@@ -92,8 +92,8 @@ enum LiftSessionPersistence {
         }
     }
 
-    /// The single UserDefaults key (JSON-encoded `Snapshot`), namespaced like `noop.activeWorkout`.
-    static let defaultsKey = "noop.activeLiftSession"
+    /// The single UserDefaults key (JSON-encoded `Snapshot`), namespaced like `pulse.activeWorkout`.
+    static let defaultsKey = "pulse.activeLiftSession"
 
     // MARK: - Codec
 

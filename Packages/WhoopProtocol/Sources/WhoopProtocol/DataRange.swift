@@ -1,6 +1,6 @@
 import Foundation
 
-/// GET_DATA_RANGE frame parsing. Pure + byte-identical to the Kotlin twin `com.noop.protocol.DataRange`.
+/// GET_DATA_RANGE frame parsing. Pure + byte-identical to the Kotlin twin `com.pulse.protocol.DataRange`.
 ///
 /// Extracted from `BLEManager`/`WhoopBleClient` (#286 follow-up): the newest-record read gates automatic
 /// sync (`isFutureDatedNewest` → `BackfillPolicy`), so its value must stay byte-identical across platforms.

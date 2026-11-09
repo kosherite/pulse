@@ -21,7 +21,7 @@ final class ImportTraceEmitTests: XCTestCase {
     /// A minimal but valid WHOOP cycles CSV folder (two cycles, two days), written to a temp dir.
     private func makeWhoopFolder() throws -> URL {
         let dir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("noop-import-trace-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("pulse-import-trace-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let header = "Cycle start time,Cycle end time,Cycle timezone,Recovery score %,"
             + "Resting heart rate (bpm),Heart rate variability (ms),Asleep duration (min)\n"

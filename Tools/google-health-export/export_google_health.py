@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Export Google Health API data as an Apple Health `export.zip`.
 
-NOOP's `AppleHealthImporter` already ingests Apple Health exports (heart rate,
+Pulse's `AppleHealthImporter` already ingests Apple Health exports (heart rate,
 HRV, resting HR, SpO2, respiratory rate, sleep stages, workouts) into the same
 normalized model the recovery / strain / sleep analytics read. This tool fetches
 the equivalent Google Health API data types and writes them in that exact format,
-so a Google / Fitbit account can drive NOOP with no app changes.
+so a Google / Fitbit account can drive Pulse with no app changes.
 
-It maps Google Health data types to the HealthKit identifiers NOOP recognizes:
+It maps Google Health data types to the HealthKit identifiers Pulse recognizes:
 
     heart-rate                    -> HKQuantityTypeIdentifierHeartRate
     heart-rate-variability        -> HKQuantityTypeIdentifierHeartRateVariabilitySDNN (RMSSD, ms)
@@ -405,7 +405,7 @@ DATA_TYPES = [
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Export Google Health data as an Apple Health export.zip for NOOP.")
+    parser = argparse.ArgumentParser(description="Export Google Health data as an Apple Health export.zip for Pulse.")
     parser.add_argument("--days", type=int, default=14, help="Number of days back to export (default 14).")
     parser.add_argument("--end", help="End date YYYY-MM-DD (default today, UTC).")
     parser.add_argument("--out", default="export.zip", help="Output path (.zip or .xml). Default export.zip.")
@@ -465,7 +465,7 @@ def main() -> None:
 
     total = len(records)
     print(f"\nWrote {total} records ({sum(len(d) for d in [xml]) // 1024} KB XML) to {out_path}")
-    print("Import it into NOOP (Strand): File -> Import -> select this file.")
+    print("Import it into Pulse (Strand): File -> Import -> select this file.")
 
 
 if __name__ == "__main__":

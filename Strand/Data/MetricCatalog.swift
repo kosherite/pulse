@@ -23,7 +23,7 @@ struct MetricDescriptor: Identifiable, Hashable {
         case "apple-health": return "Apple Health"
         case "xiaomi-band":  return "Mi Band"
         case "nutrition-csv": return String(localized: "Nutrition")
-        case "noop-mood":    return String(localized: "Mood")
+        case "pulse-mood":    return String(localized: "Mood")
         default:             return "Whoop"   // "my-whoop" + on-device computed sources
         }
     }
@@ -164,7 +164,7 @@ enum MetricCatalog {
         // (`.metricSourced` / `todayStepsMetric`), which is what actually needs it.
         d("steps", String(localized: "Steps"), "Effort", "steps", "my-whoop", "figure.walk", 0, true),
         // On-device steps ESTIMATE for a WHOOP 4.0 (no real step count over BLE): the strap's daily
-        // motion volume scaled by a personal calibration. Stored under the computed "-noop" source, so
+        // motion volume scaled by a personal calibration. Stored under the computed "-pulse" source, so
         // it reads through the same exploreSeries fallback fitness_age/vitality use. Distinct from the
         // real "steps" above — labelled "(estimated)" so it's never mistaken for a measured count.
         d("steps_est", String(localized: "Steps (estimated)"), "Effort", "steps", "my-whoop", "figure.walk.motion", 0, true,
@@ -189,7 +189,7 @@ enum MetricCatalog {
         d("fat_g", String(localized: "Fat"), "Nutrition", "g", "nutrition-csv", "f.circle", 0, nil),
 
         // ── Mind (daily mood check-in, 1–5; non-clinical self-tracking)
-        d("mood", String(localized: "Mood"), "Mind", "/5", "noop-mood", "face.smiling", 0, true),
+        d("mood", String(localized: "Mood"), "Mind", "/5", "pulse-mood", "face.smiling", 0, true),
 
         // ── Mi Band (imported from Mi Fitness). Same metricSeries mechanism as Apple Health /
         //    Nutrition, so these light up Explore, Compare and the correlation scan. Distinct
@@ -213,7 +213,7 @@ enum MetricCatalog {
     static func inCategory(_ c: String) -> [MetricDescriptor] { all.filter { $0.category == c } }
 
     /// Explicit fused view for the rolling-average tile, not a replacement for source-specific entries.
-    static let combinedStepsSource = "noop-combined-steps"
+    static let combinedStepsSource = "pulse-combined-steps"
 
     static func metric(key: String, source: String) -> MetricDescriptor? {
         if key == "steps", source == combinedStepsSource {
@@ -234,7 +234,7 @@ enum MetricCatalog {
 
     /// #616: the calorie twin of `todayStepsMetric` — route the tapped detail to the source that MATCHES
     /// the value the tile shows (imported-first, like Android). The imported Apple-Health detail
-    /// (`active_kcal` / apple-health) when the day has an imported value, else NOOP's on-device HR-estimate
+    /// (`active_kcal` / apple-health) when the day has an imported value, else Pulse's on-device HR-estimate
     /// detail (`energy_kcal` / my-whoop, which `exploreSeries` fuses from `activeKcalEst`). Without this the
     /// Calories card always opened the imported-only detail, so an on-device (WHOOP 5.0) user with no import
     /// saw an empty/disagreeing chart. Defaults to the on-device detail when no import is present.

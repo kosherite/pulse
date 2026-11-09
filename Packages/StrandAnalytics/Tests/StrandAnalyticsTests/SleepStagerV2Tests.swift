@@ -38,7 +38,7 @@ final class SleepStagerV2Tests: XCTestCase {
 
     // MARK: - drop-in contract
 
-    /// bhelm/noop#67: the public entry accepts caller streams in any order. Binary-search clipping must not
+    /// bhelm/pulse#67: the public entry accepts caller streams in any order. Binary-search clipping must not
     /// run until timestamp order is established, otherwise this deterministic permutation drops valid rows.
     func testShuffledInputsMatchSortedInputs() {
         let start = 1_751_513_600

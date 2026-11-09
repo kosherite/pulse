@@ -4,10 +4,10 @@ import WhoopStore
 
 // Edit ONE exercise line of a program: which exercise, and the targets for it.
 //
-// NOOP SHIPS NO EXERCISE CATALOGUE — deliberately. The user types whatever they call the movement
+// Pulse SHIPS NO EXERCISE CATALOGUE — deliberately. The user types whatever they call the movement
 // and it is remembered in `liftExercise` with the muscle group they gave it, then offered back next
 // time. A shipped mapping of common exercises to muscles would be both a permanent maintenance
-// burden and a correctness claim NOOP has no business making about someone else's technique.
+// burden and a correctness claim Pulse has no business making about someone else's technique.
 //
 // Classification is therefore a one-time, few-second action per exercise: pick the primary muscle
 // (a direct set) and any secondaries (indirect, counted at half). It is asked once, on first use,
@@ -74,7 +74,7 @@ struct LiftProgramItemSheet: View {
             title: item == nil ? "Add exercise" : "Edit exercise",
             subtitle: "Type any name you like. Pulse remembers it, with the muscles you give it."
         ) {
-            VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
+            VStack(alignment: .leading, spacing: PulseMetrics.sectionGap) {
                 exerciseSection
                 LiftMusclePicker(primary: $primary, secondaries: $secondaries)
                 targetsSection
@@ -123,10 +123,10 @@ struct LiftProgramItemSheet: View {
     // MARK: - Exercise name + suggestions
 
     private var exerciseSection: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Exercise", overline: "Movement")
-            NoopCard {
-                VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+            PulseCard {
+                VStack(alignment: .leading, spacing: PulseMetrics.gap) {
                     TextField("Incline dumbbell press", text: $exercise)
                         .textFieldStyle(.plain)
                         .font(StrandFont.body)
@@ -169,11 +169,11 @@ struct LiftProgramItemSheet: View {
     // MARK: - Targets
 
     private var targetsSection: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Targets", overline: "What you're aiming for")
-            NoopCard {
+            PulseCard {
                 VStack(alignment: .leading, spacing: 14) {
-                    HStack(spacing: NoopMetrics.gap) {
+                    HStack(spacing: PulseMetrics.gap) {
                         field("Working sets") {
                             numberInput("4", text: $setsText, field: .sets)
                         }
@@ -181,7 +181,7 @@ struct LiftProgramItemSheet: View {
                             numberInput("8", text: $repsText, field: .reps)
                         }
                     }
-                    HStack(spacing: NoopMetrics.gap) {
+                    HStack(spacing: PulseMetrics.gap) {
                         field(weightLabel) {
                             numberInput("60", text: $weightText, field: .weight)
                         }
@@ -193,7 +193,7 @@ struct LiftProgramItemSheet: View {
                     // hardest a set should feel, so a lifter knows where to hold back. It is shown grey in
                     // the session and, like every other grey number, a set left unrated saves it
                     // (Utku, 16 Sep 2026; RULES 34) — typing a rating always wins.
-                    HStack(spacing: NoopMetrics.gap) {
+                    HStack(spacing: PulseMetrics.gap) {
                         field("Max RPE (1–10)") {
                             numberInput("8", text: $maxRpeText, field: .maxRpe)
                         }
@@ -218,9 +218,9 @@ struct LiftProgramItemSheet: View {
     }
 
     private var noteSection: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
+        VStack(alignment: .leading, spacing: PulseMetrics.gap) {
             SectionHeader("Technique note", overline: "In your words")
-            NoopCard {
+            PulseCard {
                 TextField("Slow eccentric, pause at the bottom", text: $note, axis: .vertical)
                     // A cue read between sets, and it renders directly above the set rows — every
                     // line pushes them down the screen.
@@ -248,10 +248,10 @@ struct LiftProgramItemSheet: View {
                 .foregroundStyle(StrandPalette.textSecondary)
             Spacer()
             Button("Save") { Task { await save() } }
-                .buttonStyle(.noopPrimary)
+                .buttonStyle(.pulsePrimary)
                 .frame(maxWidth: 160)
                 .disabled(!canSave)
-                .opacity(canSave ? 1 : NoopButtonMetrics.disabledOpacity)
+                .opacity(canSave ? 1 : PulseButtonMetrics.disabledOpacity)
                 .accessibilityLabel("Save exercise")
         }
     }

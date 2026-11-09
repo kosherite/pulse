@@ -1,5 +1,5 @@
 //  LiveSessionView.swift
-//  NOOP · Live Sessions (silent guardian) — the in-session screen + summary sheet.
+//  Pulse · Live Sessions (silent guardian) — the in-session screen + summary sheet.
 //
 //  Deliberately near-empty: one breathing ring, one line of intent, one honest Charge
 //  sentence that fades, an End button. The ring is the whole language — lit teal and
@@ -24,10 +24,10 @@ struct LiveSessionView: View {
     /// Low Power Mode / the in-app quiet-motion toggle. The guardian breath is a `repeatForever`
     /// animation that never settles, so it belongs behind the same gate as the liquid surfaces.
     /// The Android twin gated `LiveSessionScreen`'s breath under battery saver in #911.
-    @ObservedObject private var motion = NoopMotionState.shared
+    @ObservedObject private var motion = PulseMotionState.shared
 
     /// "Card transparency" (0–100, default 100): fades the live-session cards in lockstep with the frosted
-    /// cards; content stays readable. Mirrors Kotlin `NoopPrefs.cardOpacityPercent`.
+    /// cards; content stays readable. Mirrors Kotlin `PulsePrefs.cardOpacityPercent`.
     @AppStorage(CardAppearancePrefs.opacityKey) private var cardOpacityPercent = CardAppearancePrefs.defaultPercent
     private var cardOpacity: Double { max(0, min(1, Double(cardOpacityPercent) / 100)) }
 
@@ -55,25 +55,25 @@ struct LiveSessionView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-                .padding(.top, NoopMetrics.space6)
+                .padding(.top, PulseMetrics.space6)
             Spacer()
             ring
             Text(guardianLine)
                 .font(StrandFont.subhead)
                 .foregroundStyle(StrandPalette.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.top, NoopMetrics.space6)
-                .padding(.horizontal, NoopMetrics.space6)
+                .padding(.top, PulseMetrics.space6)
+                .padding(.horizontal, PulseMetrics.space6)
             chargeSentence
-                .padding(.top, NoopMetrics.space3)
-                .padding(.horizontal, NoopMetrics.space6)
+                .padding(.top, PulseMetrics.space3)
+                .padding(.horizontal, PulseMetrics.space6)
             Spacer()
-            NoopButton("End session", systemImage: "stop.fill", kind: .destructive, fullWidth: true) {
+            PulseButton("End session", systemImage: "stop.fill", kind: .destructive, fullWidth: true) {
                 endSession()
             }
         }
         .screenPadding()
-        .padding(.vertical, NoopMetrics.space6)
+        .padding(.vertical, PulseMetrics.space6)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(StrandPalette.surfaceBase.ignoresSafeArea())
         #if os(macOS)
@@ -113,7 +113,7 @@ struct LiveSessionView: View {
             Text("Silent guardian")
                 .font(StrandFont.overline).tracking(StrandFont.overlineTracking)
                 .foregroundStyle(StrandPalette.metricCyan)
-            HStack(spacing: NoopMetrics.space2) {
+            HStack(spacing: PulseMetrics.space2) {
                 Text("Live Session")
                     .font(StrandFont.title1).foregroundStyle(StrandPalette.textPrimary)
                 betaPill
@@ -171,7 +171,7 @@ struct LiveSessionView: View {
     }
 
     /// Breathing is the "on track" signal: only in band, only once active, never when anything is
-    /// asking for quiet (Reduce Motion, Low Power Mode, or "Reduce motion in NOOP").
+    /// asking for quiet (Reduce Motion, Low Power Mode, or "Reduce motion in Pulse").
     private var isBreathing: Bool {
         !motion.poseStill(reduceMotion)
             && runner.output?.status == .active
@@ -303,7 +303,7 @@ struct LiveSessionSummarySheet: View {
     private var cardOpacity: Double { max(0, min(1, Double(cardOpacityPercent) / 100)) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+        VStack(alignment: .leading, spacing: PulseMetrics.sectionSpacing) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Live session")
                     .font(StrandFont.overline).tracking(StrandFont.overlineTracking)
@@ -311,7 +311,7 @@ struct LiveSessionSummarySheet: View {
                 Text("Session summary")
                     .font(StrandFont.title1).foregroundStyle(StrandPalette.textPrimary)
             }
-            .padding(.top, NoopMetrics.space6)
+            .padding(.top, PulseMetrics.space6)
 
             Text(Self.verdict(row: row))
                 .font(StrandFont.body)
@@ -346,11 +346,11 @@ struct LiveSessionSummarySheet: View {
                     .frame(maxWidth: .infinity, alignment: .center)
             }
 
-            Spacer(minLength: NoopMetrics.space3)
-            NoopButton("Done", kind: .primary, fullWidth: true) { onDone() }
+            Spacer(minLength: PulseMetrics.space3)
+            PulseButton("Done", kind: .primary, fullWidth: true) { onDone() }
         }
         .screenPadding()
-        .padding(.vertical, NoopMetrics.space6)
+        .padding(.vertical, PulseMetrics.space6)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(StrandPalette.surfaceBase.ignoresSafeArea())
         #if os(macOS)
@@ -361,7 +361,7 @@ struct LiveSessionSummarySheet: View {
     // MARK: Rows
 
     private func bandRow(_ label: String, seconds: Double, tint: Color) -> some View {
-        HStack(spacing: NoopMetrics.rowSpacing) {
+        HStack(spacing: PulseMetrics.rowSpacing) {
             Circle().fill(tint).frame(width: 8, height: 8)
             Text(label).font(StrandFont.subhead).foregroundStyle(StrandPalette.textSecondary)
             Spacer()
@@ -372,10 +372,10 @@ struct LiveSessionSummarySheet: View {
     }
 
     private func summaryCard<V: View>(@ViewBuilder _ content: () -> V) -> some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.rowSpacing) { content() }
+        VStack(alignment: .leading, spacing: PulseMetrics.rowSpacing) { content() }
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(NoopPanelSurface(cornerRadius: 24, surfaceOpacity: cardOpacity))
+            .background(PulsePanelSurface(cornerRadius: 24, surfaceOpacity: cardOpacity))
     }
 
     private var cueLine: String {

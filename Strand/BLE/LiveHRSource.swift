@@ -12,7 +12,7 @@ import Foundation
 /// Every conformer owns its OWN `CBCentralManager` and never references `BLEManager`/`WhoopBleClient`
 /// (the WHOOP-first isolation each source already documents), so nothing here can regress the WHOOP path.
 ///
-/// Faithful twin of Android `com.noop.ble.LiveHrSource`.
+/// Faithful twin of Android `com.pulse.ble.LiveHrSource`.
 @MainActor
 protocol LiveHRSource: AnyObject {
     /// Discover and connect to the source's peripheral by scanning (the fallback when the registry row

@@ -50,7 +50,7 @@ this experiment. If deep-history capture is not already working, establish that 
 8. Tap **End experiment**. Leave frame recording enabled until the normal history sync has completed,
    because some v20 buffers may arrive after the physical phases.
 9. Tap **Export experiment…** and save the file. The share sheet suggests
-   `noop-whoop5-optical-experiment-<timestamp>.jsonl`; on the device the same content lives in
+   `pulse-whoop5-optical-experiment-<timestamp>.jsonl`; on the device the same content lives in
    `puffin-deepbuffers.jsonl`, because the markers are appended to the existing capture log rather
    than written separately. Either name holds the frames and the phase boundaries together — the
    analyzer only cares about the contents.
@@ -81,7 +81,7 @@ From the repository:
 
 ```bash
 cd Packages/WhoopProtocol
-swift run whoop-optical-experiment /path/to/noop-whoop5-optical-experiment-<timestamp>.jsonl \
+swift run whoop-optical-experiment /path/to/pulse-whoop5-optical-experiment-<timestamp>.jsonl \
   > optical-report.json
 ```
 

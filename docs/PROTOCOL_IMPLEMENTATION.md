@@ -1,4 +1,4 @@
-# NOOP implementation and historical observations
+# Pulse implementation and historical observations
 
 This page records client behavior and earlier observations; it does not override the topic references. Read the [scope and compatibility](PROTOCOL.md#scope-and-compatibility) before applying this page.
 
@@ -17,7 +17,7 @@ must not override it.
 
 ## Protocol contract to implementation map
 
-The protocol pages define the wire contracts; the tables below show where NOOP
+The protocol pages define the wire contracts; the tables below show where Pulse
 implements each one. Every code reference names both a file and a symbol, and CI
 checks that both continue to exist.
 
@@ -25,109 +25,109 @@ checks that both continue to exist.
 
 | Contract | Swift | Android | Note |
 |---|---|---|---|
-| [WHOOP 4 envelope](PROTOCOL_WHOOP4.md#whoop-4-envelope) | [verifyFrame(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift), [crc8(_:_:_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift), [crc32(_:_:_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift) | [Framing.frameCrcOk](../android/app/src/main/java/com/noop/protocol/Framing.kt), [Crc.crc8](../android/app/src/main/java/com/noop/protocol/Crc.kt), [Crc.crc32](../android/app/src/main/java/com/noop/protocol/Crc.kt) | CRC8 protects the length; CRC32 protects the inner record |
-| [WHOOP 5 format 1](PROTOCOL_TRANSPORT.md#format-1-framing) | [verifyFrame(_:family:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift), [crc16Modbus(_:_:_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift), [crc32(_:_:_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift) | [Framing.frameCrcOk](../android/app/src/main/java/com/noop/protocol/Framing.kt), [Crc.crc16Modbus](../android/app/src/main/java/com/noop/protocol/Crc.kt), [Crc.crc32](../android/app/src/main/java/com/noop/protocol/Crc.kt) | Format is selected before offsets or checksums |
-| [Fragment reassembly](PROTOCOL_TRANSPORT.md#format-1-framing) | [Reassembler](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift) | [Reassembler](../android/app/src/main/java/com/noop/protocol/Framing.kt) | One family-aware bounded buffer per connection |
-| [Response correlation](PROTOCOL_TRANSPORT.md#responses-and-correlation) | [parseFrame(_:family:collectFields:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift), [Whoop4ResponseResultTests](../Packages/WhoopProtocol/Tests/WhoopProtocolTests/Whoop4ResponseResultTests.swift) | [Framing.parseFrame](../android/app/src/main/java/com/noop/protocol/Framing.kt), [Whoop4ResponseResultTest](../android/app/src/test/java/com/noop/protocol/Whoop4ResponseResultTest.kt) | Origin sequence and result code are decoded separately |
-| [CLIENT_HELLO](PROTOCOL_WHOOP5.md#connection-and-frame-format) | [DeviceFamily.clientHello](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceFamily.swift) | [DeviceFamily.clientHello](../android/app/src/main/java/com/noop/protocol/DeviceFamily.kt) | Fixed frame is family metadata |
-| [WHOOP 4 bond and handshake](PROTOCOL_WHOOP4.md#bond-handshake--connect-lifecycle-whoop-40) | [peripheral(_:didWriteValueFor:error:)](../Strand/BLE/BLEManager.swift) | [onCharacteristicWrite](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt), [runConnectHandshake](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | Confirmed write establishes the client bond state |
+| [WHOOP 4 envelope](PROTOCOL_WHOOP4.md#whoop-4-envelope) | [verifyFrame(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift), [crc8(_:_:_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift), [crc32(_:_:_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift) | [Framing.frameCrcOk](../android/app/src/main/java/com/pulse/protocol/Framing.kt), [Crc.crc8](../android/app/src/main/java/com/pulse/protocol/Crc.kt), [Crc.crc32](../android/app/src/main/java/com/pulse/protocol/Crc.kt) | CRC8 protects the length; CRC32 protects the inner record |
+| [WHOOP 5 format 1](PROTOCOL_TRANSPORT.md#format-1-framing) | [verifyFrame(_:family:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift), [crc16Modbus(_:_:_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift), [crc32(_:_:_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift) | [Framing.frameCrcOk](../android/app/src/main/java/com/pulse/protocol/Framing.kt), [Crc.crc16Modbus](../android/app/src/main/java/com/pulse/protocol/Crc.kt), [Crc.crc32](../android/app/src/main/java/com/pulse/protocol/Crc.kt) | Format is selected before offsets or checksums |
+| [Fragment reassembly](PROTOCOL_TRANSPORT.md#format-1-framing) | [Reassembler](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift) | [Reassembler](../android/app/src/main/java/com/pulse/protocol/Framing.kt) | One family-aware bounded buffer per connection |
+| [Response correlation](PROTOCOL_TRANSPORT.md#responses-and-correlation) | [parseFrame(_:family:collectFields:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift), [Whoop4ResponseResultTests](../Packages/WhoopProtocol/Tests/WhoopProtocolTests/Whoop4ResponseResultTests.swift) | [Framing.parseFrame](../android/app/src/main/java/com/pulse/protocol/Framing.kt), [Whoop4ResponseResultTest](../android/app/src/test/java/com/pulse/protocol/Whoop4ResponseResultTest.kt) | Origin sequence and result code are decoded separately |
+| [CLIENT_HELLO](PROTOCOL_WHOOP5.md#connection-and-frame-format) | [DeviceFamily.clientHello](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceFamily.swift) | [DeviceFamily.clientHello](../android/app/src/main/java/com/pulse/protocol/DeviceFamily.kt) | Fixed frame is family metadata |
+| [WHOOP 4 bond and handshake](PROTOCOL_WHOOP4.md#bond-handshake--connect-lifecycle-whoop-40) | [peripheral(_:didWriteValueFor:error:)](../Strand/BLE/BLEManager.swift) | [onCharacteristicWrite](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt), [runConnectHandshake](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | Confirmed write establishes the client bond state |
 
 ### Identity
 
 | Contract | Swift | Android | Note |
 |---|---|---|---|
-| [Hello 35 serial window](PROTOCOL_WHOOP4.md#get_hello_harvard-35-response--the-whoop-40-serial) | [Whoop4HelloSerial.decode(payload:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop4HelloSerial.swift) | [Whoop4HelloSerial.decode](../android/app/src/main/java/com/noop/protocol/Whoop4HelloSerial.kt) | Reads only the fixed nine-byte window |
-| [Two-hello confirmation](PROTOCOL_WHOOP4.md#get_hello_harvard-35-response--the-whoop-40-serial) | [RepeatedSerialGate.offer(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop4HelloSerial.swift) | [RepeatedSerialGate.offer](../android/app/src/main/java/com/noop/protocol/Whoop4HelloSerial.kt) | Adoption waits for the same serial twice |
-| [DIS 5.0/MG resolver](PROTOCOL_WHOOP5.md#whoop-50-vs-mg--telling-the-hardware-apart) | [Whoop5Variant.from(serial:hardwareRevision:modelNumber:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5Variant.swift) | [Whoop5Variant.from](../android/app/src/main/java/com/noop/protocol/Whoop5Variant.kt) | Contradictory inputs resolve to unknown |
-| [Hello 145](PROTOCOL_TRANSPORT.md#hello--command-145) | [parseFrame(_:family:collectFields:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [Framing.parseFrame](../android/app/src/main/java/com/noop/protocol/Framing.kt) | Decodes device name and firmware version |
+| [Hello 35 serial window](PROTOCOL_WHOOP4.md#get_hello_harvard-35-response--the-whoop-40-serial) | [Whoop4HelloSerial.decode(payload:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop4HelloSerial.swift) | [Whoop4HelloSerial.decode](../android/app/src/main/java/com/pulse/protocol/Whoop4HelloSerial.kt) | Reads only the fixed nine-byte window |
+| [Two-hello confirmation](PROTOCOL_WHOOP4.md#get_hello_harvard-35-response--the-whoop-40-serial) | [RepeatedSerialGate.offer(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop4HelloSerial.swift) | [RepeatedSerialGate.offer](../android/app/src/main/java/com/pulse/protocol/Whoop4HelloSerial.kt) | Adoption waits for the same serial twice |
+| [DIS 5.0/MG resolver](PROTOCOL_WHOOP5.md#whoop-50-vs-mg--telling-the-hardware-apart) | [Whoop5Variant.from(serial:hardwareRevision:modelNumber:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5Variant.swift) | [Whoop5Variant.from](../android/app/src/main/java/com/pulse/protocol/Whoop5Variant.kt) | Contradictory inputs resolve to unknown |
+| [Hello 145](PROTOCOL_TRANSPORT.md#hello--command-145) | [parseFrame(_:family:collectFields:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [Framing.parseFrame](../android/app/src/main/java/com/pulse/protocol/Framing.kt) | Decodes device name and firmware version |
 
 ### Commands
 
 | Contract | Swift | Android | Note |
 |---|---|---|---|
-| [Curated sender enum](PROTOCOL_COMMANDS.md#canonical-command-matrix) | [WhoopCommand](../Strand/BLE/Commands.swift) | [CommandNumber](../android/app/src/main/java/com/noop/protocol/Enums.kt) | Sender surface is intentionally smaller than the decode catalogue |
-| [WHOOP 4 command builder](PROTOCOL_TRANSPORT.md#whoop-4-frame-and-response-procedure) | [WhoopCommand.frame(seq:payload:)](../Strand/BLE/Commands.swift) | [Framing.buildCommand](../android/app/src/main/java/com/noop/protocol/Framing.kt) | Builds type 35 with the WHOOP 4 envelope |
-| [WHOOP 5 command builder](PROTOCOL_TRANSPORT.md#format-1-framing) | [puffinCommandFrame(cmd:seq:payload:type:header:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift) | [Framing.puffinCommandFrame](../android/app/src/main/java/com/noop/protocol/Framing.kt) | Pads the inner record before checksums |
-| [Clock 8/9-byte forms](PROTOCOL_COMMANDS.md#whoop-4) | [setClockPayload(now:)](../Strand/BLE/BLEManager.swift), [setClockPayloadLegacy(now:)](../Strand/BLE/BLEManager.swift) | [setClockPayload](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt), [setClockPayloadLegacy](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | WHOOP 4 sends both accepted lengths |
-| [Alarm 9-byte body](PROTOCOL_ALARMS.md#scheduled-alarm-lifecycle-on-whoop-4) | [WhoopCommand.setAlarmPayload(epochSec:)](../Strand/BLE/Commands.swift) | [whoop4AlarmPayload](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | Two trailing bytes remain explicit |
-| [Advertising name](PROTOCOL_COMMANDS.md#whoop-4) | [WhoopCommand.advertisingNamePayload(_:)](../Strand/BLE/Commands.swift) | [renameStrap](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | WHOOP 4 only; client bytes are bounded |
-| [Haptic preset](PROTOCOL_ALARMS.md#immediate-whoop-4-haptics) | [MaverickHaptics.notificationBuzz(loops:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HapticPayloads.swift) | [maverickHapticBody](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | Android remaps the common request to the family body |
-| [Wrist and ECG controls](PROTOCOL_ECG.md#commands-and-independent-output-gates) | [Whoop5Ecg.selectWristPayload(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5Ecg.swift), [Whoop5Ecg.togglePayload(on:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5Ecg.swift) | [Whoop5Ecg.selectWristPayload](../android/app/src/main/java/com/noop/protocol/Whoop5Ecg.kt), [Whoop5Ecg.togglePayload](../android/app/src/main/java/com/noop/protocol/Whoop5Ecg.kt) | MG capability gate is separate from framing |
-| [Feature-flag and device-config probes](PROTOCOL_CONFIGURATION.md#named-configuration-interface) | [FeatureFlagProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/FeatureFlagProbe.swift), [DeviceConfigReadProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigReadProbe.swift) | [FeatureFlagProbe](../android/app/src/main/java/com/noop/protocol/FeatureFlagProbe.kt), [DeviceConfigReadProbe](../android/app/src/main/java/com/noop/protocol/DeviceConfigReadProbe.kt) | Read paths are bounded and namespace-aware |
-| [Reboot probe](PROTOCOL_COMMANDS.md#unsupported-and-cross-version-commands) | [RebootProbeVariant](../Strand/BLE/Commands.swift) | [RebootProbeVariant](../android/app/src/main/java/com/noop/protocol/Enums.kt) | User-initiated candidate set only |
-| [Send allowlist gate](PROTOCOL_COMMANDS.md#compatibility-status) | [send(_:payload:writeType:)](../Strand/BLE/BLEManager.swift), [DeviceConfigWriteGate.admitsSend(opcode:payload:ecgGateOptIn:isMG:broadcastHrOptIn:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigWriteGate.swift) | [send](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt), [DeviceConfigWriteGate.admitsSend](../android/app/src/main/java/com/noop/protocol/DeviceConfigWriteGate.kt) | Raw WHOOP 5 sends are checked before framing |
+| [Curated sender enum](PROTOCOL_COMMANDS.md#canonical-command-matrix) | [WhoopCommand](../Strand/BLE/Commands.swift) | [CommandNumber](../android/app/src/main/java/com/pulse/protocol/Enums.kt) | Sender surface is intentionally smaller than the decode catalogue |
+| [WHOOP 4 command builder](PROTOCOL_TRANSPORT.md#whoop-4-frame-and-response-procedure) | [WhoopCommand.frame(seq:payload:)](../Strand/BLE/Commands.swift) | [Framing.buildCommand](../android/app/src/main/java/com/pulse/protocol/Framing.kt) | Builds type 35 with the WHOOP 4 envelope |
+| [WHOOP 5 command builder](PROTOCOL_TRANSPORT.md#format-1-framing) | [puffinCommandFrame(cmd:seq:payload:type:header:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Framing.swift) | [Framing.puffinCommandFrame](../android/app/src/main/java/com/pulse/protocol/Framing.kt) | Pads the inner record before checksums |
+| [Clock 8/9-byte forms](PROTOCOL_COMMANDS.md#whoop-4) | [setClockPayload(now:)](../Strand/BLE/BLEManager.swift), [setClockPayloadLegacy(now:)](../Strand/BLE/BLEManager.swift) | [setClockPayload](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt), [setClockPayloadLegacy](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | WHOOP 4 sends both accepted lengths |
+| [Alarm 9-byte body](PROTOCOL_ALARMS.md#scheduled-alarm-lifecycle-on-whoop-4) | [WhoopCommand.setAlarmPayload(epochSec:)](../Strand/BLE/Commands.swift) | [whoop4AlarmPayload](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | Two trailing bytes remain explicit |
+| [Advertising name](PROTOCOL_COMMANDS.md#whoop-4) | [WhoopCommand.advertisingNamePayload(_:)](../Strand/BLE/Commands.swift) | [renameStrap](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | WHOOP 4 only; client bytes are bounded |
+| [Haptic preset](PROTOCOL_ALARMS.md#immediate-whoop-4-haptics) | [MaverickHaptics.notificationBuzz(loops:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HapticPayloads.swift) | [maverickHapticBody](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | Android remaps the common request to the family body |
+| [Wrist and ECG controls](PROTOCOL_ECG.md#commands-and-independent-output-gates) | [Whoop5Ecg.selectWristPayload(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5Ecg.swift), [Whoop5Ecg.togglePayload(on:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5Ecg.swift) | [Whoop5Ecg.selectWristPayload](../android/app/src/main/java/com/pulse/protocol/Whoop5Ecg.kt), [Whoop5Ecg.togglePayload](../android/app/src/main/java/com/pulse/protocol/Whoop5Ecg.kt) | MG capability gate is separate from framing |
+| [Feature-flag and device-config probes](PROTOCOL_CONFIGURATION.md#named-configuration-interface) | [FeatureFlagProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/FeatureFlagProbe.swift), [DeviceConfigReadProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigReadProbe.swift) | [FeatureFlagProbe](../android/app/src/main/java/com/pulse/protocol/FeatureFlagProbe.kt), [DeviceConfigReadProbe](../android/app/src/main/java/com/pulse/protocol/DeviceConfigReadProbe.kt) | Read paths are bounded and namespace-aware |
+| [Reboot probe](PROTOCOL_COMMANDS.md#unsupported-and-cross-version-commands) | [RebootProbeVariant](../Strand/BLE/Commands.swift) | [RebootProbeVariant](../android/app/src/main/java/com/pulse/protocol/Enums.kt) | User-initiated candidate set only |
+| [Send allowlist gate](PROTOCOL_COMMANDS.md#compatibility-status) | [send(_:payload:writeType:)](../Strand/BLE/BLEManager.swift), [DeviceConfigWriteGate.admitsSend(opcode:payload:ecgGateOptIn:isMG:broadcastHrOptIn:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigWriteGate.swift) | [send](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt), [DeviceConfigWriteGate.admitsSend](../android/app/src/main/java/com/pulse/protocol/DeviceConfigWriteGate.kt) | Raw WHOOP 5 sends are checked before framing |
 
 ### History
 
 | Contract | Swift | Android | Note |
 |---|---|---|---|
-| [Offload start](PROTOCOL_TRANSPORT.md#history-sequencing-and-storage-ownership) | [beginBackfill](../Strand/BLE/BLEManager.swift) | [beginBackfill](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | Start is connection- and state-gated |
-| [Offload abort](PROTOCOL_TRANSPORT.md#interruption-and-recovery) | [abortBackfill](../Strand/BLE/BLEManager.swift) | [abortBackfill](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | Abort does not advance trim |
-| [HISTORY_END decoder](PROTOCOL_WHOOP4.md#history_end-payload-layout) | [classifyHistoricalMeta(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HistoricalMeta.swift) | [classifyHistoricalMeta](../android/app/src/main/java/com/noop/protocol/HistoricalStreams.kt) | END and COMPLETE remain distinct states |
-| [ACK with end block](PROTOCOL_TRANSPORT.md#whoop-4-history-lifecycle) | [finishChunk(unix:trim:endFrame:)](../Strand/Collect/Backfiller.swift) | [finishChunk](../android/app/src/main/java/com/noop/ble/Backfiller.kt) | The exact eight-byte end block is retained |
-| [Safe-trim invariant](PROTOCOL_TRANSPORT.md#history-sequencing-and-storage-ownership) | [finishChunk(unix:trim:endFrame:)](../Strand/Collect/Backfiller.swift) | [finishChunk](../android/app/src/main/java/com/noop/ble/Backfiller.kt) | A failed durable write withholds the ACK |
-| [Persist before ACK](PROTOCOL_TRANSPORT.md#history-sequencing-and-storage-ownership) | [Backfiller](../Strand/Collect/Backfiller.swift) | [Backfiller](../android/app/src/main/java/com/noop/ble/Backfiller.kt) | Each platform owns its transaction ordering |
-| [Data range 34](PROTOCOL_TRANSPORT.md#data-range--command-34) | [DataRange.newestUnix(from:wallNowUnix:futureSkewSeconds:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DataRange.swift), [DataRange.oldestUnix(from:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DataRange.swift) | [DataRange.newestUnix](../android/app/src/main/java/com/noop/protocol/DataRange.kt), [DataRange.oldestUnix](../android/app/src/main/java/com/noop/protocol/DataRange.kt) | Bounds are decoded independently |
-| [Ring backlog](#get_data_range-ring-backlog-689-diagnostic-only) | [DataRange.pagesBehind(from:cmdOff:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DataRange.swift) | [DataRange.pagesBehind](../android/app/src/main/java/com/noop/protocol/DataRange.kt) | Both decode validated u32 ring pointers |
+| [Offload start](PROTOCOL_TRANSPORT.md#history-sequencing-and-storage-ownership) | [beginBackfill](../Strand/BLE/BLEManager.swift) | [beginBackfill](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | Start is connection- and state-gated |
+| [Offload abort](PROTOCOL_TRANSPORT.md#interruption-and-recovery) | [abortBackfill](../Strand/BLE/BLEManager.swift) | [abortBackfill](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | Abort does not advance trim |
+| [HISTORY_END decoder](PROTOCOL_WHOOP4.md#history_end-payload-layout) | [classifyHistoricalMeta(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HistoricalMeta.swift) | [classifyHistoricalMeta](../android/app/src/main/java/com/pulse/protocol/HistoricalStreams.kt) | END and COMPLETE remain distinct states |
+| [ACK with end block](PROTOCOL_TRANSPORT.md#whoop-4-history-lifecycle) | [finishChunk(unix:trim:endFrame:)](../Strand/Collect/Backfiller.swift) | [finishChunk](../android/app/src/main/java/com/pulse/ble/Backfiller.kt) | The exact eight-byte end block is retained |
+| [Safe-trim invariant](PROTOCOL_TRANSPORT.md#history-sequencing-and-storage-ownership) | [finishChunk(unix:trim:endFrame:)](../Strand/Collect/Backfiller.swift) | [finishChunk](../android/app/src/main/java/com/pulse/ble/Backfiller.kt) | A failed durable write withholds the ACK |
+| [Persist before ACK](PROTOCOL_TRANSPORT.md#history-sequencing-and-storage-ownership) | [Backfiller](../Strand/Collect/Backfiller.swift) | [Backfiller](../android/app/src/main/java/com/pulse/ble/Backfiller.kt) | Each platform owns its transaction ordering |
+| [Data range 34](PROTOCOL_TRANSPORT.md#data-range--command-34) | [DataRange.newestUnix(from:wallNowUnix:futureSkewSeconds:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DataRange.swift), [DataRange.oldestUnix(from:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DataRange.swift) | [DataRange.newestUnix](../android/app/src/main/java/com/pulse/protocol/DataRange.kt), [DataRange.oldestUnix](../android/app/src/main/java/com/pulse/protocol/DataRange.kt) | Bounds are decoded independently |
+| [Ring backlog](#get_data_range-ring-backlog-689-diagnostic-only) | [DataRange.pagesBehind(from:cmdOff:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DataRange.swift) | [DataRange.pagesBehind](../android/app/src/main/java/com/pulse/protocol/DataRange.kt) | Both decode validated u32 ring pointers |
 
 ### Records
 
 | Contract | Swift | Android | Note |
 |---|---|---|---|
-| [Type 40](PROTOCOL_SENSORS.md#whoop-4-realtime-heart-rate-record-type-40) | [registerPostHooks()](../Packages/WhoopProtocol/Sources/WhoopProtocol/PostHooks.swift) | [Framing.parseFrame](../android/app/src/main/java/com/noop/protocol/Framing.kt) | Live HR and R-R share the framed record path |
+| [Type 40](PROTOCOL_SENSORS.md#whoop-4-realtime-heart-rate-record-type-40) | [registerPostHooks()](../Packages/WhoopProtocol/Sources/WhoopProtocol/PostHooks.swift) | [Framing.parseFrame](../android/app/src/main/java/com/pulse/protocol/Framing.kt) | Live HR and R-R share the framed record path |
 | [Type 43 variants 1917/1921](PROTOCOL_SENSORS.md#whoop-4-realtime-raw-layouts-type-43) | [registerPostHooks()](../Packages/WhoopProtocol/Sources/WhoopProtocol/PostHooks.swift) | — | Swift selects the WHOOP 4 layout by payload length; Android does not dispatch type 43 |
-| [Type 47 v24/v25 and legacy layouts](PROTOCOL_SENSORS.md#whoop-4-historical-v25-and-unknown-versions) | [historicalLayoutSupport(version:observedLength:family:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HistoricalLayoutSupport.swift), [extractHistoricalStreams(_:deviceClockRef:wallClockRef:family:wallNow:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HistoricalStreams.swift) | [decodeHistorical](../android/app/src/main/java/com/noop/protocol/HistoricalStreams.kt), [extractHistoricalStreams](../android/app/src/main/java/com/noop/protocol/HistoricalStreams.kt) | Unknown layouts remain fail-closed |
-| [R18](PROTOCOL_SENSORS.md#r18-biometric-summary) | [decodeWhoop5Historical(_:fb:payloadEnd:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [decodeWhoop5Historical](../android/app/src/main/java/com/noop/protocol/HistoricalStreams.kt) | Biometric summary uses the versioned record decoder |
-| [R20](PROTOCOL_SENSORS.md#r20-optical-blocks) | [decodeWhoop5Historical(_:fb:payloadEnd:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [decodeWhoop5Historical](../android/app/src/main/java/com/noop/protocol/HistoricalStreams.kt) | Optical blocks are decoded by record version |
-| [R21](PROTOCOL_SENSORS.md#r21-six-axis-imu) | [decodeWhoop5HistoricalV2021(_:fb:version:payloadEnd:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [decodeWhoop5HistoricalV2021](../android/app/src/main/java/com/noop/protocol/HistoricalStreams.kt) | Six inertial channels use explicit offsets |
-| [R22 versions](PROTOCOL_SENSORS.md#r22-inner-version) | — | — | No NOOP R22 record decoder is implemented |
-| [R26](PROTOCOL_SENSORS.md#r26-compact-optical-window) | [decodeWhoop5HistoricalV26(_:fb:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [decodeWhoop5HistoricalV26](../android/app/src/main/java/com/noop/protocol/HistoricalStreams.kt) | Compact optical window has a dedicated layout |
-| [ECG R16/R17](PROTOCOL_ECG.md#routing-and-shared-header) | [Whoop5Ecg](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5Ecg.swift) | [Whoop5Ecg](../android/app/src/main/java/com/noop/protocol/Whoop5Ecg.kt) | Raw and filtered routes share the status header |
-| [IMU streams 51/52](PROTOCOL_SENSORS.md#dedicated-imu-stream-types-51-and-52) | [Whoop5RawImu.decode(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5RawImu.swift) | [Whoop5RawImu.decode](../android/app/src/main/java/com/noop/protocol/Whoop5RawImu.kt) | Dedicated buffers decode to six-axis samples |
-| [Battery 26](PROTOCOL_TRANSPORT.md#battery-level--command-26) | [parseFrame(_:family:collectFields:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift), [registerPostHooks()](../Packages/WhoopProtocol/Sources/WhoopProtocol/PostHooks.swift) | [Framing.parseFrame](../android/app/src/main/java/com/noop/protocol/Framing.kt) | WHOOP 4 uses u16/10; WHOOP 5 replies with four bytes, but both decoders currently use only the low byte |
-| [Battery pack 151](PROTOCOL_TRANSPORT.md#battery-pack--command-151) | [BatteryPackInfo.decode(frame:cmdOff:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/BatteryPackInfo.swift) | [BatteryPackInfo.decode](../android/app/src/main/java/com/noop/protocol/BatteryPackInfo.kt) | Reply and event forms share the record decoder |
-| [Extended battery event 63](PROTOCOL_TRANSPORT.md#whoop-4-battery-sources) | [registerPostHooks()](../Packages/WhoopProtocol/Sources/WhoopProtocol/PostHooks.swift) | [Framing.parseFrame](../android/app/src/main/java/com/noop/protocol/Framing.kt) | WHOOP 4 event fields are decoded separately from command 26 |
+| [Type 47 v24/v25 and legacy layouts](PROTOCOL_SENSORS.md#whoop-4-historical-v25-and-unknown-versions) | [historicalLayoutSupport(version:observedLength:family:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HistoricalLayoutSupport.swift), [extractHistoricalStreams(_:deviceClockRef:wallClockRef:family:wallNow:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HistoricalStreams.swift) | [decodeHistorical](../android/app/src/main/java/com/pulse/protocol/HistoricalStreams.kt), [extractHistoricalStreams](../android/app/src/main/java/com/pulse/protocol/HistoricalStreams.kt) | Unknown layouts remain fail-closed |
+| [R18](PROTOCOL_SENSORS.md#r18-biometric-summary) | [decodeWhoop5Historical(_:fb:payloadEnd:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [decodeWhoop5Historical](../android/app/src/main/java/com/pulse/protocol/HistoricalStreams.kt) | Biometric summary uses the versioned record decoder |
+| [R20](PROTOCOL_SENSORS.md#r20-optical-blocks) | [decodeWhoop5Historical(_:fb:payloadEnd:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [decodeWhoop5Historical](../android/app/src/main/java/com/pulse/protocol/HistoricalStreams.kt) | Optical blocks are decoded by record version |
+| [R21](PROTOCOL_SENSORS.md#r21-six-axis-imu) | [decodeWhoop5HistoricalV2021(_:fb:version:payloadEnd:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [decodeWhoop5HistoricalV2021](../android/app/src/main/java/com/pulse/protocol/HistoricalStreams.kt) | Six inertial channels use explicit offsets |
+| [R22 versions](PROTOCOL_SENSORS.md#r22-inner-version) | — | — | No Pulse R22 record decoder is implemented |
+| [R26](PROTOCOL_SENSORS.md#r26-compact-optical-window) | [decodeWhoop5HistoricalV26(_:fb:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift) | [decodeWhoop5HistoricalV26](../android/app/src/main/java/com/pulse/protocol/HistoricalStreams.kt) | Compact optical window has a dedicated layout |
+| [ECG R16/R17](PROTOCOL_ECG.md#routing-and-shared-header) | [Whoop5Ecg](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5Ecg.swift) | [Whoop5Ecg](../android/app/src/main/java/com/pulse/protocol/Whoop5Ecg.kt) | Raw and filtered routes share the status header |
+| [IMU streams 51/52](PROTOCOL_SENSORS.md#dedicated-imu-stream-types-51-and-52) | [Whoop5RawImu.decode(_:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Whoop5RawImu.swift) | [Whoop5RawImu.decode](../android/app/src/main/java/com/pulse/protocol/Whoop5RawImu.kt) | Dedicated buffers decode to six-axis samples |
+| [Battery 26](PROTOCOL_TRANSPORT.md#battery-level--command-26) | [parseFrame(_:family:collectFields:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/Interpreter.swift), [registerPostHooks()](../Packages/WhoopProtocol/Sources/WhoopProtocol/PostHooks.swift) | [Framing.parseFrame](../android/app/src/main/java/com/pulse/protocol/Framing.kt) | WHOOP 4 uses u16/10; WHOOP 5 replies with four bytes, but both decoders currently use only the low byte |
+| [Battery pack 151](PROTOCOL_TRANSPORT.md#battery-pack--command-151) | [BatteryPackInfo.decode(frame:cmdOff:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/BatteryPackInfo.swift) | [BatteryPackInfo.decode](../android/app/src/main/java/com/pulse/protocol/BatteryPackInfo.kt) | Reply and event forms share the record decoder |
+| [Extended battery event 63](PROTOCOL_TRANSPORT.md#whoop-4-battery-sources) | [registerPostHooks()](../Packages/WhoopProtocol/Sources/WhoopProtocol/PostHooks.swift) | [Framing.parseFrame](../android/app/src/main/java/com/pulse/protocol/Framing.kt) | WHOOP 4 event fields are decoded separately from command 26 |
 
 ### Configuration
 
 | Contract | Swift | Android | Note |
 |---|---|---|---|
-| [Named-key SET/GET 119–121/128](PROTOCOL_CONFIGURATION.md#named-configuration-interface) | [DeviceConfigReadProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigReadProbe.swift), [DeviceConfigWriteGate](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigWriteGate.swift) | [DeviceConfigReadProbe](../android/app/src/main/java/com/noop/protocol/DeviceConfigReadProbe.kt), [DeviceConfigWriteGate](../android/app/src/main/java/com/noop/protocol/DeviceConfigWriteGate.kt) | Writes require key-aware admission and readback |
-| [Feature-flag enumeration 117/118](PROTOCOL_CONFIGURATION.md#feature-flag-inventory) | [FeatureFlagProbe.parseStart(frame:family:namespace:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/FeatureFlagProbe.swift), [FeatureFlagProbe.parseNext(frame:family:namespace:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/FeatureFlagProbe.swift) | [FeatureFlagProbe.parseStart](../android/app/src/main/java/com/noop/protocol/FeatureFlagProbe.kt), [FeatureFlagProbe.parseNext](../android/app/src/main/java/com/noop/protocol/FeatureFlagProbe.kt) | Cursor walk is bounded |
-| [R22 disable sequence](PROTOCOL_CONFIGURATION.md#r22-version-preferences) | [R22DisableReport](../Packages/WhoopProtocol/Sources/WhoopProtocol/R22Disable.swift), [FeatureFlagWriteGate](../Packages/WhoopProtocol/Sources/WhoopProtocol/R22Disable.swift) | [R22DisableReport](../android/app/src/main/java/com/noop/protocol/R22Disable.kt), [FeatureFlagWriteGate](../android/app/src/main/java/com/noop/protocol/R22Disable.kt) | Clear writes are followed by per-key verification |
-| [AFE 61/62](PROTOCOL_CONFIGURATION.md#afe-parameters-6162) | [CommandNumber](../Packages/WhoopProtocol/Sources/WhoopProtocol/Resources/whoop_protocol.json) | [CommandNames](../android/app/src/main/java/com/noop/protocol/Enums.kt) | Decode catalogue only; no sender builder |
-| [Gyro 150/152](PROTOCOL_CONFIGURATION.md#gyro-mode-150152) | — | — | No NOOP sender or decoder is implemented |
-| [Collection policies 153/154](PROTOCOL_CONFIGURATION.md#collection-settings-and-overlapping-controls) | [CommandNumber](../Packages/WhoopProtocol/Sources/WhoopProtocol/Resources/whoop_protocol.json) | [CommandNames](../android/app/src/main/java/com/noop/protocol/Enums.kt) | Named in the decode catalogue; no sender builder |
+| [Named-key SET/GET 119–121/128](PROTOCOL_CONFIGURATION.md#named-configuration-interface) | [DeviceConfigReadProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigReadProbe.swift), [DeviceConfigWriteGate](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigWriteGate.swift) | [DeviceConfigReadProbe](../android/app/src/main/java/com/pulse/protocol/DeviceConfigReadProbe.kt), [DeviceConfigWriteGate](../android/app/src/main/java/com/pulse/protocol/DeviceConfigWriteGate.kt) | Writes require key-aware admission and readback |
+| [Feature-flag enumeration 117/118](PROTOCOL_CONFIGURATION.md#feature-flag-inventory) | [FeatureFlagProbe.parseStart(frame:family:namespace:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/FeatureFlagProbe.swift), [FeatureFlagProbe.parseNext(frame:family:namespace:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/FeatureFlagProbe.swift) | [FeatureFlagProbe.parseStart](../android/app/src/main/java/com/pulse/protocol/FeatureFlagProbe.kt), [FeatureFlagProbe.parseNext](../android/app/src/main/java/com/pulse/protocol/FeatureFlagProbe.kt) | Cursor walk is bounded |
+| [R22 disable sequence](PROTOCOL_CONFIGURATION.md#r22-version-preferences) | [R22DisableReport](../Packages/WhoopProtocol/Sources/WhoopProtocol/R22Disable.swift), [FeatureFlagWriteGate](../Packages/WhoopProtocol/Sources/WhoopProtocol/R22Disable.swift) | [R22DisableReport](../android/app/src/main/java/com/pulse/protocol/R22Disable.kt), [FeatureFlagWriteGate](../android/app/src/main/java/com/pulse/protocol/R22Disable.kt) | Clear writes are followed by per-key verification |
+| [AFE 61/62](PROTOCOL_CONFIGURATION.md#afe-parameters-6162) | [CommandNumber](../Packages/WhoopProtocol/Sources/WhoopProtocol/Resources/whoop_protocol.json) | [CommandNames](../android/app/src/main/java/com/pulse/protocol/Enums.kt) | Decode catalogue only; no sender builder |
+| [Gyro 150/152](PROTOCOL_CONFIGURATION.md#gyro-mode-150152) | — | — | No Pulse sender or decoder is implemented |
+| [Collection policies 153/154](PROTOCOL_CONFIGURATION.md#collection-settings-and-overlapping-controls) | [CommandNumber](../Packages/WhoopProtocol/Sources/WhoopProtocol/Resources/whoop_protocol.json) | [CommandNames](../android/app/src/main/java/com/pulse/protocol/Enums.kt) | Named in the decode catalogue; no sender builder |
 
 ### Alarms and haptics
 
 | Contract | Swift | Android | Note |
 |---|---|---|---|
-| [SET/GET/RUN/DISABLE 66–69](PROTOCOL_ALARMS.md#scheduled-alarm-lifecycle-on-whoop-4) | [armStrapAlarm(at:)](../Strand/BLE/BLEManager.swift), [getStrapAlarm()](../Strand/BLE/BLEManager.swift), [buzzStrapOnce()](../Strand/BLE/BLEManager.swift), [disableStrapAlarm()](../Strand/BLE/BLEManager.swift) | [armStrapAlarm](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt), [getStrapAlarm](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt), [buzzStrapOnce](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt), [disableStrapAlarm](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | BLE-client entry points select the family-specific payload revision |
-| [STOP 122](PROTOCOL_ALARMS.md#busy-execution-and-stop-completion) | [WhoopCommand.stopHaptics](../Strand/BLE/Commands.swift) | [stopHaptics](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | Stop is explicit on supported paths |
-| [Pattern 19/79](PROTOCOL_ALARMS.md#immediate-whoop-4-haptics) | [MaverickHaptics.notificationBuzz(loops:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HapticPayloads.swift), [WhoopCommand.runHapticsPattern](../Strand/BLE/Commands.swift) | [maverickHapticBody](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt), [CommandNumber.RUN_HAPTIC_PATTERN_MAVERICK](../android/app/src/main/java/com/noop/protocol/Enums.kt) | Common request is remapped for WHOOP 5/MG |
+| [SET/GET/RUN/DISABLE 66–69](PROTOCOL_ALARMS.md#scheduled-alarm-lifecycle-on-whoop-4) | [armStrapAlarm(at:)](../Strand/BLE/BLEManager.swift), [getStrapAlarm()](../Strand/BLE/BLEManager.swift), [buzzStrapOnce()](../Strand/BLE/BLEManager.swift), [disableStrapAlarm()](../Strand/BLE/BLEManager.swift) | [armStrapAlarm](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt), [getStrapAlarm](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt), [buzzStrapOnce](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt), [disableStrapAlarm](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | BLE-client entry points select the family-specific payload revision |
+| [STOP 122](PROTOCOL_ALARMS.md#busy-execution-and-stop-completion) | [WhoopCommand.stopHaptics](../Strand/BLE/Commands.swift) | [stopHaptics](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | Stop is explicit on supported paths |
+| [Pattern 19/79](PROTOCOL_ALARMS.md#immediate-whoop-4-haptics) | [MaverickHaptics.notificationBuzz(loops:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/HapticPayloads.swift), [WhoopCommand.runHapticsPattern](../Strand/BLE/Commands.swift) | [maverickHapticBody](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt), [CommandNumber.RUN_HAPTIC_PATTERN_MAVERICK](../android/app/src/main/java/com/pulse/protocol/Enums.kt) | Common request is remapped for WHOOP 5/MG |
 
 ### Updates and authorization
 
 | Contract | Swift | Android | Note |
 |---|---|---|---|
-| [Update and authorization boundaries](PROTOCOL_UPDATES.md) | — | — | NOOP has no installation path on either platform |
+| [Update and authorization boundaries](PROTOCOL_UPDATES.md) | — | — | Pulse has no installation path on either platform |
 
 ### Diagnostic probes
 
 | Contract | Swift | Android | Note |
 |---|---|---|---|
-| [Reboot 29/32](#whoop-4-reboot-probe-235) | [RebootProbeVariant](../Strand/BLE/Commands.swift) | [RebootProbeVariant](../android/app/src/main/java/com/noop/protocol/Enums.kt) | Candidate frames are user-selected |
-| [Body location 84](#body-location-probe-690) | [BodyLocationProbe.format(frame:cmdOff:isWhoop5:prevPayloadHex:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/BodyLocationProbe.swift) | [formatBodyLocationProbe](../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt) | Read-only formatted response |
-| [Feature flag 761](#feature-flag-enumeration-probe-761-read-only) | [FeatureFlagProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/FeatureFlagProbe.swift) | [FeatureFlagProbe](../android/app/src/main/java/com/noop/protocol/FeatureFlagProbe.kt) | Enumeration stops on bounds or terminal response |
-| [Device config 103](#device-config-read-probe-103-read-only) | [DeviceConfigReadProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigReadProbe.swift) | [DeviceConfigReadProbe](../android/app/src/main/java/com/noop/protocol/DeviceConfigReadProbe.kt) | Read-only namespace probe |
-| [Ring backlog 689](#get_data_range-ring-backlog-689-diagnostic-only) | [DataRange.pagesBehind(from:cmdOff:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DataRange.swift) | [DataRange.pagesBehind](../android/app/src/main/java/com/noop/protocol/DataRange.kt) | Diagnostic estimate, not a stored-record count |
+| [Reboot 29/32](#whoop-4-reboot-probe-235) | [RebootProbeVariant](../Strand/BLE/Commands.swift) | [RebootProbeVariant](../android/app/src/main/java/com/pulse/protocol/Enums.kt) | Candidate frames are user-selected |
+| [Body location 84](#body-location-probe-690) | [BodyLocationProbe.format(frame:cmdOff:isWhoop5:prevPayloadHex:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/BodyLocationProbe.swift) | [formatBodyLocationProbe](../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt) | Read-only formatted response |
+| [Feature flag 761](#feature-flag-enumeration-probe-761-read-only) | [FeatureFlagProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/FeatureFlagProbe.swift) | [FeatureFlagProbe](../android/app/src/main/java/com/pulse/protocol/FeatureFlagProbe.kt) | Enumeration stops on bounds or terminal response |
+| [Device config 103](#device-config-read-probe-103-read-only) | [DeviceConfigReadProbe](../Packages/WhoopProtocol/Sources/WhoopProtocol/DeviceConfigReadProbe.swift) | [DeviceConfigReadProbe](../android/app/src/main/java/com/pulse/protocol/DeviceConfigReadProbe.kt) | Read-only namespace probe |
+| [Ring backlog 689](#get_data_range-ring-backlog-689-diagnostic-only) | [DataRange.pagesBehind(from:cmdOff:)](../Packages/WhoopProtocol/Sources/WhoopProtocol/DataRange.swift) | [DataRange.pagesBehind](../android/app/src/main/java/com/pulse/protocol/DataRange.kt) | Diagnostic estimate, not a stored-record count |
 
 <a id="whoop-4-implementation-boundary"></a>
 
 ## WHOOP 4
 
-WHOOP 4 behavior is version-scoped. NOOP implementation, observed wire bytes,
+WHOOP 4 behavior is version-scoped. Pulse implementation, observed wire bytes,
 command acknowledgement, persisted state and physical device effects are separate
 facts. For example, the seven-byte semantic alarm body is implemented with two
 additional unevaluated zero bytes observed in working requests, while acknowledgement
@@ -145,8 +145,8 @@ alone still does not prove a scheduled physical buzz.
 | History | Commit rows, rejected layouts and cursor before acknowledging the exact eight-byte END block |
 | Battery | Prefer proprietary command/event observations over the standard Battery Service stub |
 | Configuration | Keep request acceptance, readback, producer activity and persistence as separate facts |
-| Alarms | Use the seven-byte revision-1 SET body; NOOP appends the two unevaluated zero bytes observed in working requests. Readback is diagnostic and recurrence remains application-owned |
-| Updates | NOOP has no documented or authorized installation/flash path |
+| Alarms | Use the seven-byte revision-1 SET body; Pulse appends the two unevaluated zero bytes observed in working requests. Readback is diagnostic and recurrence remains application-owned |
+| Updates | Pulse has no documented or authorized installation/flash path |
 
 ### Fail-closed and preserve-raw behavior
 
@@ -167,15 +167,15 @@ not relabelled as a proven version map.
 
 Incomplete areas include request/response bodies for many supported commands,
 record layouts for several revisions, the complete Nordic BLE/SPI contract,
-configuration storage, alarm lifecycle and update authorization/recovery. NOOP
+configuration storage, alarm lifecycle and update authorization/recovery. Pulse
 does not provide or authorize firmware installation.
 
-### NOOP connection policy
+### Pulse connection policy
 
-These are NOOP client choices around the [WHOOP 4 connect sequence](PROTOCOL_WHOOP4.md#bond-handshake--connect-lifecycle-whoop-40),
+These are Pulse client choices around the [WHOOP 4 connect sequence](PROTOCOL_WHOOP4.md#bond-handshake--connect-lifecycle-whoop-40),
 not protocol requirements.
 
-- NOOP marks the connection bonded once the confirmed `GET_BATTERY_LEVEL` write is
+- Pulse marks the connection bonded once the confirmed `GET_BATTERY_LEVEL` write is
   acknowledged, then runs the connect handshake.
 - The handshake runs exactly once per connection. Its one-shot guard
   (`connectHandshakeDone`) is load-bearing: the write-acknowledgement callback that
@@ -199,11 +199,11 @@ not protocol requirements.
 ## Diagnostic-only WHOOP service families
 
 Additional WHOOP service families use the same `0001` service plus
-`0002`/`0003`/`0004`/`0005`/`0007` characteristic pattern. NOOP lists these as protocol metadata and
+`0002`/`0003`/`0004`/`0005`/`0007` characteristic pattern. Pulse lists these as protocol metadata and
 logs them when advertised, but does not connect, discover characteristics, or send commands for them
 until the correct framing is mapped and hardware-tested.
 
-| Family label in NOOP | Service UUID | Current status |
+| Family label in Pulse | Service UUID | Current status |
 |----------------------|--------------|----------------|
 | `puffin1150` | `11500001-6215-11ee-8c99-0242ac120002` | detected but unsupported |
 | `monument` | `8a580001-2fe8-4796-9267-b87a2b0c8234` | detected but unsupported; likely Castle/Rev2 framing |
@@ -292,7 +292,7 @@ a placeholder header makes every rebuilt frame fail, so the rebuild now round-tr
 
 ## PacketType (offset `[4]`, or `[8]` on WHOOP 5/MG)
 
-This is NOOP’s schema vocabulary, not a guarantee that every named packet is produced by either generation. Current WHOOP 5/MG layouts are in [sensor records](PROTOCOL_SENSORS.md).
+This is Pulse’s schema vocabulary, not a guarantee that every named packet is produced by either generation. Current WHOOP 5/MG layouts are in [sensor records](PROTOCOL_SENSORS.md).
 
 Source: `enums.PacketType` in `whoop_protocol.json`; resolved by `Schema.typeName(_:)`.
 
@@ -337,7 +337,7 @@ identify every live sensor or ECG packet. See [sensor records](PROTOCOL_SENSORS.
 WHOOP 4 `EVENT` frames carry an `EventNumber` at `[6]` and a `u32` `event_timestamp` at `[8]`.
 For WHOOP 5/MG format 1 the corresponding offsets are `[10]` and `[12]`; other event
 types need their own layouts. See [sensor/event records](PROTOCOL_SENSORS.md). A
-strap-pushed event is WHOOP's "strap-as-clock" signal: NOOP treats any event as "I may have new
+strap-pushed event is WHOOP's "strap-as-clock" signal: Pulse treats any event as "I may have new
 data" and kicks a rate-limited sync (`FrameRouter.onSyncTrigger` → `requestSync(.strap)`).
 Selected, frequently-used values (full table in `whoop_protocol.json`):
 
@@ -369,13 +369,13 @@ The legacy WHOOP 4 `BATTERY_LEVEL` event decoder uses this layout (see the `even
 
 ## CommandNumber (sending) — client subset
 
-**Non-exhaustive historical NOOP sender selection.** The table below records client
+**Non-exhaustive historical Pulse sender selection.** The table below records client
 payload conventions, primarily WHOOP 4. It is not a complete inventory, the WHOOP
 5/MG command contract or a recommendation to send every listed operation. Use the
 [command reference](PROTOCOL_COMMANDS.md) for current meanings and the [alarm reference](PROTOCOL_ALARMS.md)
 for revisioned alarms.
 
-NOOP exposes a curated, **safe** command set in `WhoopCommand` (`../Strand/BLE/Commands.swift`).
+Pulse exposes a curated, **safe** command set in `WhoopCommand` (`../Strand/BLE/Commands.swift`).
 The raw value is the on-wire command byte at `[6]` (inside a type-35 `COMMAND` frame). Commands
 are built by `WhoopCommand.frame(seq:payload:)` and written to `…0002`.
 
@@ -390,7 +390,7 @@ public func frame(seq: UInt8, payload: [UInt8] = [0x00]) -> [UInt8] {
 
 | Code | Command | Typical payload | Purpose |
 |-----:|---------|-----------------|---------|
-| 3 | `TOGGLE_REALTIME_HR` | `[0x01]`/`[0x00]` | sent by NOOP outside the documented 41.17.6.0 command set; standard BLE HR remains separate |
+| 3 | `TOGGLE_REALTIME_HR` | `[0x01]`/`[0x00]` | sent by Pulse outside the documented 41.17.6.0 command set; standard BLE HR remains separate |
 | 7 | `REPORT_VERSION_INFO` | `[0x00]` | firmware versions (decoded by `command_response` hook) |
 | 10 | `SET_CLOCK` | `[secs u32 LE][subsecs u32 LE]` | request form observed in use outside the documented 41.17.6.0 command set; one of two forms can latch on some devices |
 | 11 | `GET_CLOCK` | *empty* or `[0x00]` | request forms observed in use outside the documented 41.17.6.0 command set; readback selects the effective form |
@@ -400,18 +400,18 @@ public func frame(seq: UInt8, payload: [UInt8] = [0x00]) -> [UInt8] {
 | 34 | `GET_DATA_RANGE` | `[0x00]` | strap's stored oldest/newest record range; #689 also logs a [diagnostic ring-buffer page backlog](#get_data_range-ring-backlog-689-diagnostic-only) |
 | 35 | `GET_HELLO_HARVARD` | `[0x00]` | identity/version hello; the response carries the [WHOOP 4 serial](PROTOCOL_WHOOP4.md#get_hello_harvard-35-response--the-whoop-40-serial) |
 | 63 | `SEND_R10_R11_REALTIME` | `[0x00]` off / `[0x01]` on | the **real** type-43 raw-stream switch |
-| 66 | `SET_ALARM_TIME` | `[0x01]+epoch u32 LE+subseconds u16 LE+[0,0]` (9-byte NOOP request) | seven semantic bytes; final two zero bytes are not evaluated |
+| 66 | `SET_ALARM_TIME` | `[0x01]+epoch u32 LE+subseconds u16 LE+[0,0]` (9-byte Pulse request) | seven semantic bytes; final two zero bytes are not evaluated |
 | 67 | `GET_ALARM_TIME` | `[0x01]` | read armed alarm |
 | 68 | `RUN_ALARM` | `[0x01]` | app-driven alarm now |
 | 69 | `DISABLE_ALARM` | `[0x01]` | disarm firmware alarm |
 | 76 | `GET_ADVERTISING_NAME_HARVARD` | `[0x00]` | advertised name |
-| 77 | `SET_ADVERTISING_NAME_HARVARD` | two reserved bytes + client name + NUL | NOOP allows up to 24 client bytes; the documented device field retains at most 15 and forces its last byte to NUL |
+| 77 | `SET_ADVERTISING_NAME_HARVARD` | two reserved bytes + client name + NUL | Pulse allows up to 24 client bytes; the documented device field retains at most 15 and forces its last byte to NUL |
 | 79 | `RUN_HAPTICS_PATTERN` | `[patternId, loops, 0,0,0]` | buzz a preset haptic pattern |
 | 81 / 82 | `START_RAW_DATA` / `STOP_RAW_DATA` | `[0x01]` | raw-data collection toggle |
 | 84 | `GET_BODY_LOCATION_AND_STATUS` | `[0x00]` | wrist/body-location status (read-only diagnostic probe, #690 — below) |
-| 96 / 97 | `ENTER_HIGH_FREQ_SYNC` / `EXIT_HIGH_FREQ_SYNC` | retained client `[0x00]` forms | NOOP uses 97 during watchdog recovery; these client forms do not replace the documented WHOOP 4 contracts |
+| 96 / 97 | `ENTER_HIGH_FREQ_SYNC` / `EXIT_HIGH_FREQ_SYNC` | retained client `[0x00]` forms | Pulse uses 97 during watchdog recovery; these client forms do not replace the documented WHOOP 4 contracts |
 | 98 | `GET_EXTENDED_BATTERY_INFO` | `[0x00]` | extended battery (mV etc.) |
-| 106 | `TOGGLE_IMU_MODE` | `[0x01]` | older one-byte NOOP form; the 41.17.6.0 SET contract is `[01, state]` |
+| 106 | `TOGGLE_IMU_MODE` | `[0x01]` | older one-byte Pulse form; the 41.17.6.0 SET contract is `[01, state]` |
 | 107 | `GET_IMU_DATA_STREAM` | `[0x01]` | reads stored IMU stream state on 41.17.6.0; the WHOOP 5/MG identifier `ENABLE_OPTICAL_DATA` does not describe this WHOOP 4 operation |
 | 117 | `START_FF_KEY_EXCHANGE` | `[0x01]` | the enumerated feature-name count (read-only enumeration probe, #761 — below) |
 | 118 | `SEND_NEXT_FF` | `[0x01]` | next feature-flag NAME (cursor, not index; read-only, #761 — below) |
@@ -435,7 +435,7 @@ sent to WHOOP 4.
 **WHOOP 5/MG raw-IMU sequence (hardware-verified):** command 106 accepting a write does not mean that the
 producer started. A bounded capture first sends `START_RAW_DATA` (81) `[0x01]`, then command 106 with
 the two-byte selector `[0x01, 0x01]`. Stop uses `STOP_RAW_DATA` (82) `[0x01]`, then command 106
-`[0x01, 0x00]`. The one-byte payload in the table is older NOOP behavior, not the
+`[0x01, 0x00]`. The one-byte payload in the table is older Pulse behavior, not the
 WHOOP 4 41.17.6.0 request contract. See
 [WHOOP 5/MG raw data capture](RAW_DATA_CAPTURE.md) for storage, history repair, and export semantics.
 
@@ -452,18 +452,18 @@ WHOOP 4 41.17.6.0 request contract. See
   forms was observed to latch; read back to confirm.
 
 **WHOOP 5/MG battery decoder boundaries:** command 26 returns a four-byte `u32le`
-whole-percent value, including four zero bytes on the documented error path. NOOP
-currently reads only the lowest byte. For command 151, NOOP divides the raw `u16le`
+whole-percent value, including four zero bytes on the documented error path. Pulse
+currently reads only the lowest byte. For command 151, Pulse divides the raw `u16le`
 charge field by 10 for display; that scale is a client convention, not a confirmed
 property of the wire value.
 
-> **Note on `ENTER_HIGH_FREQ_SYNC` (96):** current builds do **not** enter high-freq sync. NOOP
+> **Note on `ENTER_HIGH_FREQ_SYNC` (96):** current builds do **not** enter high-freq sync. Pulse
 > sends `EXIT_HIGH_FREQ_SYNC` (97) during watchdog recovery. Plain `SEND_HISTORICAL_DATA`
 > returns the type-47 store without it.
 
 ## Additional 5-class command numbers
 
-Command bytes present on a 5-class (MAVERICK) strap beyond the safe subset above. NOOP does not
+Command bytes present on a 5-class (MAVERICK) strap beyond the safe subset above. Pulse does not
 send these; they are recorded for completeness.
 
 | Code | Command | Purpose |
@@ -498,7 +498,7 @@ establish a feature gate or contradict the later version-bound mapping. See
 #891. The three reply frames are pinned as decode fixtures in `Whoop5CommandResponseTests` /
 `CommandCatalogueTest`.
 
-NOOP sends these only from the gated, hand-run MG ECG probe described in
+Pulse sends these only from the gated, hand-run MG ECG probe described in
 [ECG controls](PROTOCOL_ECG.md#commands-and-independent-output-gates) — never automatically, never on a plain WHOOP 5 or WHOOP 4, and only
 behind the Experimental opt-in plus a positively-identified MG. Existing probe implementation and
 older observations must be distinguished from the expanded contract.
@@ -515,7 +515,7 @@ current absence-of-support claims.
 ## Destructive commands — *do not send*
 
 These exist on the wire but are **deliberately excluded** from ordinary
-`WhoopCommand` use. They can wipe data, brick, or power-cycle the strap. NOOP must
+`WhoopCommand` use. They can wipe data, brick, or power-cycle the strap. Pulse must
 never send them, except command 32 through the narrowly scoped, user-confirmed
 WHOOP 4 probe described below.
 
@@ -537,9 +537,9 @@ family answering at 145–147 on MAVERICK. It is named by the schema and absent 
 both platforms; it was missing from this table, so nothing recorded that it must stay that way. (83
 `VERIFY_FIRMWARE_IMAGE` is part of the same flow but is not itself a write, and is likewise unsent.)
 
-**Two guarded restart paths in NOOP.** These client paths are not proof of retained state or completed restart for every device. Neither is ever sent automatically or on any connect/offload path.
+**Two guarded restart paths in Pulse.** These client paths are not proof of retained state or completed restart for every device. Neither is ever sent automatically or on any connect/offload path.
 
-- **`REBOOT_STRAP` (29)** — the normal Restart. NOOP already triggers a reboot today via
+- **`REBOOT_STRAP` (29)** — the normal Restart. Pulse already triggers a reboot today via
   `SET_ADVERTISING_NAME_HARVARD` (rename applies on reboot). In `WhoopCommand` as `rebootStrap`, sent only
   from the user-initiated, confirmation-gated "Restart strap" action (`BLEManager.rebootStrap()` /
   `WhoopBleClient.rebootStrap()`) (#166).
@@ -555,7 +555,7 @@ Everything else in this table stays out of the enum entirely.
 
 The documented 41.17.6.0 contract does not evaluate the body for either restart
 command: empty, `00` and `01` are equivalent, and an accepted request returns result 1.
-The NOOP probe (Test Centre → Connection, WHOOP 4 only) sends one candidate at a time:
+The Pulse probe (Test Centre → Connection, WHOOP 4 only) sends one candidate at a time:
 `REBOOT_STRAP(29)` empty, `POWER_CYCLE_STRAP(32)` empty,
 `REBOOT_STRAP(29)` with `[0x01]`, `POWER_CYCLE_STRAP(32)` with `[0x01]`, or
 `REBOOT_STRAP(29)` with `[0x00]`. It reuses the reboot watchdog so the strap log shows
@@ -579,13 +579,13 @@ after command, origin sequence and result; the raw grid is shown and the record 
 until a real 5/MG capture maps the offset. **Never** feeds wear detection, sleep gating, or scoring.
 Driven by `BLEManager.probeBodyLocationAndStatus()` / `WhoopBleClient.probeBodyLocationAndStatus()`;
 formatted by the pure `BodyLocationProbe` twin (Swift↔Kotlin byte-parity locked by a golden test).
-The layout is implemented independently in NOOP; unknown enum values remain raw.
+The layout is implemented independently in Pulse; unknown enum values remain raw.
 
 ## Feature-flag enumeration probe (#761, read-only)
 
 The probe’s older count model differs from the current u8 field; use the [named configuration interface](PROTOCOL_CONFIGURATION.md#named-configuration-interface).
 
-NOOP has always been able to WRITE a feature flag
+Pulse has always been able to WRITE a feature flag
 (`SET_FF_VALUE` / 120, the R22 unlock in `Whoop5Config`). The feature-name walk uses
 117 `START_FF_KEY_EXCHANGE` followed by repeated 118 `SEND_NEXT_FF`: **names, no
 values, nothing written.** `GET_FF_VALUE` (128) is
@@ -621,7 +621,7 @@ reply are logged beside the fields decoded from them. Driven by `BLEManager.prob
 allowlisted for 5/MG framing **only while a probe is in flight**; parsed + rendered by the pure
 `FeatureFlagProbe` / `FeatureFlagProbeReport` twins (Swift↔Kotlin byte-parity, unit-tested on synthetic
 frames). Result goes to a copyable dialog + the strap log; no storage. The field
-order and opcode numbers are implemented in NOOP and agree with that WHOOP 4
+order and opcode numbers are implemented in Pulse and agree with that WHOOP 4
 observation; unknown fields remain raw.
 **Historical probe scope:** the published comparison dump is a WHOOP 4 R19-era list.
 The reference-baseline enumeration commands and eligible-key inventory are now described in
@@ -629,7 +629,7 @@ The reference-baseline enumeration commands and eligible-key inventory are now d
 
 ## Device-config read probe (#103, read-only)
 
-The NOOP probe queries named values using commands 121 and 128, with a 64-round-trip
+The Pulse probe queries named values using commands 121 and 128, with a 64-round-trip
 client cap. It is user-triggered and reports to a dialog and strap log without
 persisting values. The allowlist restricts this path to reads; it does not send
 119 or 120. Swift/Kotlin implementations have constructed-frame checks.
@@ -641,7 +641,7 @@ measurement establish an entitlement or subscription gate.
 
 ## GET_DATA_RANGE ring backlog (#689, diagnostic only)
 
- Beyond the oldest/newest timestamps NOOP already
+ Beyond the oldest/newest timestamps Pulse already
 scans from a `GET_DATA_RANGE` reply, the app computes a ring-buffer page backlog from three u32s in the
 65-byte body (`01` followed by 16 `u32le` values): write page `W = V(2)`, acknowledged/trim boundary `D = V(3)`,
 ring capacity `T = V(5)`, where `V(i)` is the u32 at inner offset `i·4 + 3` (frame offsets `cmdOff + 12/16/24`
@@ -708,7 +708,7 @@ following records form the next chunk. An `END` with no accumulated records is *
 
 ## Safe-trim invariant
 
-NOOP sends the normal chunk acknowledgement only after local durability. This is a client persistence invariant; it does not prove all device read/erase behavior or exactly-once delivery. The Swift path in
+Pulse sends the normal chunk acknowledgement only after local durability. This is a client persistence invariant; it does not prove all device read/erase behavior or exactly-once delivery. The Swift path in
 `Backfiller.finishChunk(...)` is:
 
 ```
@@ -733,7 +733,7 @@ written `.withResponse`. A BLE write confirmation is not itself proof of physica
   52. Both exclude the live type-43 flood. If the strap goes silent, the session
   exits and resumes next time via the durable cursor.
 - **Swift-specific stuck detector** (`StuckStrapDetector`): after an offload, if the strap reports records newer
-  than NOOP's frontier (from `GET_DATA_RANGE`, parsed by `dataRangeNewestUnix(from:)`) **and**
+  than Pulse's frontier (from `GET_DATA_RANGE`, parsed by `dataRangeNewestUnix(from:)`) **and**
   that frontier has been frozen for the detector window, it flags `strapNeedsReboot` and attempts
   a defensive recovery (`EXIT_HIGH_FREQ_SYNC` + `SET_CLOCK`). Off-wrist / caught-up (strap not
   ahead) is **not** treated as stuck.
@@ -814,7 +814,7 @@ inherit a base layout and override only what changed. The streamed decode that f
 ## SpO₂ on WHOOP 5/MG — what the wire does and does not carry
 
 No dedicated SpO₂ read operation is identified in the current command reference.
-R18 byte 82 has no established physiological meaning. NOOP imports
+R18 byte 82 has no established physiological meaning. Pulse imports
 `blood_oxygen_pct` as a per-cycle value; that importer does not establish the
 vendor's aggregation or calibration algorithm. See the
 [raw-record interpretation limits](PROTOCOL_SENSORS.md).
@@ -839,9 +839,9 @@ vendor's aggregation or calibration algorithm. See the
 | `../Strand/BLE/FrameRouter.swift` | decode → `LiveState` (UI) |
 | `../Strand/BLE/StandardHeartRate.swift` | `0x2A37` HR/R-R parser |
 | `../Strand/Collect/Backfiller.swift` | historical-offload state machine + safe-trim invariant |
-| `../android/app/src/main/java/com/noop/protocol/Enums.kt` | Android command and event identifiers |
-| `../android/app/src/main/java/com/noop/protocol/Framing.kt` | Android family-aware framing and response decoding |
-| `../android/app/src/main/java/com/noop/ble/WhoopBleClient.kt` | Android BLE lifecycle, command sending and offload routing |
+| `../android/app/src/main/java/com/pulse/protocol/Enums.kt` | Android command and event identifiers |
+| `../android/app/src/main/java/com/pulse/protocol/Framing.kt` | Android family-aware framing and response decoding |
+| `../android/app/src/main/java/com/pulse/ble/WhoopBleClient.kt` | Android BLE lifecycle, command sending and offload routing |
 
 ---
 

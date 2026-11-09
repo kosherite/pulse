@@ -13,23 +13,23 @@ final class IntelligenceHealDeviceScopeTests: XCTestCase {
     private typealias IE = IntelligenceEngine
 
     func testRingIdIsInScope_theBug() {
-        // The exact #1248 shape: a WHOOP is primary (computed under "my-whoop-noop") and an Oura ring
+        // The exact #1248 shape: a WHOOP is primary (computed under "my-whoop-pulse") and an Oura ring
         // banks its own hypnogram under "oura-2H3B". The ring id MUST be swept, or its drift-duped
         // hypnograms survive forever.
-        let ids = IE.healDeviceIds(computedId: "my-whoop-noop", registeredIds: ["my-whoop", "oura-2H3B"])
-        XCTAssertEqual(ids, ["my-whoop", "my-whoop-noop", "oura-2H3B"])
+        let ids = IE.healDeviceIds(computedId: "my-whoop-pulse", registeredIds: ["my-whoop", "oura-2H3B"])
+        XCTAssertEqual(ids, ["my-whoop", "my-whoop-pulse", "oura-2H3B"])
         XCTAssertTrue(ids.contains("oura-2H3B"), "the ring id the computedId-only heal missed")
     }
 
     func testComputedIdAlwaysPresent_evenWithNoRegisteredDevices() {
         // A BLE-only install with an empty registry still heals its computed rows (the prior behaviour).
-        XCTAssertEqual(IE.healDeviceIds(computedId: "my-whoop-noop", registeredIds: []), ["my-whoop-noop"])
+        XCTAssertEqual(IE.healDeviceIds(computedId: "my-whoop-pulse", registeredIds: []), ["my-whoop-pulse"])
     }
 
     func testDeDuplicatesAndSortsDeterministically() {
         // computedId can also appear in the registry list; the union de-dups and sorts so the sweep order
         // is stable across runs and matches Kotlin's toSortedSet().
-        let ids = IE.healDeviceIds(computedId: "b-noop", registeredIds: ["oura-1", "b-noop", "a-whoop"])
-        XCTAssertEqual(ids, ["a-whoop", "b-noop", "oura-1"])
+        let ids = IE.healDeviceIds(computedId: "b-pulse", registeredIds: ["oura-1", "b-pulse", "a-whoop"])
+        XCTAssertEqual(ids, ["a-whoop", "b-pulse", "oura-1"])
     }
 }

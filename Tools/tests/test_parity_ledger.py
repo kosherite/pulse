@@ -25,7 +25,7 @@ class ParityLedgerTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.swift = self.root / "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift"
-        self.kotlin = self.root / "android/app/src/main/java/com/noop/analytics/Engine.kt"
+        self.kotlin = self.root / "android/app/src/main/java/com/pulse/analytics/Engine.kt"
         self.swift.parent.mkdir(parents=True)
         self.kotlin.parent.mkdir(parents=True)
 
@@ -178,7 +178,7 @@ class ParityLedgerTests(unittest.TestCase):
         self.assertEqual(1, code)
         self.assertIn("add-unpaired-function", output)
         self.assertIn("kotlin", output)
-        self.assertIn("android/app/src/main/java/com/noop/analytics/Engine.kt", output)
+        self.assertIn("android/app/src/main/java/com/pulse/analytics/Engine.kt", output)
         self.assertIn("aFreshlyInventedOneSidedHelper/1#1", output)
         self.assertIn("--refresh-derived", output)
         self.assertIn("platform-qualified authority identity", output)
@@ -235,12 +235,12 @@ class ParityLedgerTests(unittest.TestCase):
     def test_protocol_and_oura_source_pairs_are_in_inventory_scope(self) -> None:
         self.assertIn("Packages/WhoopProtocol/Sources/**/*.swift", parity_ledger.SWIFT_GLOBS)
         self.assertIn("Packages/OuraProtocol/Sources/**/*.swift", parity_ledger.SWIFT_GLOBS)
-        self.assertIn("android/app/src/main/java/com/noop/protocol/**/*.kt", parity_ledger.KOTLIN_GLOBS)
-        self.assertIn("android/app/src/main/java/com/noop/oura/**/*.kt", parity_ledger.KOTLIN_GLOBS)
+        self.assertIn("android/app/src/main/java/com/pulse/protocol/**/*.kt", parity_ledger.KOTLIN_GLOBS)
+        self.assertIn("android/app/src/main/java/com/pulse/oura/**/*.kt", parity_ledger.KOTLIN_GLOBS)
         self.write_clean_tree()
         scope = parity_ledger.build_compact_twin_map(self.root)["scope"]
         self.assertIn("Packages/StrandAnalytics/Sources", scope["swift_roots"])
-        self.assertIn("android/app/src/main/java/com/noop/analytics", scope["kotlin_roots"])
+        self.assertIn("android/app/src/main/java/com/pulse/analytics", scope["kotlin_roots"])
 
     def test_repo_wide_line_comment_reference_is_checked_outside_inventory(self) -> None:
         self.write_clean_tree()
@@ -303,7 +303,7 @@ class ParityLedgerTests(unittest.TestCase):
         swift_test.write_text(
             "final class WorkoutSourceTests { func testPreservingCapturedCarriesStepsFromOld() {} }\n"
         )
-        kotlin_test = self.root / "android/app/src/test/java/com/noop/ui/WorkoutEditingTest.kt"
+        kotlin_test = self.root / "android/app/src/test/java/com/pulse/ui/WorkoutEditingTest.kt"
         kotlin_test.parent.mkdir(parents=True)
         kotlin_test.write_text(
             "/** Twin of Swift `testPreservingCapturedCarriesStepsFromOld`. */\n"
@@ -426,7 +426,7 @@ public enum Engine {
         self.assertIn(
             (
                 "Packages/StrandAnalytics/Sources/StrandAnalytics/Engine.swift::claim/1#1",
-                "android/app/src/main/java/com/noop/analytics/Engine.kt::right/1#1",
+                "android/app/src/main/java/com/pulse/analytics/Engine.kt::right/1#1",
             ),
             pairs,
         )
@@ -860,7 +860,7 @@ enum SwiftTwo {
 
     def test_platform_database_schema_versions_are_not_parity_twins(self) -> None:
         swift = self.root / "Packages/WhoopStore/Sources/WhoopStore/WhoopStore.swift"
-        kotlin = self.root / "android/app/src/main/java/com/noop/data/WhoopDatabase.kt"
+        kotlin = self.root / "android/app/src/main/java/com/pulse/data/WhoopDatabase.kt"
         swift.parent.mkdir(parents=True)
         kotlin.parent.mkdir(parents=True)
         swift.write_text("public enum WhoopStore { public static let schemaVersion = 18 }\n")
@@ -871,7 +871,7 @@ enum SwiftTwo {
         self.assertNotIn(
             (
                 "Packages/WhoopStore/Sources/WhoopStore/WhoopStore.swift::schemaVersion",
-                "android/app/src/main/java/com/noop/data/WhoopDatabase.kt::SCHEMA_VERSION",
+                "android/app/src/main/java/com/pulse/data/WhoopDatabase.kt::SCHEMA_VERSION",
             ),
             pairs,
         )
@@ -897,7 +897,7 @@ fun Map<String, String>.extensionOnly(value: Int) = value
 fun production() = Alpha.collide(1, 2)
 """
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/EngineTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/EngineTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text("fun testIt() { Beta.collide(1); Map.extensionOnly(1) }\n")
         findings = [item for item in self.findings() if item.rule == "test-only-callsite"]
@@ -912,7 +912,7 @@ fun production() = Alpha.collide(1, 2)
 fun production() = Roller.roll(1)
 """
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/RollTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/RollTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text("fun testIt() { Roller.roll(1, 2, 3) }\n")
         texts = "\n".join(
@@ -926,7 +926,7 @@ fun production() = Roller.roll(1)
 fun unrelated() = Roller.roll(1)
 """
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/RollTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/RollTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text("fun testIt() { Roller.roll(1, 2, 3) }\n")
         texts = "\n".join(
@@ -942,7 +942,7 @@ fun unrelated() = Roller.roll(1)
         )
         sibling = self.kotlin.parent / "Sibling.kt"
         sibling.write_text("object Sibling { fun verdict(first: Int, second: Int) = first + second }\n")
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/VerdictTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/VerdictTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text("fun testIt() { Verdict.verdict(1); Sibling.verdict(1, 2) }\n")
         texts = "\n".join(
@@ -958,7 +958,7 @@ fun unrelated() = Roller.roll(1)
 fun production() = Over.pick(1)
 """
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/OverTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/OverTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text("fun testIt() { Over.pick(1, 2) }\n")
         texts = "\n".join(
@@ -973,7 +973,7 @@ object Assembler { val burst = Burst
     fun production(): Int { return burst.codesWithTimes(1, 2) } }
 """
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/BurstTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/BurstTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text("fun testIt() { Burst.codesWithTimes(1, 2, 3) }\n")
         texts = "\n".join(
@@ -988,7 +988,7 @@ object Assembler { val burst = Burst
 object Second { fun add(value: Int) = value }
 """
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/AddTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/AddTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text("fun testIt() { Second.add(1) }\n")
         texts = "\n".join(
@@ -1003,7 +1003,7 @@ object Second { fun add(value: Int) = value }
 fun production(value: Int) = "trace=${Trace.suffix(value)}"
 '''
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/TraceTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/TraceTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text("fun testIt() { Trace.suffix(1) }\n")
 
@@ -1023,7 +1023,7 @@ fun production(value: Int) =
     "outer ${run { if (value > 0) { "inner ${Trace.suffix(value)} noise=Trace.literalOnly(value) tab=\t dollar=\$" } else "none" }}"
 '''
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/TraceTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/TraceTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text(
             "fun testIt() { Trace.suffix(1); Trace.literalOnly(1) }\n"
@@ -1056,7 +1056,7 @@ fun production(value: String) {
 }
 '''
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/TargetTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/TargetTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text(
             """fun testIt(text: String) {
@@ -1095,7 +1095,7 @@ fun literal(value: Int): String {
 fun broken(value: Int) = "broken Trace.malformed(value)
 '''
         )
-        test_path = self.root / "android/app/src/test/java/com/noop/analytics/TraceTest.kt"
+        test_path = self.root / "android/app/src/test/java/com/pulse/analytics/TraceTest.kt"
         test_path.parent.mkdir(parents=True)
         test_path.write_text(
             "fun testIt() { Trace.literalOnly(1); Trace.malformed(1) }\n"
@@ -1123,7 +1123,7 @@ fun broken(value: Int) = "broken ${run { Trace.suffix(value) }
 
         self.assertEqual(
             [
-                "android/app/src/main/java/com/noop/analytics/Engine.kt:2: "
+                "android/app/src/main/java/com/pulse/analytics/Engine.kt:2: "
                 "malformed-kotlin-template: unterminated Kotlin string template"
             ],
             errors,

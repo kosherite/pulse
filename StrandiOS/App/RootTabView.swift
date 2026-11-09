@@ -14,14 +14,14 @@ struct RootTabView: View {
     /// `NavigationStack(path:)` — which is every primary tab in this file, bound deliberately so a tab
     /// root can pop and re-scroll. So this may well be inert on our structure, and defaulting ON would
     /// advertise a behaviour that never happens. Off until someone confirms it on an iOS 26 device.
-    /// The Coach master switch, under the same `noop.` key Android writes. Default ON, so every install
+    /// The Coach master switch, under the same `pulse.` key Android writes. Default ON, so every install
     /// that shipped with the tab is unchanged.
     ///
     /// Not tab chrome: with this off the AI is off. The tab goes, the Today launcher card goes, and the
     /// daily brief is cancelled, because the brief calls a provider from the BACKGROUND with no UI
     /// attached and would otherwise keep posting AI notifications for a feature the wearer switched off.
-    @AppStorage("noop.coachEnabled") private var coachEnabled = true
-    @AppStorage("noop.bottomBarAutoHide") private var bottomBarAutoHide = false
+    @AppStorage("pulse.coachEnabled") private var coachEnabled = true
+    @AppStorage("pulse.bottomBarAutoHide") private var bottomBarAutoHide = false
 
     /// The live gym session, owned at the app root — see `LiftSessionController`.
     @EnvironmentObject private var liftSession: LiftSessionController
@@ -33,7 +33,7 @@ struct RootTabView: View {
     /// Cross-screen navigation requests (e.g. Live → "Manage devices"). Devices isn't a tab — it lives
     /// behind the More list — so a request presents it as a sheet, matching the quick-action screens.
     @EnvironmentObject private var router: NavRouter
-    /// The scene-local receiver for actions chosen from NOOP's Home Screen icon menu.
+    /// The scene-local receiver for actions chosen from Pulse's Home Screen icon menu.
     @EnvironmentObject private var homeScreenQuickActions: HomeScreenQuickActionSceneDelegate
 
     /// Which quick-action screen the centre FAB is presenting (nil = sheet closed).
@@ -67,7 +67,7 @@ struct RootTabView: View {
 
     /// V8 liquid redesign is the default Today; the Settings toggle lets a user fall back to the classic
     /// Today if they prefer it (keyed identically to the SettingsView toggle). Default ON.
-    @AppStorage("noop.liquidTodayEnabled") private var liquidTodayEnabled = true
+    @AppStorage("pulse.liquidTodayEnabled") private var liquidTodayEnabled = true
 
     /// The Today tab root, honouring the liquid/classic preference.
     @ViewBuilder private var todayTabRoot: some View {
@@ -150,7 +150,7 @@ struct RootTabView: View {
         // #1841: the same "Hide bar when scrolling" preference Android drives its own bar with. Here the
         // system owns the behaviour — iOS 26's tab bar MINIMISES to a pill on scroll down rather than
         // sliding away entirely, so this is the platform's read of the same intent, not a copy of ours.
-        .noopTabBarAutoHide(bottomBarAutoHide)
+        .pulseTabBarAutoHide(bottomBarAutoHide)
             // Tab crossfade — README §Motion: ~240ms opacity swap between tab roots, global calm
             // easing cubic-bezier(0.22,1,0.36,1).
             .animation(.timingCurve(0.22, 1, 0.36, 1, duration: 0.24), value: selectedTab)
@@ -276,7 +276,7 @@ struct RootTabView: View {
                     .padding(.horizontal, 14)
                     // Clear the floating tab bar with the same constant every screen uses, or the
                     // session bar sits on top of the tab labels.
-                    .padding(.bottom, NoopMetrics.tabBarClearance)
+                    .padding(.bottom, PulseMetrics.tabBarClearance)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
@@ -457,7 +457,7 @@ struct RootTabView: View {
     // + system title-case section headers, so it didn't match any other page (which all use ScreenScaffold
     // + SectionHeader's UPPERCASE overline + the 28pt section rhythm). Rebuilt on the shared page chrome:
     // ScreenScaffold for the title1 "More" + subtitle, a `SectionHeader` overline per group, and the group's
-    // rows in a single grouped NoopCard with hairline dividers — the same row idiom Settings/Health use.
+    // rows in a single grouped PulseCard with hairline dividers — the same row idiom Settings/Health use.
     private func moreTab(path: Binding<NavigationPath>, scrollSignal: Int) -> some View {
         NavigationStack(path: path) {
             ScreenScaffold(title: "More", subtitle: "Everything else, one tap away",
@@ -490,10 +490,10 @@ struct RootTabView: View {
                     MoreRow("Data Sources", "externaldrive.fill", .dataSources)
                     MoreRow("Backup & Sync", "externaldrive.fill.badge.icloud", .backupSync)
                     // #155: HealthKit-free Apple Health path for sideloaded installs (Siri Shortcut
-                    // reads the opt-in Documents/noop_sync.txt drop file).
+                    // reads the opt-in Documents/pulse_sync.txt drop file).
                     MoreRow("Shortcuts Export", "square.and.arrow.up.fill", .shortcutsExport)
-                    // The plain 4.0 vs 5.0/MG capability grid — what NOOP reads live off each strap.
-                    MoreRow("Pulse Limitations", "list.bullet.rectangle", .noopLimitations)
+                    // The plain 4.0 vs 5.0/MG capability grid — what Pulse reads live off each strap.
+                    MoreRow("Pulse Limitations", "list.bullet.rectangle", .pulseLimitations)
                 }
                 moreSection("App") {
                     // #805/#811: the v7.3.1 #766 alarm consolidation moved Smart Alarm under a single
@@ -541,7 +541,7 @@ struct RootTabView: View {
     /// tappable header with a disclosure chevron; tapping it expands/collapses the grouped rows card.
     /// Insights + Body default open, Data + App default collapsed (the `expandedMoreSections` seed) so the
     /// list is shorter at rest without dropping a single row. The grouped card is unchanged: a single
-    /// `NoopCard` holding a `VStack(spacing: 0)` whose `MoreRow`s draw their own hairlines, clipped to the
+    /// `PulseCard` holding a `VStack(spacing: 0)` whose `MoreRow`s draw their own hairlines, clipped to the
     /// card's rounded shape so the last divider is trimmed inside the corners. Same idiom Settings/Health use.
     @ViewBuilder
     private func moreSection<Rows: View>(_ title: String,
@@ -580,12 +580,12 @@ struct RootTabView: View {
                 // Zero internal padding so each MoreRow owns its own comfortable insets + height; the rows
                 // supply their own hairline separators (drawn at the bottom of every row but the last via the
                 // divider overlay) so the group reads as one continuous grouped list, matching Settings/Health.
-                NoopCard(padding: 0) {
+                PulseCard(padding: 0) {
                     VStack(spacing: 0) { rows() }
                         // Clip the rows column to the card's rounded shape so the last row's bottom hairline is
                         // trimmed inside the corners (the card draws its surface in the BACKGROUND and doesn't
                         // clip content itself, so without this the final divider would run past the rounded edge).
-                        .clipShape(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: PulseMetrics.cardRadius, style: .continuous))
                 }
             }
         }
@@ -599,7 +599,7 @@ struct RootTabView: View {
 private enum MoreDestination: Hashable {
     case insightsHub, intelligence, coach, insights, explore, compare
     case live, workouts, liftLog, health, labBook, stress, breathe, intervals, rhythm
-    case fusedRecord, appleHealth, miBand, dataSources, backupSync, shortcutsExport, noopLimitations
+    case fusedRecord, appleHealth, miBand, dataSources, backupSync, shortcutsExport, pulseLimitations
     case alarms, automations, testCentre, siriShortcuts, powerSaving, settings
 
     @ViewBuilder var destination: some View {
@@ -623,7 +623,7 @@ private enum MoreDestination: Hashable {
         case .appleHealth:     AppleHealthView()
         case .miBand:          XiaomiBandView()
         case .dataSources:     DataSourcesView()
-        case .noopLimitations: NoopLimitationsView()
+        case .pulseLimitations: PulseLimitationsView()
         case .backupSync:      BackupSyncView()
         case .shortcutsExport: ShortcutExportSettingsView()
         case .alarms:          SmartAlarmView()
@@ -729,7 +729,7 @@ private struct QuickActionSheet: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(
-            NoopChromeSurface()
+            PulseChromeSurface()
                 .overlay(alignment: .top) {
                     // Gold hairline top edge per the bottom-sheet spec.
                     Rectangle()
@@ -759,7 +759,7 @@ private struct QuickActionSheet: View {
             }
             .padding(.vertical, 10)
             .padding(.horizontal, 12)
-            .background(NoopPanelSurface(cornerRadius: 14))
+            .background(PulsePanelSurface(cornerRadius: 14))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -780,7 +780,7 @@ private struct QuickActionSheet: View {
 /// changes a value, never the view's identity.
 extension View {
     @ViewBuilder
-    func noopTabBarAutoHide(_ enabled: Bool) -> some View {
+    func pulseTabBarAutoHide(_ enabled: Bool) -> some View {
         if #available(iOS 26.0, *) {
             // `.onScrollDown` minimises to a pill on downward scroll; `.never` pins it fully visible.
             self.tabBarMinimizeBehavior(enabled ? .onScrollDown : .never)

@@ -38,8 +38,8 @@
       "kotlin": ["MIGRATION_34_35", "DROP TABLE IF EXISTS `rawImuSample`"]
     },
     "session_bound_imu_file": {
-      "swift": ["ImuSessionFileStore", "segmentSeconds: Int64 = 30 * 60", "NOOPIMU2"],
-      "kotlin": ["ImuSessionFileStore", "SEGMENT_SECONDS = 30 * 60L", "NOOPIMU2"]
+      "swift": ["ImuSessionFileStore", "segmentSeconds: Int64 = 30 * 60", "PulseIMU2"],
+      "kotlin": ["ImuSessionFileStore", "SEGMENT_SECONDS = 30 * 60L", "PulseIMU2"]
     },
     "decoded_segment_export": {
       "swift": ["exportSegments", "imu/\\(segment.name)"],

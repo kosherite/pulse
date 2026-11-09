@@ -21,7 +21,7 @@ public struct WatchScoreSnapshot: Codable, Equatable, Sendable {
     /// `nil` and the watch shows a cal marker rather than a number.
     public var chargeCalibrating: Bool
 
-    /// Effort (strain) on NOOP's 0 to 100 axis. `nil` when there is no usable HR window for the day.
+    /// Effort (strain) on Pulse's 0 to 100 axis. `nil` when there is no usable HR window for the day.
     public var effort: Double?
     /// True when Effort is still calibrating. `effort` is `nil` while this is true.
     public var effortCalibrating: Bool
@@ -76,12 +76,12 @@ public struct WatchScoreSnapshot: Codable, Equatable, Sendable {
 
     /// The shared app group both the watch app and its complication read the snapshot from. Injected
     /// from the `APP_GROUP_ID` build setting (see project.yml) via the `AppGroupIdentifier` Info.plist
-    /// key on every target that touches it (NOOPiOS, NOOPWatch, NOOPWatchComplications), mirroring
+    /// key on every target that touches it (PulseiOS, PulseWatch, PulseWatchComplications), mirroring
     /// `WidgetSnapshot.suiteName` — this package builds standalone (`swift test`) with no host bundle,
     /// so the fallback below is the canonical upstream group and only applies there.
     public static let appGroupId: String = {
         Bundle.main.object(forInfoDictionaryKey: "AppGroupIdentifier") as? String
-            ?? "group.com.noopapp.noop"
+            ?? "group.com.pulseapp.pulse"
     }()
     /// The UserDefaults key the latest snapshot is stored under in the shared app group.
     public static let storageKey = "latestWatchSnapshot"
