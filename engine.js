@@ -530,6 +530,7 @@ class Store {
     }
     if (this.dirtyDays.size) this.version++;
     const changed = [...this.dirtyDays]; this.dirtyDays.clear();
+    if (this.onSaved && changed.length) this.onSaved(changed);
     return changed;
   }
   // per-second rows for one minute (strap rows replace live rows for the same second)
@@ -606,21 +607,145 @@ class Analysis {
   }
 }
 
+/* ------------------------------------------------------------------ sync between devices
+ * History is mirrored to a private GitHub repository the user owns: one gzipped file per day under days/,
+ * plus profile.json for the few settings that change the numbers. Each device merges what it finds with
+ * what it has, minute by minute, and pushes back anything the repository is missing. */
+const GZ = !!(root.CompressionStream && root.DecompressionStream && root.Response);
+const bytesToB64 = b => { let t = ""; for (let i = 0; i < b.length; i += 0x8000) t += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(t); };
+const b64ToBytes = t => { const bin = atob(t.replace(/\s/g, "")), b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i); return b; };
+const pipe = async (bytes, stream) => new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer());
+const richer = (a, b) => (a[15] || 0) > (b[15] || 0) || ((a[15] || 0) === (b[15] || 0) && (a[4] || 0) > (b[4] || 0));
+class Cloud {
+  constructor(p) { this.p = p; this.s = p.store; this.dirty = new Set(); this.skip = new Set(); this.status = { state: "off", note: "", done: 0, total: 0 }; }
+  conf() { return this.s.get("cloud") || null; }
+  init() {
+    this.dirty = new Set(this.s.get("cloud_dirty") || []);
+    this.s.onSaved = days => { if (!this.conf()) return; for (const d of days) if (!this.skip.has(d)) this.dirty.add(d); this.s.put("cloud_dirty", [...this.dirty]).catch(() => {}); };
+    if (this.conf()) { this.status.state = "idle"; this.sync(); }
+    setInterval(() => this.sync(), 15 * 60 * 1000);
+  }
+  view() { const c = this.conf(); return Object.assign({ repo: c ? c.repo : null, at: this.s.get("cloud_at") }, this.status); }
+  async api(c, path, opts = {}) {
+    const r = await fetch("https://api.github.com/repos/" + c.repo + path, Object.assign({}, opts, {
+      headers: { Authorization: "Bearer " + c.token, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } }));
+    if (!r.ok) { const e = new Error({ 401: "The access key was rejected", 403: "The access key can't do this (it needs Contents: Read and write)", 404: "Repository not found, or the key can't see it" }[r.status] || "GitHub error " + r.status); e.status = r.status; throw e; }
+    return r.json();
+  }
+  // Turn sync on. The repository must be private: this is health data.
+  async link(repo, token) {
+    repo = String(repo || "").trim().replace(/^https?:\/\/github\.com\//i, "").replace(/\.git$|\/$/g, ""); token = String(token || "").trim();
+    if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) throw new Error("Enter the repository as owner/name");
+    if (!token) throw new Error("Paste the access key");
+    const c = { repo, token }, info = await this.api(c, "");
+    if (!info.private) throw new Error("That repository is public. Make it private first");
+    c.branch = info.default_branch || "main";
+    await this.s.put("cloud", c); await this.s.put("cloud_state", {});
+    this.status = { state: "idle", note: "", done: 0, total: 0 };
+    return this.sync(true);
+  }
+  async unlink() {
+    for (const k of ["cloud", "cloud_state", "cloud_dirty", "cloud_at"]) await this.s.put(k, null);
+    this.dirty.clear(); this.status = { state: "off", note: "", done: 0, total: 0 };
+  }
+  sync(force) {
+    if (!this.conf() || !root.fetch) return Promise.resolve();
+    if (this.running) { this.again = this.again || !!force; return this.running; }
+    this.running = this._sync(force).catch(e => { this.status = { state: "error", note: e.message || String(e), done: 0, total: 0 }; })
+      .finally(() => { this.running = null; if (this.again) { this.again = false; this.sync(true); } });
+    return this.running;
+  }
+  async _sync(force) {
+    const c = this.conf(), state = Object.assign({}, this.s.get("cloud_state") || {}), today = localDay(now());
+    this.status = { state: "syncing", note: "Checking", done: 0, total: 0 };
+    let tree = [];
+    try { tree = (await this.api(c, "/git/trees/" + encodeURIComponent(c.branch) + "?recursive=1")).tree || []; }
+    catch (e) { if (e.status !== 404 && e.status !== 409) throw e; }                     // an empty repository has no tree yet
+    const remote = new Map(); let profile = null;
+    for (const f of tree) { const m = /^days\/(\d{4}-\d\d-\d\d)\.json(\.gz)?$/.exec(f.path); if (m) remote.set(m[1], f); else if (f.path === "profile.json") profile = f; }
+
+    const pulls = [...remote].filter(([d, f]) => state[d] !== f.sha).sort();
+    const pushes = () => this.s.dayKeys().filter(d => (this.dirty.has(d) || !state[d] || !remote.has(d)) && (d !== today || force || !state[d] || now() - (this.pushedToday || 0) > 600));
+    this.status.total = pulls.length + pushes().length;
+    for (const [day, f] of pulls) {
+      this.status.note = "Downloading"; 
+      const blob = await this.api(c, "/git/blobs/" + f.sha), bytes = b64ToBytes(blob.content);
+      const text = f.path.endsWith(".gz") ? new TextDecoder().decode(await pipe(bytes, new DecompressionStream("gzip"))) : new TextDecoder().decode(bytes);
+      const kept = await this.merge(day, JSON.parse(text));
+      state[day] = f.sha; if (kept) this.dirty.add(day); else this.dirty.delete(day);
+      this.status.done++; if (this.status.done % 5 === 0) await this.s.put("cloud_state", state);
+    }
+    for (const day of pushes()) {
+      this.status.note = "Uploading";
+      await this.s.load(day);
+      const rows = {}; for (const [t, r] of this.s.days.get(day) || []) rows[t] = r;
+      const raw = new TextEncoder().encode(JSON.stringify({ v: 1, cols: MIN_COLS, rows }));
+      const had = remote.get(day), path = had ? had.path : "days/" + day + (GZ ? ".json.gz" : ".json");
+      const body = path.endsWith(".gz") ? await pipe(raw, new CompressionStream("gzip")) : raw;
+      try {
+        const res = await this.api(c, "/contents/" + path, { method: "PUT", body: JSON.stringify({ message: "Pulse " + day, branch: c.branch, content: bytesToB64(body), sha: had ? had.sha : undefined }) });
+        state[day] = res.content.sha; remote.set(day, { path, sha: res.content.sha }); this.dirty.delete(day);
+        if (day === today) this.pushedToday = now();
+      } catch (e) { if (e.status !== 409 && e.status !== 422) throw e; }                // the other device got there first: merge on the next pass
+      this.status.done++; if (this.status.done % 5 === 0) await this.s.put("cloud_state", state);
+      this.s.evict();
+    }
+    await this.syncProfile(c, profile, state);
+    await this.s.put("cloud_state", state); await this.s.put("cloud_dirty", [...this.dirty]); await this.s.put("cloud_at", now());
+    this.status = { state: "idle", note: "", done: 0, total: 0 };
+  }
+  // Fold one day from the repository into this device. Returns true when this device holds minutes the repository lacks.
+  async merge(day, j) {
+    const map = MIN_COLS.map(k => (j.cols || MIN_COLS).indexOf(k)), theirs = new Map();
+    for (const r of Object.values(j.rows || {})) { const row = map.map(i => i < 0 ? null : r[i]); theirs.set(row[0], row); }
+    await this.s.load(day);
+    const mine = this.s.days.get(day) || new Map(); let kept = false;
+    for (const [t, row] of mine) { const o = theirs.get(t); if (!o || richer(row, o)) { kept = true; break; } }
+    let took = 0;
+    for (const [t, row] of theirs) { const o = mine.get(t); if (!o || richer(row, o)) { this.s.setMinute(row); took++; } }
+    if (took) { this.skip.add(day); try { this.p.an.invalidate(await this.s.saveDays()); } finally { this.skip.delete(day); } }
+    return kept;
+  }
+  // Age and card order: the newest change wins.
+  async syncProfile(c, file, state) {
+    const mineAt = this.s.get("profile_at") || 0; let theirsAt = -1;
+    if (file && state.__profile === file.sha) theirsAt = state.__profile_at || 0;
+    else if (file) {
+      const theirs = JSON.parse(new TextDecoder().decode(b64ToBytes((await this.api(c, "/git/blobs/" + file.sha)).content)));
+      theirsAt = theirs.at || 0;
+      if (theirsAt > mineAt) {
+        if (theirs.age && theirs.age !== this.p.conf().age) await this.p.setAge(theirs.age, true);
+        if (theirs.cards) await this.p.setCards(theirs.cards, true);
+        await this.s.put("profile_at", theirsAt);
+      }
+    }
+    if (mineAt > theirsAt) {
+      const body = new TextEncoder().encode(JSON.stringify({ age: this.p.conf().age, cards: this.s.get("cards") || null, at: mineAt }));
+      try {
+        const res = await this.api(c, "/contents/profile.json", { method: "PUT", body: JSON.stringify({ message: "Pulse profile", branch: c.branch, content: bytesToB64(body), sha: file ? file.sha : undefined }) });
+        state.__profile = res.content.sha; state.__profile_at = mineAt;
+      } catch (e) { if (e.status !== 409 && e.status !== 422) throw e; }
+    } else if (file) { state.__profile = file.sha; state.__profile_at = theirsAt; }
+  }
+}
+
 /* ------------------------------------------------------------------ the strap link (Web Bluetooth) */
 class Pulse {
   constructor() {
     this.store = new Store(); this.an = new Analysis(this.store); this.secMem = new Map();
-    this.st = { bpm: null, last: 0, battery: null, link: "disconnected", sync: "waiting", sync_pct: null, sync_note: "",
+    this.st = { bpm: null, last: 0, battery: null, link: "disconnected", sync: "waiting", sync_pct: null, sync_eta: null, sync_behind: null, sync_note: "",
       sync_seen: 0, clock_off: null, clock_read_at: 0, pack: null, charging: null, want_sync: false };
     this.live = [];                                  // [t, bpm] for the last hour, for the short charts
     this.seq = 10; this.reasm = new Map(); this.recs = []; this.queue = []; this.activity = 0; this.first = null; this.stats = null;
     this.pendingBad = [];                            // readings with a reset clock, waiting for an anchor
     this.dirtyMinutes = new Set(); this.timer = null; this.link = null;
+    this.cloud = new Cloud(this);
   }
   conf() { return Object.assign({ age: 30, since: "", sync_every: 15, target: "" }, this.store.get("conf", {})); }
   async init() {
     await this.store.open();
     this.pendingBad = this.store.get("pending_bad", []);
+    this.cloud.init();
     setInterval(() => this.flush(), 10000);
   }
   fresh() { return this.st.bpm != null && now() - this.st.last < 5; }
@@ -739,7 +864,7 @@ class Pulse {
       const idle = now() - this.activity;
       if (this.st.sync === "syncing" && idle > 20) {
         if (kicks < 3) { kicks++; this.startSync().catch(() => {}); }
-        else { this.logStats("stalled"); this.stats = null; Object.assign(this.st, { sync: "stalled", sync_pct: null }); stalledAt = now(); }
+        else { this.logStats("stalled"); this.stats = null; Object.assign(this.st, { sync: "stalled", sync_pct: null, sync_eta: null, sync_behind: null }); stalledAt = now(); }
       }
       // a link that says "connected" but has delivered nothing for 2 minutes (common after iOS pauses the page) is dead: rebuild it
       if (now() - (this.rx || 0) > 120 && now() - this.sessionAt > 120) { this.logStats("silent link"); this.stats = null; this.link.drop(); return; }
@@ -818,6 +943,10 @@ class Pulse {
         this.recs.push({ r });
         this.first = this.first || r.t;
         this.st.sync_pct = Math.min(99, Math.round(100 * (r.t - this.first) / Math.max(1, now() - this.first)));
+        // time left: the strap sends its history oldest first, so what remains is the stretch between this reading and now
+        const elapsed = now() - st.started, covered = r.t - this.first, behind = now() - r.t;
+        this.st.sync_behind = behind;
+        this.st.sync_eta = elapsed > 4 && covered > 120 ? Math.round(behind * elapsed / covered) : null;
       } else if (f[8] === T.META) {
         const [kind, end] = decodeMeta(f); this.activity = now();
         if (this.stats) this.stats.metas[kind] = (this.stats.metas[kind] || 0) + 1;
@@ -859,7 +988,8 @@ class Pulse {
         if (done) {
           this.logStats("done"); this.stats = null;
           await this.flush();
-          Object.assign(this.st, { sync: "synced", sync_pct: null }); this.histEdge = null;
+          Object.assign(this.st, { sync: "synced", sync_pct: null, sync_eta: null, sync_behind: null }); this.histEdge = null;
+          this.cloud.sync(true);
           if (!this.repairNote) this.st.sync_note = "";
           this.repairNote = null;
           await this.store.put("last_sync", now());
@@ -930,7 +1060,7 @@ class Pulse {
       const o = {}; for (const [t, r] of this.store.days.get(d) || []) o[t] = r; days[d] = o;
       this.store.evict();
     }
-    const kv = {}; for (const [k, v] of this.store.kv) kv[k] = v;
+    const kv = {}; for (const [k, v] of this.store.kv) if (!k.startsWith("cloud")) kv[k] = v;      // the access key never leaves this device
     return JSON.stringify({ pulse: 1, cols: MIN_COLS, days, kv, exported: now() });
   }
   async importBackup(text) {
@@ -988,9 +1118,14 @@ class Pulse {
     else if (!this.link || this.st.link === "disconnected") this.wake();
     else this.st.want_sync = true;
   }
-  async setAge(age) {
+  async setAge(age, fromCloud) {
     await this.store.put("conf", Object.assign(this.conf(), { age: Math.max(13, Math.min(100, Math.round(age) || 30)) }));
     this.an.cache = null; this.an.saved = {}; await this.store.put("analysis_v3", {});
+    if (!fromCloud) { await this.store.put("profile_at", now()); this.cloud.sync(); }
+  }
+  async setCards(cards, fromCloud) {
+    await this.store.put("cards", cards);
+    if (!fromCloud) { await this.store.put("profile_at", now()); this.cloud.sync(); }
   }
   snapshot(c, a) {
     const st = this.st, today = localDay(now());
@@ -1004,7 +1139,7 @@ class Pulse {
     const pack = st.pack && now() - st.pack.at < 900 ? st.pack : null;
     const lastWorkout = [...a.days].reverse().flatMap(d => [...(d.workouts || [])].reverse()).find(w => w.hrr != null) || null;
     return { live: this.fresh(), bpm: this.fresh() ? st.bpm : null, zone: this.fresh() ? zone(st.bpm) : null, link: st.link, step: this.inSession ? st.step : null,
-      battery: st.battery, pack, sync: st.sync, sync_pct: st.sync_pct, sync_seen: st.sync_seen, sync_note: st.sync_note,
+      battery: st.battery, pack, sync: st.sync, sync_pct: st.sync_pct, sync_eta: st.sync_eta, sync_behind: st.sync_behind, sync_seen: st.sync_seen, cloud: this.cloud.view(), sync_note: st.sync_note,
       clock_off: st.clock_off != null ? st.clock_off : this.store.get("clock_off"),
       last_sync: this.store.get("last_sync"), night: nightOut, night_today: !!night, base: { rhr: base("rhr"), hrv: base("hrv") }, day, lastWorkout };
   }
@@ -1032,7 +1167,7 @@ class Pulse {
     return { from: t0, to: t, gap: rng === "60" ? 30 : 90, points: pts };
   }
 }
-const VERSION = "1.0.1";
+const VERSION = "1.1.0";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const BT_CODES = { 1: "invalid handle", 2: "not permitted / invalid", 3: "write not permitted", 5: "insufficient authentication", 6: "request not supported", 13: "invalid length", 14: "unlikely error", 15: "insufficient encryption" };
 const errText = e => { const t = String(e && (e.message || e.name) || e || "unknown").replace(/^\w*Error:\s*/, "").trim();

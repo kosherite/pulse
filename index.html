@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon.png">
 <title>Pulse</title>
-<script src="engine.js?v=1.0.1"></script>
+<script src="engine.js?v=1.1.0"></script>
 <style>
 @font-face { font-family: Inter; font-weight: 400; font-display: swap; src: url(fonts/Inter-Regular.woff2) format("woff2"); }
 @font-face { font-family: Inter; font-weight: 500; font-display: swap; src: url(fonts/Inter-Medium.woff2) format("woff2"); }
@@ -224,6 +224,7 @@ tbody tr[aria-current="true"] td:first-child::before { content: ""; display: inl
 section[data-view="settings"] .sechead { margin-top: 26px; }
 section[data-view="settings"] .sechead:first-child, section[data-view="trends"] .sechead.first { margin-top: 0; }
 section[data-view="trends"] .sechead { margin-top: 22px; }
+.row > input.field { font: 500 16px var(--sans); color: var(--ink); background: var(--well); border: 0; border-radius: 10px; height: 36px; width: min(220px, 58vw); padding: 0 12px; text-align: left; }
 input.age { font: 600 16px var(--sans); color: var(--ink); background: var(--well); border: 0; border-radius: 10px; height: 36px; width: 64px; text-align: center; }
 details.row { display: block; }
 details.row summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 400; text-align: left; }
@@ -346,7 +347,20 @@ details.row p b { color: var(--ink); font-weight: 600; }
   <div class="sechead"><span>Profile</span></div>
   <div class="group"><div class="row"><span>Age</span><input class="age" id="age" type="number" inputmode="numeric" min="13" max="100" aria-label="Age"></div></div>
 
-  <div class="sechead"><span>Data</span><span class="secr">On this device only</span></div>
+  <div class="sechead"><span>Sync between devices</span><span class="secr" id="cloud-state">Off</span></div>
+  <div class="group" id="cloud-off">
+    <div class="row"><span>Repository</span><input class="field" id="cloud-repo" type="text" placeholder="owner/name" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Private GitHub repository"></div>
+    <div class="row"><span>Access key</span><input class="field" id="cloud-key" type="password" placeholder="github_pat_…" autocomplete="off" aria-label="GitHub access key"></div>
+    <div class="row actions"><button class="link" type="button" id="cloud-link">Turn on</button></div>
+  </div>
+  <div class="group" id="cloud-on" hidden>
+    <div class="row"><span>Repository</span><span id="cloud-name">--</span></div>
+    <div class="row"><span>Last synced</span><span id="cloud-at">--</span></div>
+    <div class="row actions"><button class="link" type="button" id="cloud-sync">Sync now</button><button class="link danger" type="button" id="cloud-unlink">Turn off</button></div>
+  </div>
+  <p class="note" id="cloud-note">Keeps the same history on every device through a private GitHub repository you own. The key stays on this device.</p>
+
+  <div class="sechead"><span>Data</span><span class="secr" id="data-where">On this device only</span></div>
   <div class="group">
     <div class="row"><span>History</span><span id="history">--</span></div>
     <div class="row actions"><button class="link" type="button" id="export">Export</button><button class="link" type="button" id="import">Import</button><button class="link danger" type="button" id="delete">Delete all</button></div>
@@ -459,8 +473,10 @@ document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => { ran
 press("ranges", "r", range);
 async function loadHeartRate() { await ready; const r = await P.heartRate(range); drawHeartRate(r.points, "Waiting for your strap", "bpm", { from: r.from, to: r.to, gap: r.gap }); }
 
+const howLong = sec => sec < 5400 ? Math.max(1, Math.round(sec / 60)) + " min" : sec < 172800 ? Math.round(sec / 3600) + " h" : Math.round(sec / 86400) + " days";
+const timeLeft = s => s.sync_eta != null ? (s.sync_eta < 50 ? "less than a minute left" : "about " + howLong(s.sync_eta) + " left") : s.sync_behind > 300 ? howLong(s.sync_behind) + " to catch up" : "";
 function syncText(s) {
-  return s.sync === "syncing" ? (s.sync_pct ? "Syncing " + s.sync_pct + "%" : s.sync_seen ? "Syncing · " + s.sync_seen.toLocaleString() + " received" : "Syncing")
+  return s.sync === "syncing" ? [s.sync_pct ? "Syncing " + s.sync_pct + "%" : "Syncing", timeLeft(s)].filter(Boolean).join(" · ")
     : s.sync === "synced" && s.last_sync ? "Synced " + ago(s.last_sync) : s.sync === "pairing" ? "Needs pairing" : s.sync === "stalled" ? "Sync paused, retrying" : "";
 }
 function renderToday(s) {
@@ -538,7 +554,7 @@ function buildCards() {
       if (action === "up" && at > 0) [order[at - 1], order[at]] = [order[at], order[at - 1]];
       if (action === "down" && at < order.length - 1) [order[at + 1], order[at]] = [order[at], order[at + 1]];
       if (action === "toggle") hide = hidden ? hide.filter(x => x !== k) : [...hide, k];
-      await P.store.put("cards", { order, hidden: hide }); buildCards();
+      await P.setCards({ order, hidden: hide }); buildCards();
     };
     box.append(el);
   });
@@ -651,7 +667,7 @@ async function loadReview() {
 
 /* ---- settings ---- */
 function renderSettings(s) {
-  const state = { syncing: "Syncing " + (s.sync_pct || 0) + "%", synced: "Up to date", pairing: "Needs pairing", error: "Problem", stalled: "Paused, retrying", waiting: s.step ? s.step + "…" : "Starting" };
+  const state = { syncing: ["Syncing " + (s.sync_pct || 0) + "%", timeLeft(s)].filter(Boolean).join(" · "), synced: "Up to date", pairing: "Needs pairing", error: "Problem", stalled: "Paused, retrying", waiting: s.step ? s.step + "…" : "Starting" };
   $("sync-state").textContent = s.link === "connected" ? state[s.sync] || s.sync : s.link === "connecting" ? "Connecting" : "Not connected";
   $("last-sync").textContent = s.last_sync ? ago(s.last_sync) : "Never";
   $("battery").textContent = s.battery == null ? "--" : s.battery + "%"; meter("battery-meter", s.battery, s.battery != null && s.battery < 20);
@@ -671,6 +687,27 @@ function renderLogs() {
   lines("sync-log", syncs.length ? syncs : [null], x => x ? ago(x.started) + " · sync " + (outcome[x.outcome] || x.outcome) + " · " + (x.ok || 0).toLocaleString() + " readings" : "No syncs yet.");
   lines("link-log", P.store.get("link_log", []).slice(-10).reverse(), x => clock(x.at) + " · " + x.msg);
 }
+/* ---- sync between devices ---- */
+function renderCloud(c) {
+  const on = !!c.repo; $("cloud-off").hidden = on; $("cloud-on").hidden = !on;
+  $("cloud-state").textContent = !on ? "Off" : c.state === "syncing" ? (c.total ? c.note + " " + Math.min(c.done + 1, c.total) + " of " + c.total : "Checking") : c.state === "error" ? "Problem" : "Up to date";
+  $("data-where").textContent = on ? "This device and your repository" : "On this device only";
+  if (!on) return;
+  $("cloud-name").textContent = c.repo; $("cloud-at").textContent = c.at ? ago(c.at) : "Not yet";
+  $("cloud-note").textContent = c.state === "error" ? c.note + ". Pulse will try again; your data on this device is safe." : "History is merged across your devices automatically.";
+  $("cloud-note").classList.toggle("warn", c.state === "error");
+}
+$("cloud-link").onclick = async () => {
+  const button = $("cloud-link"); button.disabled = true; button.textContent = "Connecting…";
+  try { await ready; await P.cloud.link($("cloud-repo").value, $("cloud-key").value); $("cloud-key").value = ""; toast("Sync is on"); }
+  catch (e) { toast(e.message || String(e)); }
+  button.disabled = false; button.textContent = "Turn on"; refresh();
+};
+$("cloud-sync").onclick = async () => { await ready; P.cloud.sync(true); toast("Syncing"); refresh(); };
+$("cloud-unlink").onclick = async () => {
+  if (!confirm("Turn off sync on this device? Your history stays here and in your repository.")) return;
+  await ready; await P.cloud.unlink(); $("cloud-note").textContent = "Keeps the same history on every device through a private GitHub repository you own. The key stays on this device."; $("cloud-note").classList.remove("warn"); refresh();
+};
 async function connect() {
   try { await ready; $("connect-state").textContent = "Connecting…"; await P.connect(DEMO); toast("Connected"); refresh(); }
   catch (e) { $("connect-state").textContent = "Not connected"; toast(/cancel/i.test(String(e.message || e)) ? "Cancelled" : String(e.message || e).slice(0, 60)); }
@@ -717,7 +754,7 @@ async function refresh() {
   if (busy) return; busy = true;
   try {
     await ready; const s = await P.now();
-    renderToday(s); renderSettings(s);
+    buildCards(); renderToday(s); renderSettings(s); renderCloud(s.cloud);
     $("connect-card").hidden = s.link === "connected" || s.link === "connecting";
     const key = s.night ? s.night.day + s.night.asleep : null;
     if (key !== lastNight) { lastNight = key; if (view === "sleep") loadNights(); if (view === "trends") loadReview(); }
@@ -726,7 +763,7 @@ async function refresh() {
 window.addEventListener("hashchange", () => show(location.hash.slice(1)));
 setInterval(() => { if (!document.hidden) refresh(); }, 2000);
 setInterval(() => { if (!document.hidden && view === "today") loadHeartRate(); }, 5000);
-document.addEventListener("visibilitychange", () => { if (!document.hidden) ready.then(() => P.wake()).then(refresh).catch(() => {}); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) ready.then(() => { P.cloud.sync(); return P.wake(); }).then(refresh).catch(() => {}); });
 window.addEventListener("pageshow", () => ready.then(() => P.wake()).catch(() => {}));
 
 if (!navigator.bluetooth && !DEMO) $("connect-note").textContent = "This browser can't use Bluetooth. Open Pulse in a browser that supports Web Bluetooth, such as Bluefy on iPhone.";
