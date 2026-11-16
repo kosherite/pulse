@@ -1,7 +1,8 @@
 /* Pulse engine.
  *
  * Talks to a WHOOP 5.0 strap over Web Bluetooth, keeps per-minute history in IndexedDB, and computes
- * sleep, recovery, strain, workouts and reviews on the device. Nothing leaves the browser.
+ * sleep, recovery, strain, workouts and reviews on the device. Data leaves the browser only when the
+ * user turns on sync to a private repository of their own.
  * Licensed under the PolyForm Noncommercial License 1.0.0; see LICENSE, NOTICE and ATTRIBUTION.md on the main branch.
  */
 (function (root) {

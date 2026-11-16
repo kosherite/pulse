@@ -1,8 +1,7 @@
 # Pulse
 
 A private web app for the WHOOP 5.0 strap. It connects over Web Bluetooth, keeps your history on your
-own devices, and works out sleep, recovery, strain, workouts and heart rate recovery locally. Nothing is
-uploaded.
+own devices, and works out sleep, recovery, strain, workouts and heart rate recovery locally. Nothing is uploaded unless you turn on sync to your own repository.
 
 - `index.html`: the app (interface and styles)
 - `engine.js`: strap protocol, storage and analysis
